@@ -65,6 +65,16 @@ Recommends potential connections to users based on school, company, location, an
 ### Key Functionality
 - View recommended profiles
 
+## 5. Chat
+
+<img src="ux-design/chat.png" height="500">
+
+### Purpose
+Allows users to message one another
+
+### Key Functionality
+- Chat with other interns
+
 ## Prototype:
 
 Link to prototype: [InternBuddy](https://www.figma.com/design/70c3FtpyYMZmXRAELl1Gj0/internbuddy?node-id=0-70&t=O0R0NT4ET6CvezY6-0)
