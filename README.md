@@ -5,8 +5,8 @@ InternBuddy - Helping interns find community faster
 - [Sean Tang](https://github.com/plant445)
 - [Grace He](https://github.com/gracehe04)
 - [Angelina Wu](https://github.com/tangelinawu)
-- [Alissa Wu] (https://github.com/alissawu)
-- [Charlie Li] (https://github.com\CharlieLi111)
+- [Alissa Wu](https://github.com/alissawu)
+- [Charlie Li](https://github.com\CharlieLi111)
 
 # What and Why?
 
