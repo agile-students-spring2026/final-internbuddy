@@ -1,7 +1,5 @@
 # Guide to Contributing
 
-Delete the contents of this file and replace with the contents of a proper guide to contributing to this project, as described in the [instructions](./instructions-0c-project-setup#contributingmd)
-
 #### Team Value
 We respect each other's time. If a team member says that they will complete a task by a certain day, it is important that it gets done that day. If the team member is unable to complete the task, they must voice this concern before the deadline.
 
