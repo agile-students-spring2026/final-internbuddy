@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './LoginPage.css'
 
 function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   return (
@@ -11,11 +11,12 @@ function LoginPage() {
       <p>find your people</p>
 
       <input
+        className="login-input"
         type="text"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
+        placeholder="Username"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+    />
       <input
         type="password"
         placeholder="Password"
@@ -23,7 +24,7 @@ function LoginPage() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button>Log In</button>
+      <button>Sign Up / Log In</button>
       <p>Forgot password?</p>
     </div>
   )
