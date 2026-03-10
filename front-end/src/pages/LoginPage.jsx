@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './LoginPage.css'
+import { Link } from 'react-router-dom'
 
 function LoginPage() {
     // track what the user types in
@@ -29,7 +30,7 @@ function LoginPage() {
 
             <button className="login-button">Sign Up / Log In</button>
             {/* links at the bottom */}
-            <p className="login-link">Forgot password?</p>
+            <Link to="/forgot-password" className="login-link">Forgot password?</Link>
         </div>
     </div>
   )
