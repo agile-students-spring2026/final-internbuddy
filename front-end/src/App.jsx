@@ -4,7 +4,7 @@ import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import './App.css'
 
 // removed the default vite template stuff
-// TODO: show login page if not logged in, events page if logged in
+// TODO: show login page if not logged in, events page if logged in. rn just shows login page.
 function App() {
   return (
     <Router>
