@@ -1,3 +1,4 @@
+/* center the card on the page */
 .login-container {
   min-height: 100vh;
   background-color: #EEF0FF;
@@ -6,6 +7,7 @@
   justify-content: center;
 }
 
+/* the white card in the middle */
 .login-card {
   background: white;
   border-radius: 24px;
@@ -26,15 +28,16 @@
 
 .login-subtitle {
   font-size: 14px;
-  color: #6366f1;
+  color: #3235b7;
   margin-bottom: 32px;
 }
 
+/* username and password fields. */
 .login-input {
   width: 100%;
   padding: 12px 16px;
   border: 1.5px solid #e0e0f0;
-  border-radius: 12px;
+  border-radius: 12px; //ROUNDED!! DON'T REMOVE IT. RECT LOOKS BAD
   font-size: 14px;
   color: #1e1b4b;
   margin-bottom: 12px;
@@ -45,6 +48,7 @@
   border-color: #4F46E5;
 }
 
+/* signup / login */
 .login-button {
   width: 100%;
   background-color: #4F46E5;

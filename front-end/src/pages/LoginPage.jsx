@@ -2,30 +2,35 @@ import { useState } from 'react'
 import './LoginPage.css'
 
 function LoginPage() {
+    // track what the user types in
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
   return (
     <div className="login-container">
-      <h1>InternBuddy</h1>
-      <p>find your people</p>
+        <div className="login-card">
+            <h1 className="login-title">InternBuddy</h1>
+            <p className="login-subtitle">find your people</p>
 
-      <input
-        className="login-input"
-        type="text"
-        placeholder="Username"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-    />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+            <input
+            className="login-input"
+            type="text"
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            />
+            <input
+            className="login-input"
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            />
 
-      <button>Sign Up / Log In</button>
-      <p>Forgot password?</p>
+            <button className="login-button">Sign Up / Log In</button>
+            {/* links at the bottom */}
+            <p className="login-link">Forgot password?</p>
+        </div>
     </div>
   )
 }
