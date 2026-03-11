@@ -1,0 +1,57 @@
+/* full page layout */
+.events-page {
+  min-height: 100vh;
+  background-color: #EEF0FF;
+  display: flex;
+  flex-direction: column;
+  max-width: 390px;
+  margin: 0 auto;
+  padding-bottom: 60px; /* space for bottom nav */
+}
+
+/* your events / create events buttons up top */
+.events-top-bar {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 16px 0;
+}
+
+.events-top-btn {
+  background: white;
+  border: 1px solid #e0e0f0;
+  border-radius: 12px;
+  padding: 6px 14px;
+  font-size: 13px;
+  color: #1e1b4b;
+  cursor: pointer;
+}
+
+/* big title in the middle */
+.events-header {
+  text-align: center;
+  padding: 24px 16px 16px;
+}
+
+.events-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.events-subtitle {
+  font-size: 32px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+/* the scrollable events list */
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0 16px;
+}
+
