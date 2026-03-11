@@ -33,19 +33,15 @@
   padding: 24px 16px 16px;
 }
 
-.events-title {
-  font-size: 36px;
+.events-title,
+.events-subtitle {
   font-weight: 700;
   color: #1e1b4b;
   margin: 0;
 }
 
-.events-subtitle {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1e1b4b;
-  margin: 0;
-}
+.events-title { font-size: 36px; }
+.events-subtitle { font-size: 32px; }
 
 /* the scrollable events list */
 .events-list {
@@ -54,4 +50,3 @@
   gap: 16px;
   padding: 0 16px;
 }
-
