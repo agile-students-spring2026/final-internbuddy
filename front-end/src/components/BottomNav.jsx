@@ -11,5 +11,4 @@ function BottomNav() {
     </div>
   )
 }
-
 export default BottomNav
