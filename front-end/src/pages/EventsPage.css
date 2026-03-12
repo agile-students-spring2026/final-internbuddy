@@ -51,7 +51,7 @@
   padding: 0 16px;
 }
 
-/* bottom nav */
+/* bottom nav - FOR NOW. TODO TO MAKE THIS INTO A COMPONENT */
 .events-bottom-nav {
   position: fixed;
   bottom: 0;
