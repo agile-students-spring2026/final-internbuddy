@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { faker } from '@faker-js/faker'
 import './EventsPage.css'
 import EventCard from '../components/EventCard'
-import BottomNav from '../components/BottomNav'
 
 function EventsPage() {
   // will come from backend later
@@ -42,7 +41,12 @@ function EventsPage() {
         ))}
       </div>
 
-      <BottomNav />
+      {/* bottom nav - TODO: pull into BottomNav component */}
+      <div className="events-bottom-nav">
+        <button className="nav-btn">Home</button>
+        <button className="nav-btn">Search</button>
+        <button className="nav-btn">Profile</button>
+      </div>
 
     </div>
   )
