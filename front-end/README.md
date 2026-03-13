@@ -1,3 +1,14 @@
+
+# How to Run - FrontEnd Sprint 1
+1. cd front-end
+2. npm install (all dependencies)
+3. npm run dev
+4. Open local Vite Url shown below in terminal.
+     Local:   http://localhost:5173/
+
+You should be able to see a login page.
+
+# Set up information if you have never used Vite or React.
 # React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
