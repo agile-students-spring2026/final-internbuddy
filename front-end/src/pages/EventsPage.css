@@ -50,25 +50,3 @@
   gap: 16px;
   padding: 0 16px;
 }
-
-/* bottom nav - FOR NOW. TODO TO MAKE THIS INTO A COMPONENT */
-.events-bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 390px;
-  background: #cccccc;
-  display: flex;
-  justify-content: space-around;
-  padding: 12px 0;
-}
-
-.nav-btn {
-  background: none;
-  border: none;
-  font-size: 14px;
-  color: #1e1b4b;
-  cursor: pointer;
-}

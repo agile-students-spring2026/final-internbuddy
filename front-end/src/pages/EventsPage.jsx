@@ -41,13 +41,6 @@ function EventsPage() {
         ))}
       </div>
 
-      {/* bottom nav - TODO: pull into BottomNav component */}
-      <div className="events-bottom-nav">
-        <button className="nav-btn">Home</button>
-        <button className="nav-btn">Search</button>
-        <button className="nav-btn">Profile</button>
-      </div>
-
     </div>
   )
 }

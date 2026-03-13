@@ -1,0 +1,25 @@
+.global-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 390px;
+  background: #cccccc;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  z-index: 50;
+}
+
+.global-nav-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #1e1b4b;
+  cursor: pointer;
+}
+
+.global-nav-btn.active {
+  font-weight: 700;
+}
