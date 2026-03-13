@@ -1,0 +1,84 @@
+.your-events-page {
+  min-height: 100vh;
+  background-color: #EEF0FF;
+  max-width: 390px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.ye-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 16px 8px;
+}
+
+.ye-back-btn {
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #6366f1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ye-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.ye-section {
+  padding: 12px 16px;
+}
+
+.ye-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 10px;
+}
+
+.ye-bubbles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ye-bubble {
+  background: white;
+  border-radius: 14px;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border: 1px solid #e0e0f0;
+  min-width: 130px;
+}
+
+.ye-bubble--private {
+  border-color: #a5b4fc;
+  background: #f5f3ff;
+}
+
+.ye-bubble--suggested {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+}
+
+.ye-bubble-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e1b4b;
+}
+
+.ye-bubble-date {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.ye-bubble-host {
+  font-size: 11px;
+  color: #6366f1;
+}

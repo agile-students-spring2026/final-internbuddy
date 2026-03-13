@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { faker } from '@faker-js/faker'
 import './EventsPage.css'
 import EventCard from '../components/EventCard'
 
 function EventsPage() {
+  const navigate = useNavigate()
   // will come from backend later
   const [events, setEvents] = useState([])
 
@@ -24,8 +26,8 @@ function EventsPage() {
 
       {/* top action buttons */}
       <div className="events-top-bar">
-        <button className="events-top-btn">your events</button>
-        <button className="events-top-btn">create events</button>
+        <button className="events-top-btn" onClick={() => navigate('/your-events')}>your events</button>
+        <button className="events-top-btn" onClick={() => navigate('/create-events')}>create events</button>
       </div>
 
       {/* page title */}
