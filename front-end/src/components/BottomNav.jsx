@@ -26,6 +26,12 @@ function BottomNav() {
         Search
       </button>
       <button
+        className="global-nav-btn"
+        onClick={() => navigate('/messages')}
+      >
+        Messages
+      </button>
+      <button
         className={`global-nav-btn ${currentTab === 'profile' ? 'active' : ''}`}
         onClick={() => navigate('/profile')}
       >
