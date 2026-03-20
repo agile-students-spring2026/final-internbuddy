@@ -36,22 +36,3 @@
   color: #1e1b4b;
   cursor: pointer;
 }
-
-.event-join-btn:hover {
-  background: #c0c0c0;
-}
-
-.event-join-btn.joined {
-  background: #6366f1;
-  color: white;
-}
-
-.event-join-btn.joined:hover {
-  background: #4f46e5;
-}
-
-.event-location {
-  font-size: 13px;
-  color: #6366f1;
-  margin: 0 0 2px;
-}
