@@ -7,6 +7,8 @@ import ProfilePage from './pages/ProfilePage'
 import YourEventsPage from './pages/YourEventsPage'
 import CreateEventsPage from './pages/CreateEventsPage'
 import BottomNav from './components/BottomNav'
+import MessagesPage from './pages/MessagesPage'
+import DirectMessagePage from './pages/DirectMessagePage'
 import './App.css'
 
 function App() {
@@ -20,6 +22,8 @@ function App() {
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/your-events" element={<YourEventsPage />} />
           <Route path="/create-events" element={<CreateEventsPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/message/:id" element={<DirectMessagePage />} />
         </Routes>
         <BottomNav />
       </Router>
