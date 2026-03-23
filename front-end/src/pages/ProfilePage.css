@@ -29,6 +29,29 @@
   gap: 16px;
 }
 
+.profile-top-bar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.settings-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--profile-border);
+  background: var(--profile-surface);
+  color: var(--profile-ink);
+  box-shadow: var(--profile-shadow);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.settings-icon-btn:hover {
+  background: var(--profile-accent-soft);
+}
+
 .hero-card,
 .card,
 .request-card,

@@ -3,8 +3,10 @@
   min-height: 100vh;
   background-color: #EEF0FF;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 24px 16px;
 }
 
 /* the white card in the middle */
@@ -13,7 +15,7 @@
   border-radius: 24px;
   padding: 40px 32px;
   width: 100%;
-  max-width: 360px;
+  margin: auto 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -49,6 +51,14 @@
 }
 
 /* signup / login */
+.login-actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+}
+
 .login-button {
   width: 100%;
   background-color: #4F46E5;
@@ -58,8 +68,28 @@
   padding: 12px;
   font-size: 15px;
   font-weight: 600;
-  margin-top: 8px;
   cursor: pointer;
+}
+
+.signup-button {
+  width: 100%;
+  background-color: #ffffff;
+  color: #4F46E5;
+  border: 1.5px solid #4F46E5;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.login-fine-print {
+  width: 100%;
+  margin: 12px 0 0;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #5b5f8a;
+  text-align: left;
 }
 
 .login-link {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./ProfilePage.css";
 
 const defaultProfile = {
@@ -26,6 +27,7 @@ const ALL_INTERESTS = [
 ];
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(defaultProfile);
   const [editMode, setEditMode] = useState(false);
   const [draft, setDraft] = useState(defaultProfile);
@@ -71,6 +73,12 @@ export default function ProfilePage() {
 
   return (
     <div className="app-shell">
+      <div className="profile-top-bar">
+        <button className="settings-icon-btn" onClick={() => navigate("/settings")} aria-label="Open settings">
+          ⚙
+        </button>
+      </div>
+
       {/* ── EDIT MODAL ── */}
       {editMode && (
         <div className="modal-overlay">
