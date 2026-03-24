@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { faker } from '@faker-js/faker'
+import SwipePage from '../SwipePage'
 import './searchPage.css'
 
 const COMPANIES = ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft', 'Figma', 'Stripe', 'Notion', 'Airbnb', 'Spotify']
@@ -69,6 +70,7 @@ function PersonCard({ person, onConnect }) {
 
 export default function SearchPage() {
   const [people, setPeople] = useState([])
+  const [swipeMode, setSwipeMode] = useState(false)
   const [query, setQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
   const [sortBy, setSortBy] = useState('degree') // 'degree' | 'name' | 'mutual'
@@ -136,8 +138,31 @@ export default function SearchPage() {
     setPeople(prev => prev.map(p => p.id === id ? { ...p, connected: true } : p))
   }
 
+  if (swipeMode) {
+    return (
+      <div className="sp-swipe-shell">
+        <button
+          className="sp-mode-toggle sp-mode-toggle--on"
+          onClick={() => setSwipeMode(false)}
+        >
+          Swipe Mode: On
+        </button>
+        <SwipePage />
+      </div>
+    )
+  }
+
   return (
     <div className="sp-page">
+      <div className="sp-mode-row">
+        <button
+          className="sp-mode-toggle"
+          onClick={() => setSwipeMode(true)}
+        >
+          Swipe Mode: Off
+        </button>
+      </div>
+
       {/* Search bar */}
       <div className="sp-search-row">
         <input
