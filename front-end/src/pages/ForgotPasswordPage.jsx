@@ -6,6 +6,11 @@ function ForgotPasswordPage() {
   // track form fields
   const [usernameOrEmail, setUsernameOrEmail] = useState('')
   const [newPassword, setNewPassword] = useState('')
+  const [confirmationMessage, setConfirmationMessage] = useState('')
+
+  const handleConfirmPassword = () => {
+    setConfirmationMessage('Confirmation code sent to your email. Please check your inbox.')
+  }
 
   return (
     <div className="forgot-container">
@@ -29,7 +34,11 @@ function ForgotPasswordPage() {
           onChange={(e) => setNewPassword(e.target.value)}
         />
 
-        <button className="forgot-button">Confirm Password</button>
+        <button className="forgot-button" onClick={handleConfirmPassword}>Confirm Password</button>
+
+        {confirmationMessage && (
+          <p className="forgot-confirmation-message">{confirmationMessage}</p>
+        )}
 
         {/* back to login. imo we shld have this in case someone clicks by accident */}
         <Link to="/" className="forgot-link">Back to login</Link>

@@ -1,0 +1,150 @@
+export const settingsItems = [
+  {
+    key: 'account-center',
+    label: 'Account Center',
+    route: '/account-center',
+  },
+  {
+    key: 'saved',
+    label: 'Saved',
+    route: '/settings/saved',
+    preview: 'You have 12 saved posts and 4 saved events.',
+    details: [
+      'Saved Posts: 12',
+      'Saved Events: 4',
+      'Last saved item: Startup Networking Mixer - Mar 20',
+    ],
+  },
+  {
+    key: 'archived',
+    label: 'Archived',
+    route: '/settings/archived',
+    preview: 'Your archived stories are stored privately.',
+    details: [
+      'Stories Archive: Enabled',
+      'Archived Stories: 18',
+      'Posts Archive: 2 hidden posts',
+    ],
+  },
+  {
+    key: 'notifications',
+    label: 'Notifications',
+    route: '/settings/notifications',
+    preview: 'Push notifications are on for messages and events.',
+    details: [
+      'Direct Messages: On',
+      'Event Invites: On',
+      'Marketing Notifications: Off',
+    ],
+  },
+  {
+    key: 'account-privacy',
+    label: 'Account Privacy',
+    route: '/settings/account-privacy',
+    preview: 'Your account is public and message filters are active.',
+    details: [
+      'Account visibility: Public',
+      'Activity status: Visible to followers',
+      'Message request filter: Strict',
+    ],
+  },
+  {
+    key: 'close-friends',
+    label: 'Close Friends',
+    route: '/settings/close-friends',
+    preview: 'You have 9 people in your close friends list.',
+    details: [
+      'Close Friends count: 9',
+      'Last added: Jordan P.',
+      'Story sharing default: Close Friends only',
+    ],
+  },
+  {
+    key: 'blocked-comments',
+    label: 'Blocked Comments',
+    route: '/settings/blocked-comments',
+    preview: 'Comment filter is hiding offensive and spam words.',
+    details: [
+      'Automatic filter: Enabled',
+      'Custom blocked words: 14 terms',
+      'Review queue: 3 comments pending review',
+    ],
+  },
+  {
+    key: 'restricted',
+    label: 'Restricted',
+    route: '/settings/restricted',
+    preview: 'Restricted users can still follow but have limited interactions.',
+    details: [
+      'Restricted Accounts: 2',
+      'Comment visibility for restricted users: Hidden from others',
+      'Message handling: Moves to requests',
+    ],
+  },
+  {
+    key: 'follow-and-invite-friends',
+    label: 'Follow and Invite Friends',
+    route: '/settings/follow-and-invite-friends',
+    preview: 'Contact syncing is enabled for friend suggestions.',
+    details: [
+      'Synced contacts: 76',
+      'Invite method: SMS and share link',
+      'Pending invites: 5',
+    ],
+  },
+  {
+    key: 'favorites',
+    label: 'Favorites',
+    route: '/settings/favorites',
+    preview: 'Favorites are prioritized in your feed and stories.',
+    details: [
+      'Favorite accounts: 7',
+      'Feed priority: Enabled',
+      'Story notifications for favorites: On',
+    ],
+  },
+  {
+    key: 'help',
+    label: 'Help',
+    route: '/settings/help',
+    preview: 'Find support articles and contact options here.',
+    details: [
+      'Help Center articles viewed this month: 6',
+      'Live chat support hours: 9:00 AM - 6:00 PM EST',
+      'Open support ticket: #IB-2398 (response in 24 hours)',
+    ],
+  },
+  {
+    key: 'privacy-center',
+    label: 'Privacy Center',
+    route: '/settings/privacy-center',
+    preview: 'Control data usage, visibility, and ad preferences.',
+    details: [
+      'Personalized ads: Limited',
+      'Data download request: Not requested',
+      'Data retention preference: Standard policy',
+    ],
+  },
+  {
+    key: 'account-status',
+    label: 'Account Status',
+    route: '/settings/account-status',
+    preview: 'Your account is in good standing with no restrictions.',
+    details: [
+      'Standing: Good',
+      'Policy strikes: 0',
+      'Recent security review: Passed on Mar 18, 2026',
+    ],
+  },
+  {
+    key: 'about',
+    label: 'About',
+    route: '/settings/about',
+    preview: 'App version, legal links, and team information.',
+    details: [
+      'App version: InternBuddy 1.4.2',
+      'Build number: 2026.03.23.108',
+      'Made by: InternBuddy Product Team, New York',
+    ],
+  },
+]

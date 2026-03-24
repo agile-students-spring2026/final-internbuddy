@@ -13,6 +13,10 @@ function LoginPage() {
     navigate('/events')
   }
 
+  const handleSignUp = () => {
+    navigate('/create-account/email')
+  }
+
   return (
     <div className="login-container">
         <div className="login-card">
@@ -34,7 +38,14 @@ function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             />
 
-            <button className="login-button" onClick={handleLogin}>Sign Up / Log In</button>
+            <div className="login-actions">
+              <button className="login-button" onClick={handleLogin}>Log In</button>
+              <button className="signup-button" onClick={handleSignUp}>Create an Account</button>
+            </div>
+
+            <p className="login-fine-print">
+              By tapping Sign In or Create Account, you agree to our Terms of Service. Learn how we process your data in our Privacy Policy and Cookies Policy.
+            </p>
             {/* links at the bottom */}
             <Link to="/forgot-password" className="login-link">Forgot password?</Link>
         </div>

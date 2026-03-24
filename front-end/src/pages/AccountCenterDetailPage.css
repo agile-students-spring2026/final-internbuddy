@@ -1,0 +1,82 @@
+.account-center-detail-page {
+  min-height: 100vh;
+  background-color: #EEF0FF;
+  display: flex;
+  flex-direction: column;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 20px 16px 84px;
+}
+
+.account-center-detail-header-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.account-center-detail-title {
+  margin: 0;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+.account-center-detail-back-btn {
+  border: 1px solid #e0e0f0;
+  background: #ffffff;
+  color: #1e1b4b;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-center-detail-header-spacer {
+  width: 44px;
+}
+
+.account-center-detail-card {
+  border: 1px solid #e0e0f0;
+  border-radius: 16px;
+  background: #ffffff;
+  color: #1e1b4b;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.08);
+}
+
+.account-center-detail-card-title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.account-center-detail-card-text {
+  margin: 0 0 14px;
+  color: #5b5f8a;
+  font-size: 13px;
+}
+
+.account-center-detail-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #1e1b4b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.account-center-detail-list li + li {
+  margin-top: 8px;
+}
+
+@media (max-width: 420px) {
+  .account-center-detail-page {
+    padding: 16px 12px 84px;
+  }
+
+  .account-center-detail-title {
+    font-size: 22px;
+  }
+}
