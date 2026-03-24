@@ -1,0 +1,572 @@
+.swipe-page {
+  min-height: 100vh;
+  background: #EEF0FF;
+  display: flex;
+  flex-direction: column;
+  max-width: 390px;
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+}
+
+.swipe-card-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
+/* ── Swipe Card Container with animation ──────────────────────── */
+.swipe-card-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+  transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.swipe-card-container.swipe-left {
+  animation: swipeLeft 0.5s ease-in forwards;
+}
+
+.swipe-card-container.swipe-right {
+  animation: swipeRight 0.5s ease-in forwards;
+}
+
+@keyframes swipeLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%) rotateZ(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes swipeRight {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%) rotateZ(15deg);
+    opacity: 0;
+  }
+}
+
+/* ── Swipe Card (Image) ──────────────────────────────────────── */
+.swipe-card {
+  flex: 0 0 280px;
+  position: relative;
+  width: 100%;
+  border-radius: 0 0 20px 20px;
+  overflow: hidden;
+  box-shadow: 0 12px 32px rgba(79, 70, 229, 0.15);
+}
+
+.swipe-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Info Section (Scrollable) ──────────────────────────────── */
+.swipe-info-section {
+  flex: 1;
+  overflow-y: auto;
+  background: #ffffff;
+  padding: 20px 16px 90px 16px;
+}
+
+.swipe-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.swipe-age {
+  font-size: 20px;
+  font-weight: 600;
+  color: #4F46E5;
+}
+
+.swipe-major,
+.swipe-internship,
+.swipe-location {
+  font-size: 13px;
+  color: #5b5f8a;
+  margin: 0 0 2px;
+  font-weight: 500;
+}
+
+.swipe-internship {
+  font-weight: 600;
+  color: #4F46E5;
+}
+
+.swipe-about {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1e1b4b;
+  margin: 14px 0;
+}
+
+/* ── Detail rows ────────────────────────────────────────────── */
+.swipe-details {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 12px 0;
+  border-top: 1px solid #e0e0f0;
+  border-bottom: 1px solid #e0e0f0;
+}
+
+.swipe-detail-row {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.swipe-detail-label {
+  font-weight: 600;
+  color: #5b5f8a;
+  min-width: 70px;
+}
+
+.swipe-detail-value {
+  color: #1e1b4b;
+  flex: 1;
+}
+
+/* ── Interests ──────────────────────────────────────────────── */
+.swipe-interests {
+  margin-top: 16px;
+}
+
+.swipe-interests-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #5b5f8a;
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.swipe-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swipe-chip {
+  background: #f3e8ff;
+  border: 1px solid #e9ddff;
+  color: #4F46E5;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* ── Notification ───────────────────────────────────────────── */
+.swipe-notification {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 320px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  z-index: 100;
+  animation: slideDown 0.4s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.swipe-notification-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #86efac;
+}
+
+.swipe-notification-info {
+  background: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #a5b4fc;
+}
+
+/* ── Action Buttons (Fixed Bottom) ──────────────────────────── */
+.swipe-actions {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 390px;
+  width: 100%;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  padding: 12px 16px;
+  background: linear-gradient(to top, #ffffff 60%, transparent);
+  pointer-events: none;
+  z-index: 50;
+}
+
+.swipe-actions > button {
+  pointer-events: all;
+}
+
+.swipe-reject-btn,
+.swipe-accept-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  font-size: 24px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.swipe-reject-btn:active,
+.swipe-accept-btn:active {
+  transform: scale(0.92);
+}
+
+.swipe-reject-btn:hover,
+.swipe-accept-btn:hover {
+  transform: scale(1.08);
+}
+
+.swipe-reject-btn {
+  background: #ffffff;
+  color: #ef4444;
+  border: 2px solid #fecaca;
+}
+
+.swipe-reject-btn:hover {
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.2);
+}
+
+.swipe-accept-btn {
+  background: #10b981;
+  color: #ffffff;
+}
+
+/* ── Top Bar with Heart Button ──────────────────────────────── */
+.swipe-top-bar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+}
+
+.swipe-heart-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 2px solid #ddd6fe;
+  border-radius: 24px;
+  padding: 8px 14px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
+
+.swipe-heart-btn:hover {
+  background: #f8f5ff;
+  border-color: #c4b5fd;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.swipe-heart-btn:active {
+  transform: scale(0.95);
+}
+
+.swipe-heart-badge {
+  background: #4F46E5;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ── Requests Modal Overlay ────────────────────────────────── */
+.swipe-requests-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    background: rgba(0, 0, 0, 0);
+  }
+  to {
+    background: rgba(0, 0, 0, 0.4);
+  }
+}
+
+.swipe-requests-modal {
+  background: #ffffff;
+  width: 100%;
+  max-width: 390px;
+  border-radius: 20px 20px 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ── Modal Header ────────────────────────────────────────── */
+.swipe-requests-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 16px;
+  border-bottom: 1px solid #f3f0ff;
+}
+
+.swipe-requests-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 0;
+}
+
+.swipe-requests-close {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s;
+}
+
+.swipe-requests-close:hover {
+  color: #1e1b4b;
+}
+
+/* ── Tabs ────────────────────────────────────────────────── */
+.swipe-requests-tabs {
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  border-bottom: 1px solid #f3f0ff;
+  background: #fafaf9;
+}
+
+.swipe-requests-tab {
+  background: transparent;
+  border: none;
+  padding: 14px 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+}
+
+.swipe-requests-tab.active {
+  color: #4F46E5;
+  font-weight: 600;
+}
+
+.swipe-requests-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #4F46E5;
+}
+
+/* ── Requests List ────────────────────────────────────────– */
+.swipe-requests-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px 8px;
+}
+
+.swipe-requests-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+  padding: 40px 20px;
+  margin: 0;
+}
+
+/* ── Received Request Item ──────────────────────────────── */
+.swipe-request-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  margin: 8px;
+  background: #f8f5ff;
+  border-radius: 12px;
+  border: 1px solid #e9d5ff;
+}
+
+.swipe-request-image {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.swipe-request-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.swipe-request-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e1b4b;
+  margin: 0 0 2px 0;
+}
+
+.swipe-request-info p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.swipe-request-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.swipe-request-accept,
+.swipe-request-reject {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.swipe-request-accept {
+  background: #d1fae5;
+  color: #10b981;
+}
+
+.swipe-request-accept:hover {
+  background: #a7f3d0;
+}
+
+.swipe-request-accept:active {
+  transform: scale(0.92);
+}
+
+.swipe-request-reject {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+.swipe-request-reject:hover {
+  background: #fecaca;
+}
+
+.swipe-request-reject:active {
+  transform: scale(0.92);
+}
+
+/* ── Sent Request Item ──────────────────────────────────── */
+.swipe-sent-request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  margin: 8px;
+  background: #f0f9ff;
+  border-radius: 12px;
+  border: 1px solid #e0f2fe;
+}
+
+.swipe-sent-request-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.swipe-sent-request-info h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e1b4b;
+  margin: 0 0 2px 0;
+}
+
+.swipe-sent-request-info p {
+  font-size: 12px;
+  color: #9ca3af;
+  margin: 0;
+}
+
+.swipe-sent-request-badge {
+  font-size: 18px;
+  flex-shrink: 0;
+}
