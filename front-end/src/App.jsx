@@ -28,6 +28,7 @@ import YourEventsPage from './pages/YourEventsPage'
 import CreateEventsPage from './pages/CreateEventsPage'
 import BottomNav from './components/BottomNav'
 import MessagesPage from './pages/MessagesPage'
+import SwipePage from './pages/SwipePage'
 import DirectMessagePage from './pages/DirectMessagePage'
 import './App.css'
 
@@ -63,6 +64,7 @@ function App() {
           <Route path="/your-events" element={<YourEventsPage />} />
           <Route path="/create-events" element={<CreateEventsPage />} />
           <Route path="/messages" element={<MessagesPage />} />
+          <Route path="/swipe" element={<SwipePage />} />
           <Route path="/message/:id" element={<DirectMessagePage />} />
         </Routes>
         <BottomNav />
