@@ -30,6 +30,7 @@ import BottomNav from './components/BottomNav'
 import MessagesPage from './pages/MessagesPage'
 import SwipePage from './pages/SwipePage'
 import DirectMessagePage from './pages/DirectMessagePage'
+import SearchPage from './pages/searchPage/searchPage'
 import './App.css'
 
 function App() {
@@ -66,6 +67,7 @@ function App() {
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/swipe" element={<SwipePage />} />
           <Route path="/message/:id" element={<DirectMessagePage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
         <BottomNav />
       </Router>
