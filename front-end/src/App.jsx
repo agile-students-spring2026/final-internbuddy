@@ -29,6 +29,7 @@ import CreateEventsPage from './pages/CreateEventsPage'
 import BottomNav from './components/BottomNav'
 import MessagesPage from './pages/MessagesPage'
 import DirectMessagePage from './pages/DirectMessagePage'
+import SearchPage from './pages/searchPage/searchPage'
 import './App.css'
 
 function App() {
@@ -64,6 +65,7 @@ function App() {
           <Route path="/create-events" element={<CreateEventsPage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/message/:id" element={<DirectMessagePage />} />
+          <Route path="/search" element={<SearchPage />} />
         </Routes>
         <BottomNav />
       </Router>

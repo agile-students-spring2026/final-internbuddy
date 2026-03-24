@@ -21,7 +21,7 @@ function BottomNav() {
       </button>
       <button
         className="global-nav-btn"
-        onClick={() => navigate('/events')}
+        onClick={() => navigate('/search')}
       >
         Search
       </button>
