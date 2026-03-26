@@ -137,14 +137,30 @@ export const settingsItems = [
     ],
   },
   {
-    key: 'about',
-    label: 'About',
-    route: '/settings/about',
-    preview: 'App version, legal links, and team information.',
-    details: [
-      'App version: InternBuddy 1.4.2',
-      'Build number: 2026.03.23.108',
-      'Made by: InternBuddy Product Team, New York',
-    ],
-  },
+  key: 'about',
+  label: 'About',
+  route: '/settings/about',
+  preview: 'App version, legal links, and team information.',
+  details: [
+    'InternBuddy is a comprehensive, student-centered productivity and career development platform designed to streamline the internship experience from start to finish. The platform acts as a centralized hub where students can manage applications, track progress, organize deadlines, and reflect on their professional growth throughout the internship journey.',
+
+    'At its core, InternBuddy aims to solve the fragmentation problem that many students face when juggling multiple tools for resumes, job tracking, networking, and communication. By consolidating these workflows into a single intuitive interface, InternBuddy reduces cognitive overload and allows users to focus on what truly matters: building skills and securing meaningful opportunities.',
+
+    'The application provides features such as application tracking dashboards, task management systems, calendar integrations, and real-time progress monitoring. These tools empower users to maintain visibility over their internship pipeline, ensuring that no deadlines are missed and no opportunities are overlooked.',
+
+    'InternBuddy also emphasizes personal development and reflection. Users can log experiences, document key learnings, and track milestones throughout their internships. This functionality helps transform short-term work experiences into long-term career insights, enabling users to articulate their growth more effectively in future interviews and networking scenarios.',
+
+    'In addition to individual productivity tools, InternBuddy fosters collaboration and communication. The platform supports shared workspaces, feedback systems, and mentor interaction features, allowing interns to engage more deeply with peers, supervisors, and career advisors.',
+
+    'From a technical perspective, InternBuddy is built using modern web technologies to ensure scalability, performance, and responsiveness. The front-end leverages component-based architecture for modularity, while the back-end is designed to handle secure data storage, real-time updates, and seamless integration with third-party services such as email, calendar APIs, and job platforms.',
+
+    'Security and privacy are fundamental priorities within InternBuddy. User data is handled with strict access controls, encryption practices, and compliance considerations to ensure that sensitive information such as resumes, application statuses, and personal notes remain protected at all times.',
+
+    'InternBuddy is continuously evolving through iterative development and user feedback. The product team actively incorporates insights from students, educators, and industry professionals to refine features, improve usability, and expand the platform’s capabilities in alignment with real-world internship needs.',
+
+    'Ultimately, InternBuddy is more than just a tracking tool—it is a career companion designed to support students throughout one of the most critical phases of their professional journey. By combining organization, reflection, and collaboration into a single ecosystem, InternBuddy empowers users to navigate internships with confidence, clarity, and purpose.',
+
+    'Version 1.4.2 introduces incremental improvements to performance, UI responsiveness, and user onboarding experience. Future updates aim to integrate AI-driven recommendations, smarter analytics, and personalized career insights to further enhance the value provided to users.',
+  ],
+}
 ]
