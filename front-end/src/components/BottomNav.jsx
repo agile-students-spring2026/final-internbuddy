@@ -9,8 +9,8 @@ function BottomNav() {
     ? 'profile'
     : location.pathname.startsWith('/events')
       ? 'home'
-      : location.pathname.startsWith('/swipe')
-        ? 'swipe'
+      : location.pathname.startsWith('/search')
+        ? 'search'
         : location.pathname.startsWith('/messages')
           ? 'messages'
           : ''
@@ -24,13 +24,7 @@ function BottomNav() {
         Home
       </button>
       <button
-        className={`global-nav-btn ${currentTab === 'swipe' ? 'active' : ''}`}
-        onClick={() => navigate('/swipe')}
-      >
-        Swipe
-      </button>
-      <button
-        className="global-nav-btn"
+        className={`global-nav-btn ${currentTab === 'search' ? 'active' : ''}`}
         onClick={() => navigate('/search')}
       >
         Search
