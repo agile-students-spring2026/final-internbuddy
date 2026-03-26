@@ -8,7 +8,7 @@ export const settingsItems = [
     key: 'saved',
     label: 'Saved',
     route: '/settings/saved',
-    preview: 'You have 12 saved posts and 4 saved events.',
+    preview: 'You have 12 saved posts and 4 saved events.Please look closely to understand better',
     details: [
       'Saved Posts: 12',
       'Saved Events: 4',
@@ -19,7 +19,7 @@ export const settingsItems = [
     key: 'archived',
     label: 'Archived',
     route: '/settings/archived',
-    preview: 'Your archived stories are stored privately.',
+    preview: 'Your archived stories are stored privately. Take a moment to review them.',
     details: [
       'Stories Archive: Enabled',
       'Archived Stories: 18',
@@ -30,7 +30,7 @@ export const settingsItems = [
     key: 'notifications',
     label: 'Notifications',
     route: '/settings/notifications',
-    preview: 'Push notifications are on for messages and events.',
+    preview: 'Push notifications are on for messages and events. Stay updated with the latest activities.',
     details: [
       'Direct Messages: On',
       'Event Invites: On',
@@ -41,7 +41,7 @@ export const settingsItems = [
     key: 'account-privacy',
     label: 'Account Privacy',
     route: '/settings/account-privacy',
-    preview: 'Your account is public and message filters are active.',
+    preview: 'Your account is public and message filters are active. Make sure to check what you say beforehand.',
     details: [
       'Account visibility: Public',
       'Activity status: Visible to followers',
@@ -52,7 +52,7 @@ export const settingsItems = [
     key: 'close-friends',
     label: 'Close Friends',
     route: '/settings/close-friends',
-    preview: 'You have 9 people in your close friends list.',
+    preview: 'You have 9 people in your close friends list. Stay connected with your closest friends. Yap to your hearts content',
     details: [
       'Close Friends count: 9',
       'Last added: Jordan P.',
@@ -63,7 +63,7 @@ export const settingsItems = [
     key: 'blocked-comments',
     label: 'Blocked Comments',
     route: '/settings/blocked-comments',
-    preview: 'Comment filter is hiding offensive and spam words.',
+    preview: 'Comment filter is hiding offensive and spam words. Stay vigilant and review your blocked comments regularly.',
     details: [
       'Automatic filter: Enabled',
       'Custom blocked words: 14 terms',

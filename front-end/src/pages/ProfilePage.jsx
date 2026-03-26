@@ -65,7 +65,7 @@ export default function ProfilePage() {
 
   const addLookingFor = () => {
     const label = prompt("What are you looking for?");
-    const emoji = prompt("Pick an emoji:");
+    const emoji = prompt("Pick an emoji: any emoji that makes you happy and represents you ");
     if (label && emoji) {
       setDraft({ ...draft, lookingFor: [...draft.lookingFor, { emoji, label }] });
     }
@@ -105,14 +105,14 @@ export default function ProfilePage() {
 
             <label className="field-label">Interests ({draft.interests.length}/8)</label>
             <button className="chip-btn" onClick={() => setShowInterestPicker(!showInterestPicker)}>
-              {showInterestPicker ? "Done picking" : "Edit Interests"}
+              {showInterestPicker ? "Done picking" : "Edit Interests choose here"}
             </button>
             {showInterestPicker && (
               <div className="interest-grid">
                 {ALL_INTERESTS.map((i) => (
                   <button
                     key={i}
-                    className={`interest-chip ${draft.interests.includes(i) ? "selected" : ""}`}
+                    className={`interest-chip ${draft.interests.includes(i) ? "selected yipee" : ""}`}
                     onClick={() => toggleInterest(i)}
                   >
                     {i}
