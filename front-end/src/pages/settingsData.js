@@ -136,6 +136,7 @@ export const settingsItems = [
       'Recent outlooks :0'
       'Last date checked and login: Mar 18, 2026',
       'Last day checked and login: Mar 18, 2026',
+      'Yippee last day checked and login: Mar 18, 2026',
       'Recent security review: Passed on Mar 18, 2026',
     ],
   },
