@@ -129,10 +129,14 @@ export const settingsItems = [
     key: 'account-status',
     label: 'Account Status',
     route: '/settings/account-status',
-    preview: 'Your account is in good standing with no restrictions.',
+    preview: 'Your account is in good standing with no restrictions. This account is in decent standing ',
     details: [
       'Standing: Good',
       'Policy strikes: 0',
+      'Recent outlooks :0'
+      'Last date checked and login: Mar 18, 2026',
+      'Last day checked and login: Mar 18, 2026',
+      'Yippee last day checked and login: Mar 18, 2026',
       'Recent security review: Passed on Mar 18, 2026',
     ],
   },
