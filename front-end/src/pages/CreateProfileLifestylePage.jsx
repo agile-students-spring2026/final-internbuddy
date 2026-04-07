@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import './CreateProfileFlow.css'
 
-const OPTIONS = ['Yes', 'Socially', 'No', 'Prefer not to say']
+const OPTIONS = ['Builder', 'Creative', 'Outgoing', 'Curious', 'Collaborative', 'Adventurous']
 
 function CreateProfileLifestylePage() {
   const navigate = useNavigate()
@@ -12,8 +12,8 @@ function CreateProfileLifestylePage() {
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 15 of 16</div>
-        <h1 className="create-profile-title">Do you drink?</h1>
-        <p className="create-profile-subtitle">This helps match you with the right meetup vibes.</p>
+        <h1 className="create-profile-title">Pick your profile vibe</h1>
+        <p className="create-profile-subtitle">Choose one tag that best describes your personality.</p>
 
         <div className="profile-chips-grid">
           {OPTIONS.map((o) => (

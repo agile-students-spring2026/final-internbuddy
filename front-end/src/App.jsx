@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { EventsProvider } from './context/EventsContext'
+import { ProfileProvider } from './context/ProfileContext'
 import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage'
@@ -12,6 +13,7 @@ import CreateProfileLocationPage from './pages/CreateProfileLocationPage'
 import CreateProfilePronounsPage from './pages/CreateProfilePronounsPage'
 import CreateProfileGenderPage from './pages/CreateProfileGenderPage'
 import CreateProfileFriendPrefPage from './pages/CreateProfileFriendPrefPage'
+import CreateProfilePersonalityPage from './pages/CreateProfilePersonalityPage'
 import CreateProfileInternshipPage from './pages/CreateProfileInternshipPage'
 import CreateProfileJobTitlePage from './pages/CreateProfileJobTitlePage'
 import CreateProfileSchoolPage from './pages/CreateProfileSchoolPage'
@@ -36,8 +38,9 @@ import './App.css'
 function App() {
   return (
     <EventsProvider>
-      <Router>
-        <Routes>
+      <ProfileProvider>
+        <Router>
+          <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/create-account/email" element={<CreateAccountEmailPage />} />
@@ -50,6 +53,7 @@ function App() {
           <Route path="/create-profile/pronouns" element={<CreateProfilePronounsPage />} />
           <Route path="/create-profile/gender" element={<CreateProfileGenderPage />} />
           <Route path="/create-profile/friend-preference" element={<CreateProfileFriendPrefPage />} />
+          <Route path="/create-profile/personality" element={<CreateProfilePersonalityPage />} />
           <Route path="/create-profile/internship" element={<CreateProfileInternshipPage />} />
           <Route path="/create-profile/job-title" element={<CreateProfileJobTitlePage />} />
           <Route path="/create-profile/school" element={<CreateProfileSchoolPage />} />
@@ -68,9 +72,10 @@ function App() {
           <Route path="/swipe" element={<SwipePage />} />
           <Route path="/message/:id" element={<DirectMessagePage />} />
           <Route path="/search" element={<SearchPage />} />
-        </Routes>
-        <BottomNav />
-      </Router>
+          </Routes>
+          <BottomNav />
+        </Router>
+      </ProfileProvider>
     </EventsProvider>
   )
 }

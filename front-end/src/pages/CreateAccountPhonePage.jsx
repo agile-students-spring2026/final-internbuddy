@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateAccountFlow.css'
 
 const countryCodes = ['+1', '+44', '+61', '+81', '+91', '+971']
 
 function CreateAccountPhonePage() {
   const navigate = useNavigate()
-  const [countryCode, setCountryCode] = useState('+1')
-  const [phoneNumber, setPhoneNumber] = useState('')
+  const { account, updateAccount } = useProfile()
+  const [countryCode, setCountryCode] = useState(account.countryCode || '+1')
+  const [phoneNumber, setPhoneNumber] = useState(account.phoneNumber || '')
 
   return (
     <div className="create-account-page">
@@ -45,7 +47,13 @@ function CreateAccountPhonePage() {
           <button className="help-link-btn" type="button">Other verification methods</button>
         </div>
 
-        <button className="create-account-next-btn" onClick={() => navigate('/create-account/verify')}>
+        <button
+          className="create-account-next-btn"
+          onClick={() => {
+            updateAccount({ countryCode, phoneNumber })
+            navigate('/create-account/verify')
+          }}
+        >
           Next
         </button>
 

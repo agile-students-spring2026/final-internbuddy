@@ -4,49 +4,47 @@ import './CreateProfileFlow.css'
 
 function CreateProfileLocationPage() {
   const navigate = useNavigate()
-  const [mode, setMode] = useState('address')
-  const [address, setAddress] = useState('')
-  const [zipcode, setZipcode] = useState('')
+  const [mode, setMode] = useState('city')
+  const [city, setCity] = useState('')
+  const [stateCode, setStateCode] = useState('')
 
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 7 of 16</div>
-        <h1 className="create-profile-title">Where do you live?</h1>
-        <p className="create-profile-subtitle">Your city is shown publicly. Your full address stays private.</p>
+        <h1 className="create-profile-title">Where are you based?</h1>
+        <p className="create-profile-subtitle">This powers the location tag on your card, like NYC.</p>
 
         <div className="location-toggle-row">
           <button
-            className={`location-toggle-btn${mode === 'address' ? ' active' : ''}`}
-            onClick={() => setMode('address')}
+            className={`location-toggle-btn${mode === 'city' ? ' active' : ''}`}
+            onClick={() => setMode('city')}
           >
-            Address
+            City
           </button>
           <button
-            className={`location-toggle-btn${mode === 'zip' ? ' active' : ''}`}
-            onClick={() => setMode('zip')}
+            className={`location-toggle-btn${mode === 'state' ? ' active' : ''}`}
+            onClick={() => setMode('state')}
           >
-            Zip Code
+            State
           </button>
         </div>
 
-        {mode === 'address' ? (
+        {mode === 'city' ? (
           <input
             className="create-profile-input"
             type="text"
-            placeholder="123 Main St, City, State"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            placeholder="e.g. New York City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
           />
         ) : (
           <input
             className="create-profile-input"
-            type="tel"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            placeholder="e.g. 10001"
-            value={zipcode}
-            onChange={(e) => setZipcode(e.target.value)}
+            type="text"
+            placeholder="e.g. NY"
+            value={stateCode}
+            onChange={(e) => setStateCode(e.target.value)}
           />
         )}
 

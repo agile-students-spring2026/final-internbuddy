@@ -1,20 +1,22 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 const MEETUP_TYPES = [
-  { emoji: '🏀', label: 'Sports' },
-  { emoji: '🍜', label: 'Food' },
-  { emoji: '🎨', label: 'Creation' },
-  { emoji: '🍹', label: 'Drinks' },
-  { emoji: '🎉', label: 'Party' },
-  { emoji: '📚', label: 'Reading' },
-  { emoji: '🎵', label: 'Music' },
+  { emoji: '🎾', label: 'Tennis' },
+  { emoji: '☕', label: 'Cafes' },
+  { emoji: '🎵', label: 'Concerts' },
+  { emoji: '🎮', label: 'Gaming' },
+  { emoji: '📷', label: 'Photography' },
+  { emoji: '✈', label: 'Travel' },
+  { emoji: '💻', label: 'Hackathons' },
 ]
 
 function CreateProfileMeetupPage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState([])
+  const { onboarding, updateOnboarding } = useProfile()
+  const [selected, setSelected] = useState(onboarding.interests || [])
 
   const toggle = (label) =>
     setSelected((prev) =>
@@ -24,9 +26,9 @@ function CreateProfileMeetupPage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 16 of 16</div>
-        <h1 className="create-profile-title">Meetup preferences</h1>
-        <p className="create-profile-subtitle">What kinds of hangouts are you into? Pick as many as you like.</p>
+        <div className="create-profile-badge">Step 10 of 10</div>
+        <h1 className="create-profile-title">Choose your interests</h1>
+        <p className="create-profile-subtitle">Pick the interests you want to show in your profile card.</p>
 
         <div className="profile-chips-grid">
           {MEETUP_TYPES.map(({ emoji, label }) => (
@@ -41,11 +43,17 @@ function CreateProfileMeetupPage() {
           ))}
         </div>
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/events')}>
+        <button
+          className="create-profile-next-btn"
+          onClick={() => {
+            updateOnboarding({ interests: selected })
+            navigate('/profile')
+          }}
+        >
           Let's go! 🎉
         </button>
 
-        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/lifestyle')}>
+        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/personality')}>
           Back
         </button>
       </div>

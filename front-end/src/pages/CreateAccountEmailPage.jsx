@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateAccountFlow.css'
 
 function CreateAccountEmailPage() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const { account, updateAccount } = useProfile()
+  const [email, setEmail] = useState(account.email)
 
   return (
     <div className="create-account-page">
@@ -20,7 +22,13 @@ function CreateAccountEmailPage() {
           onChange={(e) => setEmail(e.target.value)}
         />
 
-        <button className="create-account-next-btn" onClick={() => navigate('/create-account/phone')}>
+        <button
+          className="create-account-next-btn"
+          onClick={() => {
+            updateAccount({ email })
+            navigate('/create-account/phone')
+          }}
+        >
           Next
         </button>
 

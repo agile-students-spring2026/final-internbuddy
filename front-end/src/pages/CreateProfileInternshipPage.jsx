@@ -10,8 +10,8 @@ function CreateProfileInternshipPage() {
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 11 of 16</div>
-        <h1 className="create-profile-title">Where are you interning?</h1>
-        <p className="create-profile-subtitle">Enter the company or organisation name.</p>
+        <h1 className="create-profile-title">Internship company</h1>
+        <p className="create-profile-subtitle">Enter the company name used in your internship headline.</p>
 
         <input
           className="create-profile-input"

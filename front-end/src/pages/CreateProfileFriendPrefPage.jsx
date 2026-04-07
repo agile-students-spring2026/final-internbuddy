@@ -1,42 +1,39 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
-
-const PREFS = ['Women', 'Men', 'Non-binary people', 'Everyone']
 
 function CreateProfileFriendPrefPage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState([])
-
-  const toggle = (p) =>
-    setSelected((prev) =>
-      prev.includes(p) ? prev.filter((x) => x !== p) : [...prev, p]
-    )
+  const { onboarding, updateOnboarding } = useProfile()
+  const [aboutMe, setAboutMe] = useState(onboarding.about || '')
 
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 10 of 16</div>
-        <h1 className="create-profile-title">Friend gender preference</h1>
-        <p className="create-profile-subtitle">Who would you like to meet? Select all that apply.</p>
+        <div className="create-profile-badge">Step 8 of 10</div>
+        <h1 className="create-profile-title">Write your About me</h1>
+        <p className="create-profile-subtitle">Share a short bio that introduces you and what you are looking for.</p>
 
-        <div className="profile-chips-grid">
-          {PREFS.map((p) => (
-            <button
-              key={p}
-              className={`profile-chip${selected.includes(p) ? ' selected' : ''}`}
-              onClick={() => toggle(p)}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
+        <textarea
+          className="create-profile-input"
+          rows="5"
+          placeholder="e.g. I'm a CS student who loves hackathons, open source, and meeting fellow interns in NYC."
+          value={aboutMe}
+          onChange={(e) => setAboutMe(e.target.value)}
+        />
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/internship')}>
+        <button
+          className="create-profile-next-btn"
+          onClick={() => {
+            updateOnboarding({ about: aboutMe })
+            navigate('/create-profile/personality')
+          }}
+        >
           Next
         </button>
 
-        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/gender')}>
+        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/pronouns')}>
           Back
         </button>
       </div>

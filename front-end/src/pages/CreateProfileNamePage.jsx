@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 function CreateProfileNamePage() {
   const navigate = useNavigate()
-  const [firstName, setFirstName] = useState('')
-  const [lastName, setLastName] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [firstName, setFirstName] = useState(onboarding.firstName || '')
+  const [lastName, setLastName] = useState(onboarding.lastName || '')
 
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 5 of 16</div>
-        <h1 className="create-profile-title">What is your name?</h1>
-        <p className="create-profile-subtitle">Tell us your first and last name.</p>
+        <div className="create-profile-badge">Step 5 of 10</div>
+        <h1 className="create-profile-title">What name should appear on your card?</h1>
+        <p className="create-profile-subtitle">Enter the first and last name shown at the top of your profile.</p>
 
         <input
           className="create-profile-input"
@@ -30,7 +32,13 @@ function CreateProfileNamePage() {
           onChange={(e) => setLastName(e.target.value)}
         />
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/dob')}>
+        <button
+          className="create-profile-next-btn"
+          onClick={() => {
+            updateOnboarding({ firstName, lastName })
+            navigate('/create-profile/dob')
+          }}
+        >
           Next
         </button>
 
