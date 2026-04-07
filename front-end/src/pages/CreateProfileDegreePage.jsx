@@ -3,11 +3,11 @@ import { useNavigate } from 'react-router-dom'
 import './CreateProfileFlow.css'
 
 const DEGREES = [
-  'High School',
-  "Associate's",
-  "Bachelor's",
-  "Master's",
-  'PhD',
+  'Computer Science',
+  'Software Engineering',
+  'Data Science',
+  'Information Systems',
+  'Electrical Engineering',
   'Other',
 ]
 
@@ -19,8 +19,8 @@ function CreateProfileDegreePage() {
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 14 of 16</div>
-        <h1 className="create-profile-title">Highest degree</h1>
-        <p className="create-profile-subtitle">What's your highest level of education?</p>
+        <h1 className="create-profile-title">Major or focus area</h1>
+        <p className="create-profile-subtitle">Choose what should represent your academic focus.</p>
 
         <div className="profile-chips-grid">
           {DEGREES.map((d) => (

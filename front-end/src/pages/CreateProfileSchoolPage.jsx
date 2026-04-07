@@ -10,8 +10,8 @@ function CreateProfileSchoolPage() {
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 13 of 16</div>
-        <h1 className="create-profile-title">Where did you go to school?</h1>
-        <p className="create-profile-subtitle">Enter your most recent school or university.</p>
+        <h1 className="create-profile-title">School name</h1>
+        <p className="create-profile-subtitle">Enter the school shown in your headline (for example NYU).</p>
 
         <input
           className="create-profile-input"

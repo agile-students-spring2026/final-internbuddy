@@ -10,8 +10,8 @@ function CreateProfileJobTitlePage() {
     <div className="create-profile-page">
       <div className="create-profile-card">
         <div className="create-profile-badge">Step 12 of 16</div>
-        <h1 className="create-profile-title">What's your job title?</h1>
-        <p className="create-profile-subtitle">Enter your official or general role.</p>
+        <h1 className="create-profile-title">Internship role</h1>
+        <p className="create-profile-subtitle">Enter your role for the internship headline.</p>
 
         <input
           className="create-profile-input"

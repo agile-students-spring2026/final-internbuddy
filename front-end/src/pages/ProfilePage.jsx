@@ -1,25 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useProfile } from "../context/ProfileContext";
 import "./ProfilePage.css";
-
-const defaultProfile = {
-  name: "My Name",
-  major: "cs @ NYU",
-  internship: "swe intern @ Amazon",
-  location: "NYC | May – Aug 2026",
-  connections: 28,
-  about:
-    "I'm a CS student who loves hackathons, open-source, and building cool things. I'll be at Amazon this summer in NYC, and looking forward to meeting fellow interns!",
-  interests: ["🎾 Tennis", "☕ Cafes", "🎵 Concerts", "🎮 Gaming", "📷 Photography", "✈️ Travel"],
-  personality: "ESFJ",
-  lookingFor: [
-    { emoji: "🍣", label: "Sushi chats" },
-    { emoji: "🏀", label: "Basketball games" },
-    { emoji: "🎾", label: "Tennis match" },
-  ],
-  hostingEvents: ["Sushi Night – June 12", "Movie Night – June 19"],
-  attendingEvents: ["Central Park Picnic – June 15"],
-};
 
 const ALL_INTERESTS = [
   "🎾 Tennis","☕ Cafes","🎵 Concerts","🎮 Gaming","📷 Photography",
@@ -28,9 +10,10 @@ const ALL_INTERESTS = [
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState(defaultProfile);
+  const { profile, account, updateProfile, updateAccount } = useProfile();
   const [editMode, setEditMode] = useState(false);
-  const [draft, setDraft] = useState(defaultProfile);
+  const [draft, setDraft] = useState(profile);
+  const [draftAccount, setDraftAccount] = useState(account);
   const [showInterestPicker, setShowInterestPicker] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [friendRequests] = useState([
@@ -38,13 +21,23 @@ export default function ProfilePage() {
     { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
   ]);
 
+  useEffect(() => {
+    setDraft(profile);
+  }, [profile]);
+
+  useEffect(() => {
+    setDraftAccount(account);
+  }, [account]);
+
   const openEdit = () => {
     setDraft({ ...profile });
+    setDraftAccount({ ...account });
     setEditMode(true);
   };
 
   const saveEdit = () => {
-    setProfile({ ...draft });
+    updateProfile({ ...draft });
+    updateAccount({ ...draftAccount });
     setEditMode(false);
     setShowInterestPicker(false);
   };
@@ -99,6 +92,15 @@ export default function ProfilePage() {
 
             <label className="field-label">About</label>
             <textarea className="field-input field-textarea" value={draft.about} onChange={(e) => setDraft({ ...draft, about: e.target.value })} />
+
+            <label className="field-label">Email</label>
+            <input className="field-input" value={draftAccount.email} onChange={(e) => setDraftAccount({ ...draftAccount, email: e.target.value })} />
+
+            <label className="field-label">Country Code</label>
+            <input className="field-input" value={draftAccount.countryCode || ''} onChange={(e) => setDraftAccount({ ...draftAccount, countryCode: e.target.value })} />
+
+            <label className="field-label">Phone</label>
+            <input className="field-input" value={draftAccount.phoneNumber || ''} onChange={(e) => setDraftAccount({ ...draftAccount, phoneNumber: e.target.value })} />
 
             <label className="field-label">Personality Type</label>
             <input className="field-input" value={draft.personality} onChange={(e) => setDraft({ ...draft, personality: e.target.value })} />
@@ -170,6 +172,12 @@ export default function ProfilePage() {
             <section className="card">
               <h3 className="section-heading">About me</h3>
               <p className="about-text">{profile.about}</p>
+            </section>
+
+            <section className="card">
+              <h3 className="section-heading">Contact</h3>
+              <p className="about-text">Email: {account.email || 'Not provided'}</p>
+              <p className="about-text">Phone: {account.phoneNumber ? `${account.countryCode} ${account.phoneNumber}` : 'Not provided'}</p>
             </section>
 
             {/* INTERESTS */}

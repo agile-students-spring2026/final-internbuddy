@@ -25,7 +25,7 @@ function CreateAccountVerifyPage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 3 of 15</div>
+        <div className="create-profile-badge">Step 3 of 9</div>
         <h1 className="create-profile-title">Enter the code</h1>
         <p className="create-profile-subtitle">We texted a 6-digit verification code to your phone number.</p>
 

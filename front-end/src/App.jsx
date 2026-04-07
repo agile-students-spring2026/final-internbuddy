@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { EventsProvider } from './context/EventsContext'
+import { ProfileProvider } from './context/ProfileContext'
 import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage'
@@ -36,8 +37,9 @@ import './App.css'
 function App() {
   return (
     <EventsProvider>
-      <Router>
-        <Routes>
+      <ProfileProvider>
+        <Router>
+          <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/create-account/email" element={<CreateAccountEmailPage />} />
@@ -68,9 +70,10 @@ function App() {
           <Route path="/swipe" element={<SwipePage />} />
           <Route path="/message/:id" element={<DirectMessagePage />} />
           <Route path="/search" element={<SearchPage />} />
-        </Routes>
-        <BottomNav />
-      </Router>
+          </Routes>
+          <BottomNav />
+        </Router>
+      </ProfileProvider>
     </EventsProvider>
   )
 }
