@@ -12,12 +12,7 @@ const defaultProfile = {
     "I'm a CS student who loves hackathons, open-source, and building cool things. I'll be at Amazon this summer in NYC, and looking forward to meeting fellow interns!",
   interests: ['🎾 Tennis', '☕ Cafes', '🎵 Concerts', '🎮 Gaming', '📷 Photography', '✈ Travel'],
   personality: 'ESFJ',
-  lookingFor: [
-    { emoji: '🍣', label: 'Sushi chats' },
-    { emoji: '🏀', label: 'Basketball games' },
-    { emoji: '🎾', label: 'Tennis match' }
-  ],
-  hostingEvents: ['Sushi Night - June 12', 'Movie Night - June 19'],
+  hostingEvents: ['Tech Mixer - June 12', 'Movie Night - June 19'],
   attendingEvents: ['Central Park Picnic - June 15']
 }
 

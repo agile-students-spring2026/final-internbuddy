@@ -26,7 +26,7 @@ function CreateProfileMeetupPage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 9 of 9</div>
+        <div className="create-profile-badge">Step 10 of 10</div>
         <h1 className="create-profile-title">Choose your interests</h1>
         <p className="create-profile-subtitle">Pick the interests you want to show in your profile card.</p>
 
@@ -53,7 +53,7 @@ function CreateProfileMeetupPage() {
           Let's go! 🎉
         </button>
 
-        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/friend-preference')}>
+        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/personality')}>
           Back
         </button>
       </div>

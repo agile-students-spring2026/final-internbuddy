@@ -12,7 +12,7 @@ function CreateProfilePronounsPage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 7 of 9</div>
+        <div className="create-profile-badge">Step 7 of 10</div>
         <h1 className="create-profile-title">School and major headline</h1>
         <p className="create-profile-subtitle">Add the two lines shown under your name.</p>
 

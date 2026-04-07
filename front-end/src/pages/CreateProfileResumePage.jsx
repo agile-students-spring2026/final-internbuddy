@@ -26,7 +26,7 @@ function CreateProfileResumePage() {
     return (
       <div className="create-profile-page">
         <div className="create-profile-card">
-          <div className="create-profile-badge">Step 4 of 9</div>
+          <div className="create-profile-badge">Step 4 of 10</div>
           <h1 className="create-profile-title">Upload Your Resume</h1>
           <p className="create-profile-subtitle">
             We'll extract your name, school and major headline, internship line, location, and interests.
@@ -88,7 +88,7 @@ function CreateProfileResumePage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 4 of 9</div>
+        <div className="create-profile-badge">Step 4 of 10</div>
         <h1 className="create-profile-title">Set up your profile</h1>
         <p className="create-profile-subtitle">
           Build your card with name, headline, internship details, about me, and interests.

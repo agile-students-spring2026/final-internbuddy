@@ -56,14 +56,6 @@ export default function ProfilePage() {
     }
   };
 
-  const addLookingFor = () => {
-    const label = prompt("What are you looking for?");
-    const emoji = prompt("Pick an emoji: any emoji that makes you happy and represents you ");
-    if (label && emoji) {
-      setDraft({ ...draft, lookingFor: [...draft.lookingFor, { emoji, label }] });
-    }
-  };
-
   return (
     <div className="app-shell">
       <div className="profile-top-bar">
@@ -195,19 +187,6 @@ export default function ProfilePage() {
             <section className="card personality-card">
               <span className="personality-label">Personality Type</span>
               <span className="personality-badge">{profile.personality}</span>
-            </section>
-
-            {/* LOOKING FOR */}
-            <section className="card">
-              <h3 className="section-heading">Looking For</h3>
-              <ul className="looking-list">
-                {profile.lookingFor.map((l, idx) => (
-                  <li key={idx} className="looking-item">
-                    <span className="looking-emoji">{l.emoji}</span>
-                    {l.label}
-                  </li>
-                ))}
-              </ul>
             </section>
 
             {/* EVENTS */}

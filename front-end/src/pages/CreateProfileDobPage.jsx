@@ -14,7 +14,7 @@ function CreateProfileDobPage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 6 of 9</div>
+        <div className="create-profile-badge">Step 6 of 10</div>
         <h1 className="create-profile-title">Internship timeline</h1>
         <p className="create-profile-subtitle">Add internship dates and your location for the profile card summary line.</p>
 

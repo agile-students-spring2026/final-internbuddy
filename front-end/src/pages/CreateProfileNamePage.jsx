@@ -12,7 +12,7 @@ function CreateProfileNamePage() {
   return (
     <div className="create-profile-page">
       <div className="create-profile-card">
-        <div className="create-profile-badge">Step 5 of 9</div>
+        <div className="create-profile-badge">Step 5 of 10</div>
         <h1 className="create-profile-title">What name should appear on your card?</h1>
         <p className="create-profile-subtitle">Enter the first and last name shown at the top of your profile.</p>
 
