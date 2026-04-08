@@ -4,6 +4,9 @@ const cors = require('cors');
 
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
+const eventsRoutes = require('./routes/eventsRoutes');
+const swipeRoutes = require('./routes/swipeRoutes');
+const messagesRoutes = require('./routes/messagesRoutes');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandlers');
 
 const app = express();
@@ -24,6 +27,9 @@ app.get('/api/health', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/events', eventsRoutes);
+app.use('/api/swipe', swipeRoutes);
+app.use('/api/messages', messagesRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
