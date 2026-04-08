@@ -1,5 +1,4 @@
 import { createContext, useState, useEffect } from 'react'
-import { faker } from '@faker-js/faker'
 
 export const EventsContext = createContext()
 
@@ -7,19 +6,21 @@ export function EventsProvider({ children }) {
   const [events, setEvents] = useState([])
 
   useEffect(() => {
-    const fakeEvents = Array.from({ length: 6 }, (_, i) => ({
-      id: i,
-      title: faker.company.catchPhrase(),
-      description: faker.lorem.sentence(),
-      time: faker.date.soon().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      date: faker.date.soon().toLocaleDateString(),
-      location: `${faker.location.streetAddress()}, ${faker.location.city()}`,
-    }))
-    setEvents(fakeEvents)
+    fetch('/api/events')
+      .then(res => res.json())
+      .then(data => setEvents(data))
+      .catch(err => console.error('Failed to fetch events:', err))
   }, [])
 
   const addEvent = (newEvent) => {
-    setEvents(prev => [{ ...newEvent, id: Date.now() }, ...prev])
+    fetch('/api/events', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newEvent),
+    })
+      .then(res => res.json())
+      .then(created => setEvents(prev => [created, ...prev]))
+      .catch(err => console.error('Failed to create event:', err))
   }
 
   return (
@@ -28,4 +29,3 @@ export function EventsProvider({ children }) {
     </EventsContext.Provider>
   )
 }
-

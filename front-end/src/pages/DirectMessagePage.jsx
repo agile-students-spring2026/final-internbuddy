@@ -1,25 +1,41 @@
-import { useNavigate } from "react-router-dom";
-
-const conversation = {
-  id: "c1",
-  otherUser: {
-    id: "u2",
-    name: "John Green",
-    username: "jgreen",
-    avatar: "https://picsum.photos/seed/jgreen/100/100",
-    subtitle: "SWE Intern @ Google",
-  },
-};
-
-const messages = [
-  { id: 1, sender: "them", text: "Hey! Are you free later this week?" },
-  { id: 2, sender: "me", text: "Yeah probably, what’s up?" },
-  { id: 3, sender: "them", text: "Wanted to grab coffee and talk internships." },
-  { id: 4, sender: "me", text: "I’m down." },
-];
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function DirectMessagePage() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [conversation, setConversation] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [newText, setNewText] = useState("");
+
+  useEffect(() => {
+    fetch(`/api/messages/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setConversation(data.conversation);
+        setMessages(data.messages);
+      })
+      .catch(err => console.error('Failed to fetch messages:', err));
+  }, [id]);
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!newText.trim()) return;
+
+    fetch(`/api/messages/${id}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: newText }),
+    })
+      .then(res => res.json())
+      .then(msg => {
+        setMessages(prev => [...prev, msg]);
+        setNewText("");
+      })
+      .catch(err => console.error('Failed to send message:', err));
+  };
+
+  if (!conversation) return null;
 
   return (
     <div className="min-h-screen bg-[#eeeef8] p-4">
@@ -72,22 +88,23 @@ export default function DirectMessagePage() {
           ))}
         </div>
 
-        {/* Input (disabled) */}
-        <div className="p-4 border-t border-gray-100">
+        {/* Input */}
+        <form onSubmit={handleSend} className="p-4 border-t border-gray-100">
           <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
             <input
-              disabled
-              placeholder="Messaging coming soon..."
-              className="flex-1 bg-transparent text-sm text-gray-400 outline-none"
+              value={newText}
+              onChange={(e) => setNewText(e.target.value)}
+              placeholder="Type a message..."
+              className="flex-1 bg-transparent text-sm text-gray-900 outline-none"
             />
             <button
-              disabled
-              className="text-xs text-gray-400"
+              type="submit"
+              className="text-xs text-indigo-600 font-semibold"
             >
               Send
             </button>
           </div>
-        </div>
+        </form>
 
       </div>
     </div>
