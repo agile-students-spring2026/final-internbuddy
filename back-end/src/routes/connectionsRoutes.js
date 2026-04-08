@@ -1,5 +1,9 @@
 const express = require('express');
-const { sendRequest } = require('../controllers/connectionsController');
+const {
+  sendRequest,
+  getPending,
+  getAccepted
+} = require('../controllers/connectionsController');
 
 const router = express.Router();
 
@@ -9,5 +13,7 @@ router.get('/ping', (req, res) => {
 });
 
 router.post('/request', sendRequest);
+router.get('/:userId/pending', getPending);
+router.get('/:userId', getAccepted);
 
 module.exports = router;

@@ -20,7 +20,30 @@ function addRequest(fromUserId, toUserId) {
   return record;
 }
 
+function getPendingForUser(userId) {
+  const results = [];
+  for (const record of connections.values()) {
+    if (record.toUserId === userId && record.status === 'pending') {
+      results.push(record);
+    }
+  }
+  return results;
+}
+
+function getAcceptedForUser(userId) {
+  const results = [];
+  for (const record of connections.values()) {
+    if (record.status !== 'accepted') continue;
+    if (record.fromUserId === userId || record.toUserId === userId) {
+      results.push(record);
+    }
+  }
+  return results;
+}
+
 module.exports = {
   connections,
-  addRequest
+  addRequest,
+  getPendingForUser,
+  getAcceptedForUser
 };
