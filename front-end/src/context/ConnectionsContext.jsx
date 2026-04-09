@@ -7,12 +7,17 @@ const MY_USER_ID = '1'
 
 export function ConnectionsProvider({ children }) {
   const [pending, setPending] = useState([])
+  const [sent, setSent] = useState([])
   const [accepted, setAccepted] = useState([])
 
   useEffect(() => {
     fetch(`/api/connections/${MY_USER_ID}/pending`)
       .then(res => res.json())
       .then(data => setPending(data.pending))
+
+    fetch(`/api/connections/${MY_USER_ID}/sent`)
+      .then(res => res.json())
+      .then(data => setSent(data.sent))
 
     fetch(`/api/connections/${MY_USER_ID}`)
       .then(res => res.json())
@@ -24,7 +29,12 @@ export function ConnectionsProvider({ children }) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ fromUserId: MY_USER_ID, toUserId })
-    }).then(res => res.json())
+    })
+      .then(res => res.json())
+      .then(data => {
+        setSent(prev => [...prev, data.request])
+        return data
+      })
   }
 
   function acceptRequest(requestId) {
@@ -47,10 +57,14 @@ export function ConnectionsProvider({ children }) {
   function cancelRequest(requestId) {
     return fetch(`/api/connections/${requestId}`, { method: 'DELETE' })
       .then(res => res.json())
+      .then(data => {
+        setSent(prev => prev.filter(r => r.id !== requestId))
+        return data
+      })
   }
 
   return (
-    <ConnectionsContext.Provider value={{ pending, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
+    <ConnectionsContext.Provider value={{ pending, sent, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
       {children}
     </ConnectionsContext.Provider>
   )

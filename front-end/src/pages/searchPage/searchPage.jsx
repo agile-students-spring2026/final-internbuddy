@@ -144,7 +144,6 @@ export default function SearchPage() {
   }, [people, query, applied, sortBy])
 
   const handleConnect = (id) => {
-    setPeople(prev => prev.map(p => p.id === id ? { ...p, connected: true } : p))
     return sendRequest(String(id))
   }
 

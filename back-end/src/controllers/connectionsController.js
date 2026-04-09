@@ -1,6 +1,7 @@
 const {
   addRequest,
   getPendingForUser,
+  getSentForUser,
   getAcceptedForUser,
   acceptRequestById,
   rejectRequestById,
@@ -35,6 +36,12 @@ function getAccepted(req, res) {
   const { userId } = req.params;
   const accepted = getAcceptedForUser(userId);
   return res.status(200).json({ accepted });
+}
+
+function getSent(req, res) {
+  const { userId } = req.params;
+  const sent = getSentForUser(userId);
+  return res.status(200).json({ sent });
 }
 
 function acceptRequest(req, res) {
@@ -82,6 +89,7 @@ function deleteConnection(req, res) {
 module.exports = {
   sendRequest,
   getPending,
+  getSent,
   getAccepted,
   acceptRequest,
   rejectRequest,

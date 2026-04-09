@@ -60,6 +60,19 @@ function acceptRequestById(id) {
   return record;
 }
 
+function getSentForUser(userId) {
+  const results = [];
+  for (const record of connections.values()) {
+    if (record.fromUserId === userId && record.status === 'pending') {
+      results.push({
+        ...record,
+        toUser: getUserById(record.toUserId)
+      });
+    }
+  }
+  return results;
+}
+
 function seedConnections() {
   // user "3" sent a request to user "1" - incoming pending for user 1
   addRequest('3', '1');
@@ -90,6 +103,7 @@ module.exports = {
   connections,
   addRequest,
   getPendingForUser,
+  getSentForUser,
   getAcceptedForUser,
   acceptRequestById,
   rejectRequestById,

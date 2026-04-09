@@ -76,11 +76,10 @@ const MOCK_PROFILES = [
 ]
 
 function SwipePage() {
-  const { pending, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
+  const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notification, setNotification] = useState(null)
   const [swipeDirection, setSwipeDirection] = useState(null)
-  const [sentRequests, setSentRequests] = useState([])
   const [showRequests, setShowRequests] = useState(false)
   const [requestsTab, setRequestsTab] = useState('received')
 
@@ -101,7 +100,6 @@ function SwipePage() {
 
   const handleAccept = () => {
     setSwipeDirection('right')
-    setSentRequests([...sentRequests, profile.name])
     sendRequest(String(profile.id))
     setNotification({ type: 'success', text: `✓ Friend request sent to ${profile.name}!` })
     setTimeout(() => {
@@ -120,9 +118,9 @@ function SwipePage() {
       <div className="swipe-top-bar">
         <button className="swipe-heart-btn" onClick={() => setShowRequests(true)}>
           ❤️
-          {(sentRequests.length + pending.length) > 0 && (
+          {(sent.length + pending.length) > 0 && (
             <span className="swipe-heart-badge">
-              {sentRequests.length + pending.length}
+              {sent.length + pending.length}
             </span>
           )}
         </button>
@@ -214,7 +212,7 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('sent')}
               >
-                Sent ({sentRequests.length})
+                Sent ({sent.length})
               </button>
             </div>
 
@@ -243,11 +241,11 @@ function SwipePage() {
                 ))}
 
               {requestsTab === 'sent' &&
-                (sentRequests.length > 0 ? (
-                  sentRequests.map((name, index) => (
-                    <div key={index} className="swipe-sent-request-item">
+                (sent.length > 0 ? (
+                  sent.map((req) => (
+                    <div key={req.id} className="swipe-sent-request-item">
                       <div className="swipe-sent-request-info">
-                        <h3>{name}</h3>
+                        <h3>{req.toUser ? req.toUser.name : `User ${req.toUserId}`}</h3>
                         <p>Request sent</p>
                       </div>
                       <span className="swipe-sent-request-badge">⏳</span>
