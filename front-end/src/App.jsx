@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { EventsProvider } from './context/EventsContext'
 import { ProfileProvider } from './context/ProfileContext'
+import { ConnectionsProvider } from './context/ConnectionsContext'
 import LoginPage from './pages/LoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage'
@@ -39,6 +40,7 @@ function App() {
   return (
     <EventsProvider>
       <ProfileProvider>
+      <ConnectionsProvider>
         <Router>
           <Routes>
           <Route path="/" element={<LoginPage />} />
@@ -75,6 +77,7 @@ function App() {
           </Routes>
           <BottomNav />
         </Router>
+      </ConnectionsProvider>
       </ProfileProvider>
     </EventsProvider>
   )
