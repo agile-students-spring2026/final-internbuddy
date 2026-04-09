@@ -53,6 +53,27 @@ describe('Connections routes', () => {
     });
   });
 
+  describe('GET /api/connections/:userId/sent', () => {
+    it('should return sent pending requests for a user', async () => {
+      const send = await request(app)
+        .post('/api/connections/request')
+        .send({ fromUserId: '50', toUserId: '51' });
+
+      const res = await request(app).get('/api/connections/50/sent');
+
+      expect(res.status).to.equal(200);
+      expect(res.body.sent).to.be.an('array');
+      expect(res.body.sent.length).to.be.at.least(1);
+      expect(res.body.sent[0]).to.have.property('toUser');
+    });
+
+    it('should return empty array for user with no sent requests', async () => {
+      const res = await request(app).get('/api/connections/999/sent');
+      expect(res.status).to.equal(200);
+      expect(res.body.sent).to.deep.equal([]);
+    });
+  });
+
   describe('GET /api/connections/:userId', () => {
     it('should return accepted connections for a user', async () => {
       // user 1 has a seeded accepted connection with user 2
