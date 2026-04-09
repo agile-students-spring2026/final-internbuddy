@@ -44,8 +44,13 @@ export function ConnectionsProvider({ children }) {
       })
   }
 
+  function cancelRequest(requestId) {
+    return fetch(`/api/connections/${requestId}`, { method: 'DELETE' })
+      .then(res => res.json())
+  }
+
   return (
-    <ConnectionsContext.Provider value={{ pending, accepted, sendRequest, acceptRequest, rejectRequest }}>
+    <ConnectionsContext.Provider value={{ pending, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
       {children}
     </ConnectionsContext.Provider>
   )

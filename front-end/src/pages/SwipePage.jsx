@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useContext } from 'react'
+import { ConnectionsContext } from '../context/ConnectionsContext'
 import './SwipePage.css'
 
 const MOCK_PROFILES = [
@@ -75,17 +76,13 @@ const MOCK_PROFILES = [
 ]
 
 function SwipePage() {
+  const { pending, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notification, setNotification] = useState(null)
   const [swipeDirection, setSwipeDirection] = useState(null)
   const [sentRequests, setSentRequests] = useState([])
   const [showRequests, setShowRequests] = useState(false)
   const [requestsTab, setRequestsTab] = useState('received')
-
-  const mockReceivedRequests = [
-    { id: 1, name: 'Priya S.', role: 'Design Intern @ Figma', image: 'https://picsum.photos/seed/priya/100/100' },
-    { id: 2, name: 'Jordan K.', role: 'PM Intern @ Stripe', image: 'https://picsum.photos/seed/jordan/100/100' },
-  ]
 
   const profile = MOCK_PROFILES[currentIndex]
 
@@ -105,6 +102,7 @@ function SwipePage() {
   const handleAccept = () => {
     setSwipeDirection('right')
     setSentRequests([...sentRequests, profile.name])
+    sendRequest(String(profile.id))
     setNotification({ type: 'success', text: `✓ Friend request sent to ${profile.name}!` })
     setTimeout(() => {
       if (currentIndex < MOCK_PROFILES.length - 1) {
@@ -122,9 +120,9 @@ function SwipePage() {
       <div className="swipe-top-bar">
         <button className="swipe-heart-btn" onClick={() => setShowRequests(true)}>
           ❤️
-          {(sentRequests.length + mockReceivedRequests.length) > 0 && (
+          {(sentRequests.length + pending.length) > 0 && (
             <span className="swipe-heart-badge">
-              {sentRequests.length + mockReceivedRequests.length}
+              {sentRequests.length + pending.length}
             </span>
           )}
         </button>
@@ -208,7 +206,7 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('received')}
               >
-                Received ({mockReceivedRequests.length})
+                Received ({pending.length})
               </button>
               <button
                 className={`swipe-requests-tab ${
@@ -222,21 +220,21 @@ function SwipePage() {
 
             <div className="swipe-requests-list">
               {requestsTab === 'received' &&
-                (mockReceivedRequests.length > 0 ? (
-                  mockReceivedRequests.map((req) => (
+                (pending.length > 0 ? (
+                  pending.map((req) => (
                     <div key={req.id} className="swipe-request-item">
                       <img
-                        src={req.image}
-                        alt={req.name}
+                        src={req.fromUser.image}
+                        alt={req.fromUser.name}
                         className="swipe-request-image"
                       />
                       <div className="swipe-request-info">
-                        <h3>{req.name}</h3>
-                        <p>{req.role}</p>
+                        <h3>{req.fromUser.name}</h3>
+                        <p>{req.fromUser.role}</p>
                       </div>
                       <div className="swipe-request-actions">
-                        <button className="swipe-request-accept">✓</button>
-                        <button className="swipe-request-reject">✕</button>
+                        <button className="swipe-request-accept" onClick={() => acceptRequest(req.id)}>✓</button>
+                        <button className="swipe-request-reject" onClick={() => rejectRequest(req.id)}>✕</button>
                       </div>
                     </div>
                   ))

@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useContext } from 'react'
 import { faker } from '@faker-js/faker'
+import { ConnectionsContext } from '../../context/ConnectionsContext'
 import SwipePage from '../SwipePage'
 import './searchPage.css'
 
@@ -31,12 +32,19 @@ function Degreebadge({ degree }) {
   return <span className={`sp-degree sp-degree--${degree}`}>{labels[degree]}</span>
 }
 
-function PersonCard({ person, onConnect }) {
+function PersonCard({ person, onConnect, onCancel }) {
   const [status, setStatus] = useState(person.connected ? 'connected' : 'idle')
+  const [requestId, setRequestId] = useState(null)
 
   const handleConnect = () => {
     setStatus('pending')
-    onConnect(person.id)
+    onConnect(person.id).then(data => setRequestId(data.request.id))
+  }
+
+  const handleCancel = () => {
+    onCancel(requestId)
+    setStatus('idle')
+    setRequestId(null)
   }
 
   return (
@@ -59,16 +67,17 @@ function PersonCard({ person, onConnect }) {
       </div>
       <button
         className={`sp-connect-btn sp-connect-btn--${status}`}
-        onClick={handleConnect}
-        disabled={status !== 'idle'}
+        onClick={status === 'pending' ? handleCancel : handleConnect}
+        disabled={status === 'connected'}
       >
-        {status === 'connected' ? 'Connected' : status === 'pending' ? 'Pending' : '+ Connect'}
+        {status === 'connected' ? 'Connected' : status === 'pending' ? 'Pending ✕' : '+ Connect'}
       </button>
     </div>
   )
 }
 
 export default function SearchPage() {
+  const { sendRequest, cancelRequest } = useContext(ConnectionsContext)
   const [people, setPeople] = useState([])
   const [swipeMode, setSwipeMode] = useState(false)
   const [query, setQuery] = useState('')
@@ -136,6 +145,11 @@ export default function SearchPage() {
 
   const handleConnect = (id) => {
     setPeople(prev => prev.map(p => p.id === id ? { ...p, connected: true } : p))
+    return sendRequest(String(id))
+  }
+
+  const handleCancel = (requestId) => {
+    cancelRequest(requestId)
   }
 
   if (swipeMode) {
@@ -200,7 +214,7 @@ export default function SearchPage() {
       <div className="sp-results">
         {results.length === 0
           ? <p className="sp-empty">No results. Try adjusting your filters.</p>
-          : results.map(p => <PersonCard key={p.id} person={p} onConnect={handleConnect} />)
+          : results.map(p => <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} />)
         }
       </div>
 
