@@ -51,10 +51,26 @@ function acceptRequestById(id) {
   return record;
 }
 
+function rejectRequestById(id) {
+  const record = connections.get(id);
+  if (!record) return null;
+  record.status = 'rejected';
+  return record;
+}
+
+function deleteConnectionById(id) {
+  const record = connections.get(id);
+  if (!record) return null;
+  connections.delete(id);
+  return record;
+}
+
 module.exports = {
   connections,
   addRequest,
   getPendingForUser,
   getAcceptedForUser,
-  acceptRequestById
+  acceptRequestById,
+  rejectRequestById,
+  deleteConnectionById
 };
