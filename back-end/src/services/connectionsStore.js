@@ -3,6 +3,8 @@
 // { id, fromUserId, toUserId, status, createdAt }
 // status is one of: 'pending', 'accepted', 'rejected'
 
+const { getUserById } = require('./usersStore');
+
 const connections = new Map();
 
 let nextId = 1;
@@ -24,7 +26,10 @@ function getPendingForUser(userId) {
   const results = [];
   for (const record of connections.values()) {
     if (record.toUserId === userId && record.status === 'pending') {
-      results.push(record);
+      results.push({
+        ...record,
+        fromUser: getUserById(record.fromUserId)
+      });
     }
   }
   return results;
@@ -35,7 +40,11 @@ function getAcceptedForUser(userId) {
   for (const record of connections.values()) {
     if (record.status !== 'accepted') continue;
     if (record.fromUserId === userId || record.toUserId === userId) {
-      results.push(record);
+      const otherUserId = record.fromUserId === userId ? record.toUserId : record.fromUserId;
+      results.push({
+        ...record,
+        otherUser: getUserById(otherUserId)
+      });
     }
   }
   return results;
