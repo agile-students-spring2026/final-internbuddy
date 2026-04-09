@@ -1,94 +1,43 @@
-import { useState, useContext } from 'react'
-import { ConnectionsContext } from '../context/ConnectionsContext'
+import { useState, useEffect } from 'react'
 import './SwipePage.css'
 
-const MOCK_PROFILES = [
-  {
-    id: 101,
-    name: 'Sarah',
-    age: 21,
-    major: 'Data Science @ UC Berkeley',
-    internshipFull: 'Data Science Intern @ Google',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about:
-      'I love data, coffee, and exploring new neighborhoods. Excited to meet other interns this summer!',
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile1/400/500',
-    interests: ['🎵 Music', '🍜 Food', '📚 Reading', '🎨 Art'],
-    drinks: 'Socially',
-  },
-  {
-    id: 102,
-    name: 'Jessica',
-    age: 22,
-    major: 'Computer Science @ Stanford',
-    internshipFull: 'Software Engineer Intern @ Meta',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about:
-      "Full-stack developer, startup enthusiast, love hiking and trying new restaurants around the Bay.",
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile2/400/500',
-    interests: ['🏀 Sports', '🎉 Party', '🎨 Creation', '☕ Cafes'],
-    drinks: 'Yes',
-  },
-  {
-    id: 103,
-    name: 'Alex',
-    age: 23,
-    major: 'Electrical Engineering @ MIT',
-    internshipFull: 'Product Manager Intern @ Apple',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about:
-      "I love building products that matter. When I'm not working, you can find me at concerts or reading sci-fi.",
-    pronouns: 'they/them',
-    image: 'https://picsum.photos/seed/profile3/400/500',
-    interests: ['🎵 Music', '🎨 Creation', '📚 Reading', '🏊 Swimming'],
-    drinks: 'No',
-  },
-  {
-    id: 104,
-    name: 'Elena',
-    age: 20,
-    major: 'UX/UI Design @ Cal Poly',
-    internshipFull: 'UX Designer Intern @ Adobe',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about:
-      "Design lover and coffee enthusiast. I enjoy sketching, photography, and meeting creative people!",
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile4/400/500',
-    interests: ['🍜 Food', '🎨 Creation', '🍹 Drinks', '📷 Photography'],
-    drinks: 'Socially',
-  },
-  {
-    id: 105,
-    name: 'Morgan',
-    age: 22,
-    major: 'Computer Science @ UCSC',
-    internshipFull: 'Backend Engineer Intern @ Stripe',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about:
-      "Backend optimization nerd, weekend athlete, and always down for a good game night.",
-    pronouns: 'he/him',
-    image: 'https://picsum.photos/seed/profile5/400/500',
-    interests: ['🏀 Sports', '📚 Reading', '🎵 Music', '🎮 Gaming'],
-    drinks: 'Socially',
-  },
-]
-
 function SwipePage() {
-  const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
+  const [profiles, setProfiles] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notification, setNotification] = useState(null)
   const [swipeDirection, setSwipeDirection] = useState(null)
+  const [sentRequests, setSentRequests] = useState([])
+  const [receivedRequests, setReceivedRequests] = useState([])
   const [showRequests, setShowRequests] = useState(false)
   const [requestsTab, setRequestsTab] = useState('received')
 
-  const profile = MOCK_PROFILES[currentIndex]
+  useEffect(() => {
+    fetch('/api/swipe/profiles')
+      .then(res => res.json())
+      .then(data => setProfiles(data))
+      .catch(err => console.error('Failed to fetch profiles:', err))
+
+    fetch('/api/swipe/requests')
+      .then(res => res.json())
+      .then(data => {
+        setReceivedRequests(data.received || [])
+        setSentRequests(data.sent || [])
+      })
+      .catch(err => console.error('Failed to fetch requests:', err))
+  }, [])
+
+  const profile = profiles[currentIndex]
 
   const handleReject = () => {
     setSwipeDirection('left')
+    fetch('/api/swipe/pass', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileId: profile.id }),
+    }).catch(err => console.error('Failed to pass:', err))
+
     setTimeout(() => {
-      if (currentIndex < MOCK_PROFILES.length - 1) {
+      if (currentIndex < profiles.length - 1) {
         setCurrentIndex(currentIndex + 1)
         setNotification(null)
       } else {
@@ -100,10 +49,16 @@ function SwipePage() {
 
   const handleAccept = () => {
     setSwipeDirection('right')
-    sendRequest(String(profile.id))
     setNotification({ type: 'success', text: `✓ Friend request sent to ${profile.name}!` })
+
+    fetch('/api/swipe/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profileId: profile.id }),
+    }).catch(err => console.error('Failed to like:', err))
+
     setTimeout(() => {
-      if (currentIndex < MOCK_PROFILES.length - 1) {
+      if (currentIndex < profiles.length - 1) {
         setCurrentIndex(currentIndex + 1)
         setNotification(null)
       } else {
@@ -113,14 +68,26 @@ function SwipePage() {
     }, 1600)
   }
 
+  const handleAcceptRequest = (id) => {
+    fetch(`/api/swipe/requests/${id}/accept`, { method: 'POST' })
+      .then(() => setReceivedRequests(prev => prev.filter(r => r.id !== id)))
+      .catch(err => console.error('Failed to accept request:', err))
+  }
+
+  const handleRejectRequest = (id) => {
+    fetch(`/api/swipe/requests/${id}/reject`, { method: 'POST' })
+      .then(() => setReceivedRequests(prev => prev.filter(r => r.id !== id)))
+      .catch(err => console.error('Failed to reject request:', err))
+  }
+
   return (
     <div className="swipe-page">
       <div className="swipe-top-bar">
         <button className="swipe-heart-btn" onClick={() => setShowRequests(true)}>
           ❤️
-          {(sent.length + pending.length) > 0 && (
+          {(sentRequests.length + receivedRequests.length) > 0 && (
             <span className="swipe-heart-badge">
-              {sent.length + pending.length}
+              {sentRequests.length + receivedRequests.length}
             </span>
           )}
         </button>
@@ -204,7 +171,7 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('received')}
               >
-                Received ({pending.length})
+                Received ({receivedRequests.length})
               </button>
               <button
                 className={`swipe-requests-tab ${
@@ -212,14 +179,14 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('sent')}
               >
-                Sent ({sent.length})
+                Sent ({sentRequests.length})
               </button>
             </div>
 
             <div className="swipe-requests-list">
               {requestsTab === 'received' &&
-                (pending.length > 0 ? (
-                  pending.map((req) => (
+                (receivedRequests.length > 0 ? (
+                  receivedRequests.map((req) => (
                     <div key={req.id} className="swipe-request-item">
                       <img
                         src={req.fromUser.image}
@@ -231,8 +198,8 @@ function SwipePage() {
                         <p>{req.fromUser.role}</p>
                       </div>
                       <div className="swipe-request-actions">
-                        <button className="swipe-request-accept" onClick={() => acceptRequest(req.id)}>✓</button>
-                        <button className="swipe-request-reject" onClick={() => rejectRequest(req.id)}>✕</button>
+                        <button className="swipe-request-accept" onClick={() => handleAcceptRequest(req.id)}>✓</button>
+                        <button className="swipe-request-reject" onClick={() => handleRejectRequest(req.id)}>✕</button>
                       </div>
                     </div>
                   ))
@@ -241,8 +208,8 @@ function SwipePage() {
                 ))}
 
               {requestsTab === 'sent' &&
-                (sent.length > 0 ? (
-                  sent.map((req) => (
+                (sentRequests.length > 0 ? (
+                  sentRequests.map((req) => (
                     <div key={req.id} className="swipe-sent-request-item">
                       <div className="swipe-sent-request-info">
                         <h3>{req.toUser ? req.toUser.name : `User ${req.toUserId}`}</h3>

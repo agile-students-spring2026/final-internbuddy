@@ -1,6 +1,6 @@
 # InternBuddy Back-End
 
-Express.js back-end scaffold focused on the signup -> profile pipeline.
+Express.js back-end for the InternBuddy application.
 
 ## Folder structure
 
@@ -13,64 +13,100 @@ back-end/
     server.js
     controllers/
       authController.js
+      eventsController.js
+      messagesController.js
       profileController.js
+      swipeController.js
     data/
       profileStepOrder.js
     middleware/
       errorHandlers.js
     routes/
       authRoutes.js
+      eventsRoutes.js
+      messagesRoutes.js
       profileRoutes.js
+      swipeRoutes.js
     services/
       mockStore.js
   test/
     authRoutes.test.js
+    eventsRoutes.test.js
+    messagesRoutes.test.js
     profileRoutes.test.js
+    swipeRoutes.test.js
   package.json
 ```
 
 ## Setup
 
-1. Open terminal in `back-end`.
+1. Open terminal in `back-end/`.
 2. Install dependencies:
-   - `npm install`
-3. Start server:
-   - `npm run dev`
+   ```bash
+   npm install
+   ```
+3. Create a `.env` file (see `.env.example` if available) — do **not** commit this file.
+4. Start the server:
+   ```bash
+   npm run dev
+   ```
+   The server runs on `http://localhost:3001` by default.
 
 ## Test and coverage
 
-- Run tests with coverage:
-  - `npm test`
-- Coverage reports:
-  - terminal summary
-  - `back-end/coverage/index.html`
+Run tests with coverage:
 
-## Mock API routes
+```bash
+npm test
+```
+
+Coverage reports:
+- Terminal summary printed after tests
+- HTML report at `back-end/coverage/index.html`
+
+## API Routes
 
 ### Static route
 
-- `GET /` -> returns `public/index.html`
+- `GET /` — serves `public/index.html`
 
-### Health route
+### Health
 
-- `GET /api/health`
+- `GET /api/health` — returns `{ status: "ok" }`
 
-### Auth routes
+### Auth routes (`/api/auth`)
 
-- `POST /api/auth/signup`
-  - body: `{ "email": "...", "phone": "..." }`
-- `POST /api/auth/verify`
-  - body: `{ "userId": "...", "code": "123456" }`
-- `GET /api/auth/:userId`
+- `POST /api/auth/signup` — body: `{ "email": "...", "phone": "..." }`
+- `POST /api/auth/verify` — body: `{ "userId": "...", "code": "123456" }`
+- `GET /api/auth/:userId` — get account by userId
 
-### Profile routes
+### Profile routes (`/api/profile`)
 
-- `GET /api/profile/:userId`
-- `POST /api/profile/:userId/step`
-  - body: `{ "step": "name", "value": { ... } }`
-- `POST /api/profile/:userId/complete`
+- `GET /api/profile/:userId` — get profile
+- `POST /api/profile/:userId/step` — body: `{ "step": "name", "value": { ... } }`
+- `POST /api/profile/:userId/complete` — mark profile complete
+
+### Events routes (`/api/events`)
+
+- `GET /api/events` — list all events
+- `GET /api/events/me` — get current user's events (hosting, attending, private, suggested)
+- `GET /api/events/:id` — get single event by id
+- `POST /api/events` — body: `{ "title": "...", "description": "...", "location": "...", "date": "...", "time": "...", "privacy": "public" }`
+
+### Swipe routes (`/api/swipe`)
+
+- `GET /api/swipe/profiles` — list swipeable profiles
+- `POST /api/swipe/like` — body: `{ "profileId": 1 }`
+- `POST /api/swipe/pass` — body: `{ "profileId": 1 }`
+- `GET /api/swipe/requests` — get sent and received friend requests
+
+### Messages routes (`/api/messages`)
+
+- `GET /api/messages` — list all conversations
+- `GET /api/messages/:conversationId` — get conversation with messages
+- `POST /api/messages/:conversationId` — body: `{ "text": "..." }`
 
 ## Notes
 
-- Current implementation uses in-memory mock data only.
+- Current implementation uses in-memory mock data — data resets on server restart.
 - Do not commit secrets; store sensitive values in `.env` files.
