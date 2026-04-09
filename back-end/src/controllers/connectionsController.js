@@ -1,7 +1,8 @@
 const {
   addRequest,
   getPendingForUser,
-  getAcceptedForUser
+  getAcceptedForUser,
+  acceptRequestById
 } = require('../services/connectionsStore');
 
 function sendRequest(req, res) {
@@ -34,8 +35,23 @@ function getAccepted(req, res) {
   return res.status(200).json({ accepted });
 }
 
+function acceptRequest(req, res) {
+  const { requestId } = req.params;
+  const record = acceptRequestById(requestId);
+
+  if (!record) {
+    return res.status(404).json({ error: 'Connection request not found' });
+  }
+
+  return res.status(200).json({
+    message: 'Connection request accepted (mock)',
+    request: record
+  });
+}
+
 module.exports = {
   sendRequest,
   getPending,
-  getAccepted
+  getAccepted,
+  acceptRequest
 };

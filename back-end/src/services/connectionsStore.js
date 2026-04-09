@@ -41,9 +41,20 @@ function getAcceptedForUser(userId) {
   return results;
 }
 
+function acceptRequestById(id) {
+  const record = connections.get(id);
+  if (!record) {
+    return null;
+  }
+  record.status = 'accepted';
+  record.acceptedAt = new Date().toISOString();
+  return record;
+}
+
 module.exports = {
   connections,
   addRequest,
   getPendingForUser,
-  getAcceptedForUser
+  getAcceptedForUser,
+  acceptRequestById
 };
