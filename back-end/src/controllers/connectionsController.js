@@ -7,6 +7,7 @@ const {
   rejectRequestById,
   deleteConnectionById
 } = require('../services/connectionsStore');
+const { getUserById } = require('../services/usersStore');
 
 function sendRequest(req, res) {
   const { fromUserId, toUserId } = req.body;
@@ -22,7 +23,7 @@ function sendRequest(req, res) {
 
   return res.status(201).json({
     message: 'Connection request sent (mock)',
-    request: record
+    request: { ...record, toUser: getUserById(toUserId) }
   });
 }
 
