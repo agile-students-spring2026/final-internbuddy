@@ -51,6 +51,18 @@ function acceptRequestById(id) {
   return record;
 }
 
+function seedConnections() {
+  // user "3" sent a request to user "1" - incoming pending for user 1
+  addRequest('3', '1');
+  // user "4" sent a request to user "1" - another incoming pending
+  addRequest('4', '1');
+  // user "1" and user "2" are already friends
+  const req = addRequest('1', '2');
+  acceptRequestById(req.id);
+}
+
+seedConnections();
+
 function rejectRequestById(id) {
   const record = connections.get(id);
   if (!record) return null;
@@ -72,5 +84,6 @@ module.exports = {
   getAcceptedForUser,
   acceptRequestById,
   rejectRequestById,
-  deleteConnectionById
+  deleteConnectionById,
+  seedConnections
 };
