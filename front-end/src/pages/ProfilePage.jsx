@@ -212,6 +212,13 @@ export default function ProfilePage() {
 
         {activeTab === "requests" && (
           <div className="requests-page">
+            <button
+              onClick={() => setActiveTab("profile")}
+              className="mb-6 inline-flex w-fit items-center gap-2 rounded-xl border border-[#d9d9e8] bg-white px-4 py-2 text-[16px] font-medium text-[#23235f] shadow-sm transition hover:shadow-md hover:bg-gray-50"
+            >
+              <span className="text-[18px] leading-none">←</span>
+              <span>Back</span>
+            </button>
             <h2 className="page-title">Friend Requests</h2>
             {friendRequests.map((r) => (
               <div key={r.id} className="request-card">

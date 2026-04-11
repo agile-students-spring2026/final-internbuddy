@@ -252,13 +252,14 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.35);
   z-index: 100;
-  display: flex;
-  align-items: flex-end;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
 }
 
 .sp-drawer {
   background: white;
-  border-radius: 20px 20px 0 0;
+  border-radius: 20px 20px 20px 20px;
   padding: 1.25rem 1rem 2rem;
   width: 100%;
   max-width: 430px;
@@ -266,6 +267,7 @@
   max-height: 80vh;
   overflow-y: auto;
 }
+
 
 .sp-drawer-header {
   display: flex;
