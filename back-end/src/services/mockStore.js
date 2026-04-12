@@ -266,6 +266,15 @@ function verifyAccount(userId) {
   return account;
 }
 
+function findAccountByEmail(email) {
+  for (const account of accounts.values()) {
+    if (account.email.toLowerCase() === email.toLowerCase()) {
+      return account;
+    }
+  }
+  return null;
+}
+
 function saveProfileStep(userId, step, value) {
   const profile = profiles.get(userId);
   if (!profile) {
@@ -383,6 +392,7 @@ function sendMessage(conversationId, text) {
 module.exports = {
   createAccount,
   getAccount,
+  findAccountByEmail,
   verifyAccount,
   saveProfileStep,
   getProfile,

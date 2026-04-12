@@ -1,4 +1,4 @@
-const { createAccount, verifyAccount, getAccount } = require('../services/mockStore');
+const { createAccount, verifyAccount, getAccount, findAccountByEmail } = require('../services/mockStore');
 
 function signup(req, res) {
   const { email, phone } = req.body;
@@ -10,7 +10,15 @@ function signup(req, res) {
     });
   }
 
-  const account = createAccount({ email, phone });
+  const normalizedEmail = email.trim().toLowerCase();
+
+  if (findAccountByEmail(normalizedEmail)) {
+    return res.status(409).json({
+      error: 'Account with this email already exists'
+    });
+  }
+
+  const account = createAccount({ email: normalizedEmail, phone });
 
   return res.status(201).json({
     message: 'Signup created (mock)',
