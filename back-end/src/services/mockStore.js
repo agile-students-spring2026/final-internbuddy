@@ -405,7 +405,7 @@ function createConversation(currentUserId, otherUserId) {
     otherUser: {
       id: otherUid,
       name: userInfo.name,
-      username: userInfo.name.toLowerCase().replace(/\s+/g, ''),
+      username: userInfo.name.toLowerCase().replaceAll(' ', ''),
       avatar: userInfo.image,
       subtitle: userInfo.role,
     },
