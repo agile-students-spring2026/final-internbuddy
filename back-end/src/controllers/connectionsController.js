@@ -8,6 +8,7 @@ const {
   deleteConnectionById
 } = require('../services/connectionsStore');
 const { getUserById } = require('../services/usersStore');
+const { createConversation } = require('../services/mockStore');
 
 function sendRequest(req, res) {
   const { fromUserId, toUserId } = req.body;
@@ -53,9 +54,12 @@ function acceptRequest(req, res) {
     return res.status(404).json({ error: 'Connection request not found' });
   }
 
+  const conversation = createConversation(record.toUserId, record.fromUserId);
+
   return res.status(200).json({
     message: 'Connection request accepted (mock)',
-    request: record
+    request: record,
+    conversation,
   });
 }
 

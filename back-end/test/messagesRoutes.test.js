@@ -46,4 +46,47 @@ describe('Messages Routes', () => {
     expect(res.status).to.equal(400);
     expect(res.body).to.have.property('error');
   });
+
+  it('POST /api/messages should create a new conversation', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .send({ userId: '1', otherUserId: '103' });
+    expect(res.status).to.equal(201);
+    expect(res.body).to.have.property('id');
+    expect(res.body.otherUser).to.have.property('name', 'Alex');
+    expect(res.body.otherUser).to.have.property('id', 'u103');
+  });
+
+  it('POST /api/messages should return 400 if userId is missing', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .send({ otherUserId: '103' });
+    expect(res.status).to.equal(400);
+  });
+
+  it('POST /api/messages should return 400 if otherUserId is missing', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .send({ userId: '1' });
+    expect(res.status).to.equal(400);
+  });
+
+  it('POST /api/messages should return existing conversation for duplicate pair', async () => {
+    const first = await request(app)
+      .post('/api/messages')
+      .send({ userId: '1', otherUserId: '104' });
+    const second = await request(app)
+      .post('/api/messages')
+      .send({ userId: '1', otherUserId: '104' });
+    expect(first.body.id).to.equal(second.body.id);
+  });
+
+  it('GET /api/messages/:id should work for a newly created conversation', async () => {
+    const created = await request(app)
+      .post('/api/messages')
+      .send({ userId: '1', otherUserId: '105' });
+    const res = await request(app).get(`/api/messages/${created.body.id}`);
+    expect(res.status).to.equal(200);
+    expect(res.body.messages).to.deep.equal([]);
+  });
 });

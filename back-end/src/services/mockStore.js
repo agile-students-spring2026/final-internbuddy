@@ -1,4 +1,5 @@
 const profileStepOrder = require('../data/profileStepOrder');
+const { getUserById } = require('./usersStore');
 
 const accounts = new Map();
 const profiles = new Map();
@@ -210,6 +211,8 @@ const conversations = [
   },
 ];
 
+let nextConversationId = 4;
+
 const messagesByConversation = {
   c1: [
     { id: 1, sender: 'them', text: 'Hey! Are you free later this week?' },
@@ -389,6 +392,33 @@ function sendMessage(conversationId, text) {
   return newMsg;
 }
 
+function createConversation(currentUserId, otherUserId) {
+  const otherUid = otherUserId.startsWith('u') ? otherUserId : `u${otherUserId}`;
+
+  const existing = conversations.find(c => c.otherUser.id === otherUid);
+  if (existing) return existing;
+
+  const userInfo = getUserById(otherUserId);
+  const convoId = `c${nextConversationId++}`;
+  const newConvo = {
+    id: convoId,
+    otherUser: {
+      id: otherUid,
+      name: userInfo.name,
+      username: userInfo.name.toLowerCase().replace(/\s+/g, ''),
+      avatar: userInfo.image,
+      subtitle: userInfo.role,
+    },
+    lastMessage: '',
+    timestamp: 'now',
+    unreadCount: 0,
+  };
+
+  conversations.push(newConvo);
+  messagesByConversation[convoId] = [];
+  return newConvo;
+}
+
 module.exports = {
   createAccount,
   getAccount,
@@ -408,4 +438,5 @@ module.exports = {
   getConversations,
   getMessages,
   sendMessage,
+  createConversation,
 };
