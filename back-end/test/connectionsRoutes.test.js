@@ -100,6 +100,32 @@ describe('Connections routes', () => {
       expect(res.body.request.status).to.equal('accepted');
     });
 
+    it('should include a conversation in the accept response', async () => {
+      const send = await request(app)
+        .post('/api/connections/request')
+        .send({ fromUserId: '101', toUserId: '1' });
+
+      const res = await request(app).post(`/api/connections/${send.body.request.id}/accept`);
+
+      expect(res.status).to.equal(200);
+      expect(res.body).to.have.property('conversation');
+      expect(res.body.conversation).to.have.property('id');
+      expect(res.body.conversation).to.have.property('otherUser');
+    });
+
+    it('should create a conversation retrievable via messages API', async () => {
+      const send = await request(app)
+        .post('/api/connections/request')
+        .send({ fromUserId: '102', toUserId: '1' });
+
+      const accepted = await request(app).post(`/api/connections/${send.body.request.id}/accept`);
+      const convoId = accepted.body.conversation.id;
+
+      const res = await request(app).get(`/api/messages/${convoId}`);
+      expect(res.status).to.equal(200);
+      expect(res.body.messages).to.deep.equal([]);
+    });
+
     it('should return 404 if request does not exist', async () => {
       const res = await request(app).post('/api/connections/9999/accept');
       expect(res.status).to.equal(404);

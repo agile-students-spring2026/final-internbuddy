@@ -22,4 +22,16 @@ function sendMessage(req, res) {
   res.status(201).json(message);
 }
 
-module.exports = { getConversations, getMessages, sendMessage };
+function createConversation(req, res) {
+  const { userId, otherUserId } = req.body;
+  if (!userId || !otherUserId) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+      required: ['userId', 'otherUserId'],
+    });
+  }
+  const conversation = mockStore.createConversation(userId, otherUserId);
+  res.status(201).json(conversation);
+}
+
+module.exports = { getConversations, getMessages, sendMessage, createConversation };
