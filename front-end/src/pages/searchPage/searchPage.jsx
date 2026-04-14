@@ -10,7 +10,6 @@ const ROLES = ['SWE Intern', 'PM Intern', 'Design Intern', 'Data Intern', 'Finan
 const CITIES = ['New York, NY', 'San Francisco, CA', 'Seattle, WA', 'Austin, TX', 'Boston, MA', 'Chicago, IL']
 const RADII = ['5 mi', '10 mi', '25 mi', '50 mi', 'Any']
 
-const API_BASE = 'http://localhost:3001'
 const CURRENT_USER_ID = '1'
 
 function Degreebadge({ degree }) {
@@ -121,8 +120,7 @@ export default function SearchPage() {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true)
-    console.log('Fetching:', `${API_BASE}/api/users/search?${params.toString()}`)
-    fetch(`${API_BASE}/api/users/search?${params}`, {
+    fetch(`/api/users/search?${params}`, {
       headers: { 'x-current-user-id': CURRENT_USER_ID }
     })
       .then(res => res.json())

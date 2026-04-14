@@ -80,7 +80,7 @@ function SwipePage() {
         <div className="swipe-card-wrapper">
           <div className={`swipe-card-container ${swipeDirection ? `swipe-${swipeDirection}` : ''}`}>
             <div className="swipe-card">
-              <img className="swipe-image" src={profile.image} alt={profile.name} />
+              <img className="swipe-image" src={profile.swipeImage || profile.image} alt={profile.name} />
             </div>
 
             <div className="swipe-info-section">
