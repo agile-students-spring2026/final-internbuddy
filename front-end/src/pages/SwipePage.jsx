@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { ConnectionsContext } from '../context/ConnectionsContext'
 import './SwipePage.css'
 
 function SwipePage() {
+  const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
   const [profiles, setProfiles] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [notification, setNotification] = useState(null)
   const [swipeDirection, setSwipeDirection] = useState(null)
-  const [sentRequests, setSentRequests] = useState([])
-  const [receivedRequests, setReceivedRequests] = useState([])
   const [showRequests, setShowRequests] = useState(false)
   const [requestsTab, setRequestsTab] = useState('received')
 
@@ -16,14 +16,6 @@ function SwipePage() {
       .then(res => res.json())
       .then(data => setProfiles(data))
       .catch(err => console.error('Failed to fetch profiles:', err))
-
-    fetch('/api/swipe/requests')
-      .then(res => res.json())
-      .then(data => {
-        setReceivedRequests(data.received || [])
-        setSentRequests(data.sent || [])
-      })
-      .catch(err => console.error('Failed to fetch requests:', err))
   }, [])
 
   const profile = profiles[currentIndex]
@@ -51,11 +43,8 @@ function SwipePage() {
     setSwipeDirection('right')
     setNotification({ type: 'success', text: `✓ Friend request sent to ${profile.name}!` })
 
-    fetch('/api/swipe/like', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ profileId: profile.id }),
-    }).catch(err => console.error('Failed to like:', err))
+    sendRequest(String(profile.id))
+      .catch(err => console.error('Failed to send request:', err))
 
     setTimeout(() => {
       if (currentIndex < profiles.length - 1) {
@@ -68,26 +57,14 @@ function SwipePage() {
     }, 1600)
   }
 
-  const handleAcceptRequest = (id) => {
-    fetch(`/api/swipe/requests/${id}/accept`, { method: 'POST' })
-      .then(() => setReceivedRequests(prev => prev.filter(r => r.id !== id)))
-      .catch(err => console.error('Failed to accept request:', err))
-  }
-
-  const handleRejectRequest = (id) => {
-    fetch(`/api/swipe/requests/${id}/reject`, { method: 'POST' })
-      .then(() => setReceivedRequests(prev => prev.filter(r => r.id !== id)))
-      .catch(err => console.error('Failed to reject request:', err))
-  }
-
   return (
     <div className="swipe-page">
       <div className="swipe-top-bar">
         <button className="swipe-heart-btn" onClick={() => setShowRequests(true)}>
           ❤️
-          {(sentRequests.length + receivedRequests.length) > 0 && (
+          {(sent.length + pending.length) > 0 && (
             <span className="swipe-heart-badge">
-              {sentRequests.length + receivedRequests.length}
+              {sent.length + pending.length}
             </span>
           )}
         </button>
@@ -171,7 +148,7 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('received')}
               >
-                Received ({receivedRequests.length})
+                Received ({pending.length})
               </button>
               <button
                 className={`swipe-requests-tab ${
@@ -179,27 +156,27 @@ function SwipePage() {
                 }`}
                 onClick={() => setRequestsTab('sent')}
               >
-                Sent ({sentRequests.length})
+                Sent ({sent.length})
               </button>
             </div>
 
             <div className="swipe-requests-list">
               {requestsTab === 'received' &&
-                (receivedRequests.length > 0 ? (
-                  receivedRequests.map((req) => (
+                (pending.length > 0 ? (
+                  pending.map((req) => (
                     <div key={req.id} className="swipe-request-item">
                       <img
-                        src={req.fromUser.image}
-                        alt={req.fromUser.name}
+                        src={req.fromUser?.image || `https://picsum.photos/seed/${req.fromUserId}/100/100`}
+                        alt={req.fromUser?.name || 'User'}
                         className="swipe-request-image"
                       />
                       <div className="swipe-request-info">
-                        <h3>{req.fromUser.name}</h3>
-                        <p>{req.fromUser.role}</p>
+                        <h3>{req.fromUser?.name || `User ${req.fromUserId}`}</h3>
+                        <p>{req.fromUser?.role || ''}</p>
                       </div>
                       <div className="swipe-request-actions">
-                        <button className="swipe-request-accept" onClick={() => handleAcceptRequest(req.id)}>✓</button>
-                        <button className="swipe-request-reject" onClick={() => handleRejectRequest(req.id)}>✕</button>
+                        <button className="swipe-request-accept" onClick={() => acceptRequest(req.id)}>✓</button>
+                        <button className="swipe-request-reject" onClick={() => rejectRequest(req.id)}>✕</button>
                       </div>
                     </div>
                   ))
@@ -208,11 +185,11 @@ function SwipePage() {
                 ))}
 
               {requestsTab === 'sent' &&
-                (sentRequests.length > 0 ? (
-                  sentRequests.map((req) => (
+                (sent.length > 0 ? (
+                  sent.map((req) => (
                     <div key={req.id} className="swipe-sent-request-item">
                       <div className="swipe-sent-request-info">
-                        <h3>{req.toUser ? req.toUser.name : `User ${req.toUserId}`}</h3>
+                        <h3>{req.toUser?.name || `User ${req.toUserId}`}</h3>
                         <p>Request sent</p>
                       </div>
                       <span className="swipe-sent-request-badge">⏳</span>

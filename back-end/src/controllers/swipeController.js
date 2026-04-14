@@ -28,4 +28,25 @@ function getRequests(req, res) {
   res.json(requests);
 }
 
-module.exports = { getProfiles, likeProfile, passProfile, getRequests };
+function acceptRequest(req, res) {
+  const id = Number(req.params.id);
+  const record = mockStore.acceptSwipeRequest(id);
+  if (!record) {
+    return res.status(404).json({ error: 'Request not found' });
+  }
+  const conversation = record.fromUserId
+    ? mockStore.createConversation('1', record.fromUserId)
+    : null;
+  res.json({ message: 'Request accepted', request: record, conversation });
+}
+
+function rejectRequest(req, res) {
+  const id = Number(req.params.id);
+  const record = mockStore.rejectSwipeRequest(id);
+  if (!record) {
+    return res.status(404).json({ error: 'Request not found' });
+  }
+  res.json({ message: 'Request rejected', request: record });
+}
+
+module.exports = { getProfiles, likeProfile, passProfile, getRequests, acceptRequest, rejectRequest };

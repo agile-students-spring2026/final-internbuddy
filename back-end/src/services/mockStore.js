@@ -164,16 +164,17 @@ const swipeLikes = [];
 const swipePasses = [];
 
 const receivedRequests = [
-  { id: 1, name: 'Priya S.', role: 'Design Intern @ Figma', image: 'https://picsum.photos/seed/priya/100/100' },
-  { id: 2, name: 'Jordan K.', role: 'PM Intern @ Stripe', image: 'https://picsum.photos/seed/jordan/100/100' },
+  { id: 1, fromUserId: '3', fromUser: { name: 'Priya S.', role: 'Design Intern @ Figma', image: 'https://picsum.photos/seed/priya/100/100' } },
+  { id: 2, fromUserId: '4', fromUser: { name: 'Jordan K.', role: 'PM Intern @ Stripe', image: 'https://picsum.photos/seed/jordan/100/100' } },
 ];
+let nextSwipeRequestId = 3;
 
 // ── Messages mock data ──
 const conversations = [
   {
     id: 'c1',
     otherUser: {
-      id: 'u2',
+      id: '2',
       name: 'John Green',
       username: 'jgreen',
       avatar: 'https://picsum.photos/seed/jgreen/100/100',
@@ -186,7 +187,7 @@ const conversations = [
   {
     id: 'c2',
     otherUser: {
-      id: 'u3',
+      id: '200',
       name: 'Elon Musk',
       username: 'emusk',
       avatar: 'https://picsum.photos/seed/emusk/100/100',
@@ -199,7 +200,7 @@ const conversations = [
   {
     id: 'c3',
     otherUser: {
-      id: 'u4',
+      id: '201',
       name: 'Andy Jassy',
       username: 'ajassy',
       avatar: 'https://picsum.photos/seed/ajassy/100/100',
@@ -345,7 +346,13 @@ function getSwipeProfiles() {
 }
 
 function likeProfile(profileId) {
-  swipeLikes.push(profileId);
+  const profile = swipeProfiles.find(p => p.id === profileId);
+  const sentRequest = {
+    id: nextSwipeRequestId++,
+    toUserId: profileId,
+    toUser: profile ? { name: profile.name, role: profile.major, image: profile.image } : null,
+  };
+  swipeLikes.push(sentRequest);
   return { liked: profileId };
 }
 
@@ -356,6 +363,18 @@ function passProfile(profileId) {
 
 function getSwipeRequests() {
   return { received: receivedRequests, sent: swipeLikes };
+}
+
+function acceptSwipeRequest(requestId) {
+  const idx = receivedRequests.findIndex(r => r.id === requestId);
+  if (idx === -1) return null;
+  return receivedRequests.splice(idx, 1)[0];
+}
+
+function rejectSwipeRequest(requestId) {
+  const idx = receivedRequests.findIndex(r => r.id === requestId);
+  if (idx === -1) return null;
+  return receivedRequests.splice(idx, 1)[0];
 }
 
 // ── Messages functions ──
@@ -393,9 +412,7 @@ function sendMessage(conversationId, text) {
 }
 
 function createConversation(currentUserId, otherUserId) {
-  const otherUid = otherUserId.startsWith('u') ? otherUserId : `u${otherUserId}`;
-
-  const existing = conversations.find(c => c.otherUser.id === otherUid);
+  const existing = conversations.find(c => c.otherUser.id === otherUserId);
   if (existing) return existing;
 
   const userInfo = getUserById(otherUserId);
@@ -403,7 +420,7 @@ function createConversation(currentUserId, otherUserId) {
   const newConvo = {
     id: convoId,
     otherUser: {
-      id: otherUid,
+      id: otherUserId,
       name: userInfo.name,
       username: userInfo.name.toLowerCase().replaceAll(' ', ''),
       avatar: userInfo.image,
@@ -435,6 +452,8 @@ module.exports = {
   likeProfile,
   passProfile,
   getSwipeRequests,
+  acceptSwipeRequest,
+  rejectSwipeRequest,
   getConversations,
   getMessages,
   sendMessage,
