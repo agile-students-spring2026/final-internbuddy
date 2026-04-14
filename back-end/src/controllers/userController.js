@@ -12,11 +12,13 @@ function searchUsersHandler(req, res) {
 
     try {
         const matches = searchUsers({ q, company, school, role, city })
-            .filter((u) => u.id !== currentUserId);
+            .filter((u) => u.id !== currentUserId)
+            .map((u) => enrichUser(u, currentUserId))
+            .filter((u) => !u.connected);
         const total = matches.length;
         const totalPages = Math.ceil(total / limit);
         const offset = (page - 1) * limit;
-        const enriched = matches.slice(offset, offset + limit).map((u) => enrichUser(u, currentUserId));
+        const enriched = matches.slice(offset, offset + limit);
 
         res.json({
             data: enriched,

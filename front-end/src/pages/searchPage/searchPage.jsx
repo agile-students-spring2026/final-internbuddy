@@ -19,8 +19,15 @@ function Degreebadge({ degree }) {
   return <span className={`sp-degree sp-degree--${d}`}>{labels[degree]}</span>
 }
 
-function PersonCard({ person, onConnect, onCancel }) {
-  const [status, setStatus] = useState(person.connected ? 'connected' : 'idle')
+function getInitialStatus(person) {
+  if (person.connected) return 'connected'
+  if (person.connectionStatus === 'pending-outgoing') return 'pending'
+  if (person.connectionStatus === 'pending-incoming') return 'incoming'
+  return 'idle'
+}
+
+function PersonCard({ person, onConnect, onCancel, onAccept }) {
+  const [status, setStatus] = useState(() => getInitialStatus(person))
   const [requestId, setRequestId] = useState(null)
 
   const handleConnect = () => {
@@ -32,6 +39,18 @@ function PersonCard({ person, onConnect, onCancel }) {
     onCancel(requestId)
     setStatus('idle')
     setRequestId(null)
+  }
+
+  const handleAccept = () => {
+    onAccept(person.id)
+    setStatus('connected')
+  }
+
+  const label = {
+    connected: 'Connected',
+    pending: 'Pending ✕',
+    incoming: 'Accept',
+    idle: '+ Connect',
   }
 
   return (
@@ -54,17 +73,21 @@ function PersonCard({ person, onConnect, onCancel }) {
       </div>
       <button
         className={`sp-connect-btn sp-connect-btn--${status}`}
-        onClick={status === 'pending' ? handleCancel : handleConnect}
+        onClick={
+          status === 'pending' ? handleCancel
+          : status === 'incoming' ? handleAccept
+          : handleConnect
+        }
         disabled={status === 'connected'}
       >
-        {status === 'connected' ? 'Connected' : status === 'pending' ? 'Pending ✕' : '+ Connect'}
+        {label[status]}
       </button>
     </div>
   )
 }
 
 export default function SearchPage() {
-  const { sendRequest, cancelRequest } = useContext(ConnectionsContext)
+  const { sendRequest, cancelRequest, pending, accepted, acceptRequest } = useContext(ConnectionsContext)
   const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(false)
   const [swipeMode, setSwipeMode] = useState(false)
@@ -106,7 +129,7 @@ export default function SearchPage() {
       .then(json => setPeople(json.data || []))
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, applied])
+  }, [query, applied, pending, accepted])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
@@ -143,6 +166,11 @@ export default function SearchPage() {
 
   const handleConnect = (id) => sendRequest(String(id))
   const handleCancel = (requestId) => cancelRequest(requestId)
+  const handleAcceptFromSearch = (id) => {
+    // find the pending request for this user and accept it
+    const req = pending.find(r => r.fromUserId === String(id))
+    if (req) acceptRequest(req.id)
+  }
 
   if (swipeMode) {
     return (
@@ -203,7 +231,7 @@ export default function SearchPage() {
           : results.length === 0
             ? <p className="sp-empty">No results. Try adjusting your filters.</p>
             : results.map(p => (
-                <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} />
+                <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} onAccept={handleAcceptFromSearch} />
               ))
         }
       </div>

@@ -54,7 +54,7 @@ describe('Messages Routes', () => {
     expect(res.status).to.equal(201);
     expect(res.body).to.have.property('id');
     expect(res.body.otherUser).to.have.property('name', 'Alex');
-    expect(res.body.otherUser).to.have.property('id', 'u103');
+    expect(res.body.otherUser).to.have.property('id', '103');
   });
 
   it('POST /api/messages should return 400 if userId is missing', async () => {
