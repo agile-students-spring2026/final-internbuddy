@@ -99,6 +99,20 @@ function deleteConnectionById(id) {
   return record;
 }
 
+// returns 'accepted', 'pending-incoming', 'pending-outgoing', or null
+function getRelationship(userId, otherUserId) {
+  for (const record of connections.values()) {
+    const involves = (record.fromUserId === userId && record.toUserId === otherUserId)
+      || (record.fromUserId === otherUserId && record.toUserId === userId);
+    if (!involves) continue;
+    if (record.status === 'accepted') return 'accepted';
+    if (record.status === 'pending') {
+      return record.toUserId === userId ? 'pending-incoming' : 'pending-outgoing';
+    }
+  }
+  return null;
+}
+
 module.exports = {
   connections,
   addRequest,
@@ -108,5 +122,6 @@ module.exports = {
   acceptRequestById,
   rejectRequestById,
   deleteConnectionById,
-  seedConnections
+  seedConnections,
+  getRelationship,
 };

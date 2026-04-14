@@ -94,7 +94,7 @@ const userEvents = {
 // ── Swipe mock data ──
 const swipeProfiles = [
   {
-    id: 1,
+    id: 101,
     name: 'Sarah',
     age: 21,
     major: 'Data Science @ UC Berkeley',
@@ -107,7 +107,7 @@ const swipeProfiles = [
     drinks: 'Socially',
   },
   {
-    id: 2,
+    id: 102,
     name: 'Jessica',
     age: 22,
     major: 'Computer Science @ Stanford',
@@ -120,7 +120,7 @@ const swipeProfiles = [
     drinks: 'Yes',
   },
   {
-    id: 3,
+    id: 103,
     name: 'Alex',
     age: 23,
     major: 'Electrical Engineering @ MIT',
@@ -133,7 +133,7 @@ const swipeProfiles = [
     drinks: 'No',
   },
   {
-    id: 4,
+    id: 104,
     name: 'Elena',
     age: 20,
     major: 'UX/UI Design @ Cal Poly',
@@ -146,7 +146,7 @@ const swipeProfiles = [
     drinks: 'Socially',
   },
   {
-    id: 5,
+    id: 105,
     name: 'Morgan',
     age: 22,
     major: 'Computer Science @ UCSC',

@@ -70,11 +70,15 @@ function getMutualCount(userId, targetId) {
 }
 
 function enrichUser(user, currentUserId) {
+  const { getRelationship } = require('./connectionsStore');
   const { connections, ...publicUser } = user;
+  const relationship = currentUserId ? getRelationship(currentUserId, user.id) : null;
   return {
     ...publicUser,
     degree: currentUserId ? getConnectionDegree(currentUserId, user.id) : null,
     mutualCount: currentUserId ? getMutualCount(currentUserId, user.id) : 0,
+    connected: relationship === 'accepted',
+    connectionStatus: relationship,
   };
 }
 
