@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
-import { faker } from '@faker-js/faker'
+//import { faker } from '@faker-js/faker'
 import { ConnectionsContext } from '../../context/ConnectionsContext'
 import SwipePage from '../SwipePage'
 import './searchPage.css'
@@ -10,26 +10,13 @@ const ROLES = ['SWE Intern', 'PM Intern', 'Design Intern', 'Data Intern', 'Finan
 const CITIES = ['New York, NY', 'San Francisco, CA', 'Seattle, WA', 'Austin, TX', 'Boston, MA', 'Chicago, IL']
 const RADII = ['5 mi', '10 mi', '25 mi', '50 mi', 'Any']
 
-function generatePeople(count = 20) {
-  return Array.from({ length: count }, (_, i) => {
-    const degree = i < 3 ? 1 : i < 10 ? 2 : 3
-    return {
-      id: i + 1,
-      name: faker.person.fullName(),
-      role: faker.helpers.arrayElement(ROLES),
-      company: faker.helpers.arrayElement(COMPANIES),
-      school: faker.helpers.arrayElement(SCHOOLS),
-      city: faker.helpers.arrayElement(CITIES),
-      mutual: degree === 1 ? 0 : faker.number.int({ min: 1, max: 12 }),
-      degree,
-      connected: false,
-    }
-  })
-}
+const API_BASE = 'http://localhost:3001'
+const CURRENT_USER_ID = '1'
 
 function Degreebadge({ degree }) {
-  const labels = { 1: '1st', 2: '2nd', 3: '3rd' }
-  return <span className={`sp-degree sp-degree--${degree}`}>{labels[degree]}</span>
+  const labels = {1: '1st', 2: '2nd', 3: '3rd'}
+  const d = degree ?? 3
+  return <span className={`sp-degree sp-degree--${d}`}>{labels[degree]}</span>
 }
 
 function PersonCard({ person, onConnect, onCancel }) {
@@ -57,12 +44,12 @@ function PersonCard({ person, onConnect, onCancel }) {
       <div className="sp-card-info">
         <div className="sp-card-row">
           <span className="sp-name">{person.name}</span>
-          <Degreebadge degree={person.degree} />
+          {person.degree && <Degreebadge degree={person.degree} />}
         </div>
         <p className="sp-role">{person.role} @ {person.company}</p>
         <p className="sp-meta">{person.school} · {person.city}</p>
-        {person.mutual > 0 && (
-          <p className="sp-mutual">{person.mutual} mutual connection{person.mutual > 1 ? 's' : ''}</p>
+        {person.mutualCount > 0 && (
+          <p className="sp-mutual">{person.mutualCount} mutual connection{person.mutualCount > 1 ? 's' : ''}</p>
         )}
       </div>
       <button
@@ -79,10 +66,11 @@ function PersonCard({ person, onConnect, onCancel }) {
 export default function SearchPage() {
   const { sendRequest, cancelRequest } = useContext(ConnectionsContext)
   const [people, setPeople] = useState([])
+  const [loading, setLoading] = useState(false)
   const [swipeMode, setSwipeMode] = useState(false)
   const [query, setQuery] = useState('')
   const [showFilters, setShowFilters] = useState(false)
-  const [sortBy, setSortBy] = useState('degree') // 'degree' | 'name' | 'mutual'
+  const [sortBy, setSortBy] = useState('degree')
   const [filters, setFilters] = useState({
     companies: [],
     schools: [],
@@ -90,12 +78,35 @@ export default function SearchPage() {
     city: '',
     radius: 'Any',
   })
-  const [applied, setApplied] = useState(filters)
+  const [applied, setApplied] = useState({
+    companies: [],
+    schools: [],
+    roles: [],
+    city: '',
+    radius: 'Any',
+  })
 
   useEffect(() => {
+    console.log('useEffect running, applied:', applied)
+    const params = new URLSearchParams()
+    if (query) params.set('q', query)
+    if (applied.companies.length === 1) params.set('company', applied.companies[0])
+    if (applied.schools.length === 1) params.set('school', applied.schools[0])
+    if (applied.roles.length === 1) params.set('role', applied.roles[0])
+    if (applied.city) params.set('city', applied.city)
+    if (applied.radius !== 'Any') params.set('radius', applied.radius)
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPeople(generatePeople(20))
-  }, [])
+    setLoading(true)
+    console.log('Fetching:', `${API_BASE}/api/users/search?${params.toString()}`)
+    fetch(`${API_BASE}/api/users/search?${params}`, {
+      headers: { 'x-current-user-id': CURRENT_USER_ID }
+    })
+      .then(res => res.json())
+      .then(json => setPeople(json.data || []))
+      .catch(err => console.error('Search fetch failed:', err))
+      .finally(() => setLoading(false))
+  }, [query, applied])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
@@ -123,41 +134,20 @@ export default function SearchPage() {
     (applied.city ? 1 : 0) + (applied.radius !== 'Any' ? 1 : 0)
 
   const results = useMemo(() => {
-    let list = people.filter(p => {
-      const q = query.toLowerCase()
-      if (q && !p.name.toLowerCase().includes(q) &&
-          !p.company.toLowerCase().includes(q) &&
-          !p.school.toLowerCase().includes(q) &&
-          !p.role.toLowerCase().includes(q)) return false
-      if (applied.companies.length && !applied.companies.includes(p.company)) return false
-      if (applied.schools.length && !applied.schools.includes(p.school)) return false
-      if (applied.roles.length && !applied.roles.includes(p.role)) return false
-      if (applied.city && p.city !== applied.city) return false
-      return true
-    })
-
-    if (sortBy === 'degree') list = [...list].sort((a, b) => a.degree - b.degree)
-    else if (sortBy === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name))
-    else if (sortBy === 'mutual') list = [...list].sort((a, b) => b.mutual - a.mutual)
-
+    let list = [...people]
+    if (sortBy === 'degree') list.sort((a, b) => (a.degree ?? 99) - (b.degree ?? 99))
+    else if (sortBy === 'name') list.sort((a, b) => a.name.localeCompare(b.name))
+    else if (sortBy === 'mutual') list.sort((a, b) => (b.mutualCount ?? 0) - (a.mutualCount ?? 0))
     return list
-  }, [people, query, applied, sortBy])
+  }, [people, sortBy])
 
-  const handleConnect = (id) => {
-    return sendRequest(String(id))
-  }
-
-  const handleCancel = (requestId) => {
-    cancelRequest(requestId)
-  }
+  const handleConnect = (id) => sendRequest(String(id))
+  const handleCancel = (requestId) => cancelRequest(requestId)
 
   if (swipeMode) {
     return (
       <div className="sp-swipe-shell">
-        <button
-          className="sp-mode-toggle sp-mode-toggle--on"
-          onClick={() => setSwipeMode(false)}
-        >
+        <button className="sp-mode-toggle sp-mode-toggle--on" onClick={() => setSwipeMode(false)}>
           Swipe Mode: On
         </button>
         <SwipePage />
@@ -168,10 +158,7 @@ export default function SearchPage() {
   return (
     <div className="sp-page">
       <div className="sp-mode-row">
-        <button
-          className="sp-mode-toggle"
-          onClick={() => setSwipeMode(true)}
-        >
+        <button className="sp-mode-toggle" onClick={() => setSwipeMode(true)}>
           Swipe Mode: Off
         </button>
       </div>
@@ -193,9 +180,10 @@ export default function SearchPage() {
         </button>
       </div>
 
-      {/* Sort row */}
       <div className="sp-sort-row">
-        <span className="sp-result-count">{results.length} intern{results.length !== 1 ? 's' : ''}</span>
+        <span className="sp-result-count">
+          {loading ? 'Loading…' : `${results.length} intern${results.length !== 1 ? 's' : ''}`}
+        </span>
         <div className="sp-sort-pills">
           {['degree', 'mutual', 'name'].map(s => (
             <button
@@ -209,15 +197,17 @@ export default function SearchPage() {
         </div>
       </div>
 
-      {/* Results */}
       <div className="sp-results">
-        {results.length === 0
-          ? <p className="sp-empty">No results. Try adjusting your filters.</p>
-          : results.map(p => <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} />)
+        {loading
+          ? <p className="sp-empty">Loading…</p>
+          : results.length === 0
+            ? <p className="sp-empty">No results. Try adjusting your filters.</p>
+            : results.map(p => (
+                <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} />
+              ))
         }
       </div>
 
-      {/* Filter drawer */}
       {showFilters && (
         <div className="sp-drawer-overlay" onClick={() => setShowFilters(false)}>
           <div className="sp-drawer" onClick={e => e.stopPropagation()}>
@@ -226,7 +216,6 @@ export default function SearchPage() {
               <button className="sp-drawer-close" onClick={() => setShowFilters(false)}>✕</button>
             </div>
 
-            {/* Location */}
             <section className="sp-filter-section">
               <h3 className="sp-filter-label">City</h3>
               <div className="sp-chip-group">
@@ -242,7 +231,6 @@ export default function SearchPage() {
               </div>
             </section>
 
-            {/* Radius */}
             <section className="sp-filter-section">
               <h3 className="sp-filter-label">Radius</h3>
               <div className="sp-chip-group">
@@ -258,7 +246,6 @@ export default function SearchPage() {
               </div>
             </section>
 
-            {/* Company */}
             <section className="sp-filter-section">
               <h3 className="sp-filter-label">Company</h3>
               <div className="sp-chip-group">
@@ -274,7 +261,6 @@ export default function SearchPage() {
               </div>
             </section>
 
-            {/* School */}
             <section className="sp-filter-section">
               <h3 className="sp-filter-label">School</h3>
               <div className="sp-chip-group">
@@ -290,7 +276,6 @@ export default function SearchPage() {
               </div>
             </section>
 
-            {/* Role */}
             <section className="sp-filter-section">
               <h3 className="sp-filter-label">Role</h3>
               <div className="sp-chip-group">

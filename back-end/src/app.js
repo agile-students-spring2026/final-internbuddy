@@ -8,6 +8,7 @@ const connectionsRoutes = require('./routes/connectionsRoutes');
 const eventsRoutes = require('./routes/eventsRoutes');
 const swipeRoutes = require('./routes/swipeRoutes');
 const messagesRoutes = require('./routes/messagesRoutes');
+const userRoutes = require('./routes/userRoutes');
 const { notFoundHandler, errorHandler } = require('./middleware/errorHandlers');
 
 const app = express();
@@ -31,7 +32,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api/events', eventsRoutes);
 app.use('/api/swipe', swipeRoutes);
 app.use('/api/messages', messagesRoutes);
-
+app.use("/api/users", userRoutes);
 app.use('/api/connections', connectionsRoutes);
 
 app.use(notFoundHandler);
