@@ -91,84 +91,6 @@ const userEvents = {
   ],
 };
 
-// ── Swipe mock data ──
-const swipeProfiles = [
-  {
-    id: 101,
-    name: 'Sarah',
-    age: 21,
-    major: 'Data Science @ UC Berkeley',
-    internshipFull: 'Data Science Intern @ Google',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: 'I love data, coffee, and exploring new neighborhoods. Excited to meet other interns this summer!',
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile1/400/500',
-    interests: ['Music', 'Food', 'Reading', 'Art'],
-    drinks: 'Socially',
-  },
-  {
-    id: 102,
-    name: 'Jessica',
-    age: 22,
-    major: 'Computer Science @ Stanford',
-    internshipFull: 'Software Engineer Intern @ Meta',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: 'Full-stack developer, startup enthusiast, love hiking and trying new restaurants around the Bay.',
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile2/400/500',
-    interests: ['Sports', 'Party', 'Creation', 'Cafes'],
-    drinks: 'Yes',
-  },
-  {
-    id: 103,
-    name: 'Alex',
-    age: 23,
-    major: 'Electrical Engineering @ MIT',
-    internshipFull: 'Product Manager Intern @ Apple',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: "I love building products that matter. When I'm not working, you can find me at concerts or reading sci-fi.",
-    pronouns: 'they/them',
-    image: 'https://picsum.photos/seed/profile3/400/500',
-    interests: ['Music', 'Creation', 'Reading', 'Swimming'],
-    drinks: 'No',
-  },
-  {
-    id: 104,
-    name: 'Elena',
-    age: 20,
-    major: 'UX/UI Design @ Cal Poly',
-    internshipFull: 'UX Designer Intern @ Adobe',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: 'Design lover and coffee enthusiast. I enjoy sketching, photography, and meeting creative people!',
-    pronouns: 'she/her',
-    image: 'https://picsum.photos/seed/profile4/400/500',
-    interests: ['Food', 'Creation', 'Drinks', 'Photography'],
-    drinks: 'Socially',
-  },
-  {
-    id: 105,
-    name: 'Morgan',
-    age: 22,
-    major: 'Computer Science @ UCSC',
-    internshipFull: 'Backend Engineer Intern @ Stripe',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: 'Backend optimization nerd, weekend athlete, and always down for a good game night.',
-    pronouns: 'he/him',
-    image: 'https://picsum.photos/seed/profile5/400/500',
-    interests: ['Sports', 'Reading', 'Music', 'Gaming'],
-    drinks: 'Socially',
-  },
-];
-
-const swipeLikes = [];
-const swipePasses = [];
-
-const receivedRequests = [
-  { id: 1, fromUserId: '3', fromUser: { name: 'Priya S.', role: 'Design Intern @ Figma', image: 'https://picsum.photos/seed/priya/100/100' } },
-  { id: 2, fromUserId: '4', fromUser: { name: 'Jordan K.', role: 'PM Intern @ Stripe', image: 'https://picsum.photos/seed/jordan/100/100' } },
-];
-let nextSwipeRequestId = 3;
-
 // ── Messages mock data ──
 const conversations = [
   {
@@ -340,43 +262,6 @@ function createEvent({ title, description, location, date, time, privacy }) {
   return newEvent;
 }
 
-// ── Swipe functions ──
-function getSwipeProfiles() {
-  return swipeProfiles;
-}
-
-function likeProfile(profileId) {
-  const profile = swipeProfiles.find(p => p.id === profileId);
-  const sentRequest = {
-    id: nextSwipeRequestId++,
-    toUserId: profileId,
-    toUser: profile ? { name: profile.name, role: profile.major, image: profile.image } : null,
-  };
-  swipeLikes.push(sentRequest);
-  return { liked: profileId };
-}
-
-function passProfile(profileId) {
-  swipePasses.push(profileId);
-  return { passed: profileId };
-}
-
-function getSwipeRequests() {
-  return { received: receivedRequests, sent: swipeLikes };
-}
-
-function acceptSwipeRequest(requestId) {
-  const idx = receivedRequests.findIndex(r => r.id === requestId);
-  if (idx === -1) return null;
-  return receivedRequests.splice(idx, 1)[0];
-}
-
-function rejectSwipeRequest(requestId) {
-  const idx = receivedRequests.findIndex(r => r.id === requestId);
-  if (idx === -1) return null;
-  return receivedRequests.splice(idx, 1)[0];
-}
-
 // ── Messages functions ──
 function getConversations() {
   return conversations;
@@ -448,12 +333,6 @@ module.exports = {
   getEventById,
   getUserEvents,
   createEvent,
-  getSwipeProfiles,
-  likeProfile,
-  passProfile,
-  getSwipeRequests,
-  acceptSwipeRequest,
-  rejectSwipeRequest,
   getConversations,
   getMessages,
   sendMessage,
