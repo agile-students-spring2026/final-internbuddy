@@ -40,7 +40,7 @@ const QUESTIONS = [
 
 function CreateProfilePersonalityPage() {
   const navigate = useNavigate()
-  const { profile, updateProfile } = useProfile()
+  const { onboarding, updateOnboarding } = useProfile()
   const [answers, setAnswers] = useState({})
 
   const personality = useMemo(() => {
@@ -66,6 +66,7 @@ function CreateProfilePersonalityPage() {
               {question.options.map((option) => (
                 <button
                   key={option.letter}
+                  type="button"
                   className={`profile-chip${answers[question.key] === option.letter ? ' selected' : ''}`}
                   onClick={() => selectAnswer(question.key, option.letter)}
                 >
@@ -77,14 +78,14 @@ function CreateProfilePersonalityPage() {
         ))}
 
         <p className="create-profile-help">
-          Current result: <strong>{personality || profile.personality}</strong>
+          Current result: <strong>{personality || onboarding.personality}</strong>
         </p>
 
         <button
           className="create-profile-next-btn"
           onClick={() => {
             if (!personality) return
-            updateProfile({ personality })
+            updateOnboarding({ personality })
             navigate('/create-profile/meetup-types')
           }}
           disabled={!personality}

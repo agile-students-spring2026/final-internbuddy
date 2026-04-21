@@ -1,14 +1,9 @@
 const express = require('express');
-const {
-  getProfileByUserId,
-  saveStep,
-  finish
-} = require('../controllers/profileController');
-
 const router = express.Router();
+const { requireAuth } = require('../middleware/authMiddleware');
+const { getMyProfile, saveProfile } = require('../controllers/profileController');
 
-router.get('/:userId', getProfileByUserId);
-router.post('/:userId/step', saveStep);
-router.post('/:userId/complete', finish);
+router.get('/me', requireAuth, getMyProfile);
+router.post('/', requireAuth, saveProfile);
 
 module.exports = router;

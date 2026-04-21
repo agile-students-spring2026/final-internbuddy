@@ -1,66 +1,55 @@
-const {
-  getProfile,
-  saveProfileStep,
-  completeProfile,
-  getAccount
-} = require('../services/mockStore');
+const Profile = require('../models/Profile');
+const User = require('../models/User');
 
-function getProfileByUserId(req, res) {
-  const { userId } = req.params;
-  const profile = getProfile(userId);
+async function getMyProfile(req, res, next) {
+  try {
+    const userId = req.auth.userId;
 
-  if (!profile) {
-    return res.status(404).json({ error: 'Profile not found' });
+    const profile = await Profile.findOne({ userId });
+
+    if (!profile) {
+      return res.status(404).json({ error: 'Profile not found' });
+    }
+
+    return res.status(200).json({ profile });
+  } catch (err) {
+    return next(err);
   }
-
-  return res.status(200).json({ profile });
 }
 
-function saveStep(req, res) {
-  const { userId } = req.params;
-  const { step, value } = req.body;
+async function saveProfile(req, res, next) {
+  try {
+    const userId = req.auth.userId;
 
-  if (!step) {
-    return res.status(400).json({
-      error: 'Missing required fields',
-      required: ['step', 'value']
+    const profile = await Profile.findOneAndUpdate(
+      { userId },
+      {
+        userId,
+        ...req.body,
+        completed: true,
+        completedAt: new Date(),
+      },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+      }
+    );
+
+    await User.findByIdAndUpdate(userId, {
+      onboardingCompleted: true,
     });
+
+    return res.status(200).json({
+      message: 'Profile saved',
+      profile,
+    });
+  } catch (err) {
+    return next(err);
   }
-
-  const account = getAccount(userId);
-  if (!account) {
-    return res.status(404).json({ error: 'Account not found' });
-  }
-
-  const result = saveProfileStep(userId, step, value);
-  if (!result) {
-    return res.status(404).json({ error: 'Profile not found' });
-  }
-
-  return res.status(200).json({
-    message: 'Profile step saved (mock)',
-    savedStep: step,
-    nextStep: result.nextStep,
-    profile: result.profile
-  });
-}
-
-function finish(req, res) {
-  const { userId } = req.params;
-  const profile = completeProfile(userId);
-
-  if (!profile) {
-    return res.status(404).json({ error: 'Profile not found' });
-  }
-
-  return res.status(200).json({
-    message: 'Profile completed (mock)',
-    profile
-  });
 }
 
 module.exports = {
-  getProfileByUserId,
-  saveStep,
-  finish
+  getMyProfile,
+  saveProfile,
 };
