@@ -1,45 +1,153 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useProfile } from "../context/ProfileContext";
 import "./ProfilePage.css";
 
 const ALL_INTERESTS = [
-  "🎾 Tennis","☕ Cafes","🎵 Concerts","🎮 Gaming","📷 Photography",
-  "✈️ Travel","🍕 Foodie","📚 Reading","🧗 Climbing","🎨 Art","🎤 Karaoke","🏊 Swimming",
+  "🎾 Tennis",
+  "☕ Cafes",
+  "🎵 Concerts",
+  "🎮 Gaming",
+  "📷 Photography",
+  "✈️ Travel",
+  "🍕 Foodie",
+  "📚 Reading",
+  "🧗 Climbing",
+  "🎨 Art",
+  "🎤 Karaoke",
+  "🏊 Swimming",
 ];
+
+const emptyProfile = {
+  name: "",
+  major: "",
+  internship: "",
+  location: "",
+  city: "",
+  about: "",
+  interests: [],
+  personality: "",
+  connections: 0,
+  hostingEvents: [],
+  attendingEvents: [],
+};
+
+const emptyAccount = {
+  email: "",
+  phone: "",
+};
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { profile, account, updateProfile, updateAccount } = useProfile();
+
+  const [profileData, setProfileData] = useState(emptyProfile);
+  const [accountData, setAccountData] = useState(emptyAccount);
+
+  const [loading, setLoading] = useState(true);
+  const [pageError, setPageError] = useState("");
+
   const [editMode, setEditMode] = useState(false);
-  const [draft, setDraft] = useState(profile);
-  const [draftAccount, setDraftAccount] = useState(account);
+  const [draft, setDraft] = useState(emptyProfile);
   const [showInterestPicker, setShowInterestPicker] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
+  const [saving, setSaving] = useState(false);
+
   const [friendRequests] = useState([
     { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
     { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
   ]);
 
   useEffect(() => {
-    setDraft(profile);
-  }, [profile]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setPageError("");
 
-  useEffect(() => {
-    setDraftAccount(account);
-  }, [account]);
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setPageError("You must be logged in to view your profile.");
+          setLoading(false);
+          return;
+        }
 
-  const openEdit = () => {
-    setDraft({ ...profile });
-    setDraftAccount({ ...account });
-    setEditMode(true);
+        const [profileRes, authRes] = await Promise.all([
+          fetch("/api/profile/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+          fetch("/api/auth/me", {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }),
+        ]);
+
+        const profileJson = await profileRes.json();
+        const authJson = await authRes.json();
+
+        if (!profileRes.ok) {
+          console.error(profileJson);
+          setPageError(profileJson.error || "Failed to load profile");
+          setLoading(false);
+          return;
+        }
+
+        if (!authRes.ok) {
+          console.error(authJson);
+          setPageError(authJson.error || "Failed to load account");
+          setLoading(false);
+          return;
+        }
+
+        const backendProfile = profileJson.profile || {};
+        const backendUser = authJson.user || {};
+
+        const mappedProfile = {
+          name: backendProfile.name || "",
+          major: backendProfile.major || "",
+          internship:
+            backendProfile.internship ||
+            [backendProfile.jobTitle, backendProfile.company].filter(Boolean).join(" @ "),
+          location:
+            backendProfile.location ||
+            [backendProfile.city].filter(Boolean).join(" | "),
+          city: backendProfile.city || "",
+          about: backendProfile.about || "",
+          interests: backendProfile.interests || [],
+          personality: backendProfile.personality || "",
+          connections: backendProfile.connections || 0,
+          hostingEvents: backendProfile.hostingEvents || [],
+          attendingEvents: backendProfile.attendingEvents || [],
+        };
+
+        const mappedAccount = {
+          email: backendUser.email || "",
+          phone: backendUser.phone || "",
+        };
+
+        setProfileData(mappedProfile);
+        setAccountData(mappedAccount);
+      } catch (err) {
+        console.error(err);
+        setPageError("Something went wrong while loading your profile.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('internbuddy.profileData');
+  
+    navigate('/');
   };
 
-  const saveEdit = () => {
-    updateProfile({ ...draft });
-    updateAccount({ ...draftAccount });
-    setEditMode(false);
-    setShowInterestPicker(false);
+  const openEdit = () => {
+    setDraft({ ...profileData });
+    setEditMode(true);
   };
 
   const cancelEdit = () => {
@@ -48,7 +156,7 @@ export default function ProfilePage() {
   };
 
   const toggleInterest = (interest) => {
-    const current = draft.interests;
+    const current = draft.interests || [];
     if (current.includes(interest)) {
       setDraft({ ...draft, interests: current.filter((i) => i !== interest) });
     } else if (current.length < 8) {
@@ -56,57 +164,185 @@ export default function ProfilePage() {
     }
   };
 
+  const saveEdit = async () => {
+    try {
+      setSaving(true);
+      setPageError("");
+
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setPageError("You must be logged in to save profile changes.");
+        setSaving(false);
+        return;
+      }
+
+      const payload = {
+        name: draft.name,
+        major: draft.major,
+        internship: draft.internship,
+        location: draft.location,
+        about: draft.about,
+        interests: draft.interests,
+        personality: draft.personality,
+        city: draft.city,
+      };
+
+      const res = await fetch("/api/profile", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error(data);
+        setPageError(data.error || "Failed to save profile");
+        setSaving(false);
+        return;
+      }
+
+      const saved = data.profile || {};
+
+      const mappedProfile = {
+        name: saved.name || "",
+        major: saved.major || "",
+        internship:
+          saved.internship ||
+          [saved.jobTitle, saved.company].filter(Boolean).join(" @ "),
+        location:
+          saved.location ||
+          [saved.city].filter(Boolean).join(" | "),
+        city: saved.city || "",
+        about: saved.about || "",
+        interests: saved.interests || [],
+        personality: saved.personality || "",
+        connections: saved.connections || 0,
+        hostingEvents: saved.hostingEvents || [],
+        attendingEvents: saved.attendingEvents || [],
+      };
+
+      setProfileData(mappedProfile);
+      setEditMode(false);
+      setShowInterestPicker(false);
+    } catch (err) {
+      console.error(err);
+      setPageError("Something went wrong while saving your profile.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="app-shell">
+        <div className="scroll-area">
+          <p className="about-text">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (pageError && !editMode && !profileData.name && !profileData.about) {
+    return (
+      <div className="app-shell">
+        <div className="scroll-area">
+          <p className="about-text">{pageError}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app-shell">
       <div className="profile-top-bar">
-        <button className="settings-icon-btn" onClick={() => navigate("/settings")} aria-label="Open settings">
+        <button
+          onClick={handleLogout}
+          className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 shadow-sm 
+           text-[13px] font-semibold 
+           text-[color:var(--profile-ink-muted)] 
+           hover:bg-gray-50"
+        >
+          Logout
+        </button>
+
+        <button
+          className="settings-icon-btn"
+          onClick={() => navigate("/settings")}
+          aria-label="Open settings"
+        >
           ⚙
         </button>
       </div>
 
-      {/* ── EDIT MODAL ── */}
       {editMode && (
         <div className="modal-overlay">
           <div className="modal">
             <h2 className="modal-title">Edit Profile</h2>
 
             <label className="field-label">Name</label>
-            <input className="field-input" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+            <input
+              className="field-input"
+              value={draft.name || ""}
+              onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+            />
 
             <label className="field-label">Major / School</label>
-            <input className="field-input" value={draft.major} onChange={(e) => setDraft({ ...draft, major: e.target.value })} />
+            <input
+              className="field-input"
+              value={draft.major || ""}
+              onChange={(e) => setDraft({ ...draft, major: e.target.value })}
+            />
 
             <label className="field-label">Internship</label>
-            <input className="field-input" value={draft.internship} onChange={(e) => setDraft({ ...draft, internship: e.target.value })} />
+            <input
+              className="field-input"
+              value={draft.internship || ""}
+              onChange={(e) => setDraft({ ...draft, internship: e.target.value })}
+            />
 
             <label className="field-label">Location & Dates</label>
-            <input className="field-input" value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+            <input
+              className="field-input"
+              value={draft.location || ""}
+              onChange={(e) => setDraft({ ...draft, location: e.target.value })}
+            />
 
             <label className="field-label">About</label>
-            <textarea className="field-input field-textarea" value={draft.about} onChange={(e) => setDraft({ ...draft, about: e.target.value })} />
-
-            <label className="field-label">Email</label>
-            <input className="field-input" value={draftAccount.email} onChange={(e) => setDraftAccount({ ...draftAccount, email: e.target.value })} />
-
-            <label className="field-label">Country Code</label>
-            <input className="field-input" value={draftAccount.countryCode || ''} onChange={(e) => setDraftAccount({ ...draftAccount, countryCode: e.target.value })} />
-
-            <label className="field-label">Phone</label>
-            <input className="field-input" value={draftAccount.phoneNumber || ''} onChange={(e) => setDraftAccount({ ...draftAccount, phoneNumber: e.target.value })} />
+            <textarea
+              className="field-input field-textarea"
+              value={draft.about || ""}
+              onChange={(e) => setDraft({ ...draft, about: e.target.value })}
+            />
 
             <label className="field-label">Personality Type</label>
-            <input className="field-input" value={draft.personality} onChange={(e) => setDraft({ ...draft, personality: e.target.value })} />
+            <input
+              className="field-input"
+              value={draft.personality || ""}
+              onChange={(e) => setDraft({ ...draft, personality: e.target.value })}
+            />
 
-            <label className="field-label">Interests ({draft.interests.length}/8)</label>
-            <button className="chip-btn" onClick={() => setShowInterestPicker(!showInterestPicker)}>
+            <label className="field-label">
+              Interests ({(draft.interests || []).length}/8)
+            </label>
+            <button
+              className="chip-btn"
+              type="button"
+              onClick={() => setShowInterestPicker(!showInterestPicker)}
+            >
               {showInterestPicker ? "Done picking" : "Edit Interests choose here"}
             </button>
+
             {showInterestPicker && (
               <div className="interest-grid">
                 {ALL_INTERESTS.map((i) => (
                   <button
                     key={i}
-                    className={`interest-chip ${draft.interests.includes(i) ? "selected yipee" : ""}`}
+                    type="button"
+                    className={`interest-chip ${(draft.interests || []).includes(i) ? "selected yipee" : ""}`}
                     onClick={() => toggleInterest(i)}
                   >
                     {i}
@@ -115,19 +351,23 @@ export default function ProfilePage() {
               </div>
             )}
 
+            {pageError && <p className="text-red-500 text-sm mt-3">{pageError}</p>}
+
             <div className="modal-actions">
-              <button className="btn-secondary" onClick={cancelEdit}>Cancel</button>
-              <button className="btn-primary" onClick={saveEdit}>Save</button>
+              <button className="btn-secondary" onClick={cancelEdit} disabled={saving}>
+                Cancel
+              </button>
+              <button className="btn-primary" onClick={saveEdit} disabled={saving}>
+                {saving ? "Saving..." : "Save"}
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── MAIN CONTENT ── */}
       <div className="scroll-area">
         {activeTab === "profile" && (
           <>
-            {/* HERO CARD */}
             <div className="hero-card">
               <div className="avatar-ring">
                 <div className="avatar">
@@ -135,24 +375,29 @@ export default function ProfilePage() {
                 </div>
               </div>
               <div className="hero-info">
-                <h1 className="hero-name">{profile.name}</h1>
-                <p className="hero-detail">{profile.major}</p>
-                <p className="hero-detail accent">{profile.internship}</p>
-                <p className="hero-detail muted">{profile.location}</p>
+                <h1 className="hero-name">{profileData.name || "Your Name"}</h1>
+                <p className="hero-detail">{profileData.major || "Add your school / major"}</p>
+                <p className="hero-detail accent">
+                  {profileData.internship || "Add your internship"}
+                </p>
+                <p className="hero-detail muted">
+                  {profileData.location || "Add your location"}
+                </p>
               </div>
             </div>
 
-            {/* CONNECTIONS ROW */}
             <div className="connections-row">
               <div className="conn-badge">
-                <span className="conn-num">{profile.connections}</span>
+                <span className="conn-num">{profileData.connections}</span>
                 <span className="conn-label">Connections</span>
               </div>
             </div>
 
-            {/* ACTION BUTTONS */}
             <div className="action-row">
-              <button className="action-btn outline" onClick={() => setActiveTab("requests")}>
+              <button
+                className="action-btn outline"
+                onClick={() => setActiveTab("requests")}
+              >
                 Friend Requests
               </button>
               <button className="action-btn filled" onClick={openEdit}>
@@ -160,48 +405,53 @@ export default function ProfilePage() {
               </button>
             </div>
 
-            {/* ABOUT */}
+            {pageError && <p className="text-red-500 text-sm mt-3">{pageError}</p>}
+
             <section className="card">
               <h3 className="section-heading">About me</h3>
-              <p className="about-text">{profile.about}</p>
+              <p className="about-text">{profileData.about || "Tell people about yourself."}</p>
             </section>
 
             <section className="card">
               <h3 className="section-heading">Contact</h3>
-              <p className="about-text">Email: {account.email || 'Not provided'}</p>
-              <p className="about-text">Phone: {account.phoneNumber ? `${account.countryCode} ${account.phoneNumber}` : 'Not provided'}</p>
+              <p className="about-text">Email: {accountData.email || "Not provided"}</p>
+              <p className="about-text">Phone: {accountData.phone || "Not provided"}</p>
             </section>
 
-            {/* INTERESTS */}
             <section className="card">
               <h3 className="section-heading">Interests</h3>
               <div className="tags-wrap">
-                {profile.interests.map((i) => (
-                  <span key={i} className="tag">{i}</span>
+                {(profileData.interests || []).map((i) => (
+                  <span key={i} className="tag">
+                    {i}
+                  </span>
                 ))}
-                <button className="tag tag-add" onClick={openEdit}>+ Add</button>
+                <button className="tag tag-add" onClick={openEdit}>
+                  + Add
+                </button>
               </div>
             </section>
 
-            {/* PERSONALITY */}
             <section className="card personality-card">
               <span className="personality-label">Personality Type</span>
-              <span className="personality-badge">{profile.personality}</span>
+              <span className="personality-badge">
+                {profileData.personality || "Not set"}
+              </span>
             </section>
 
-            {/* EVENTS */}
             <section className="card events-card">
               <h3 className="events-heading">Your Events</h3>
               <div className="events-col">
                 <h4 className="events-sub">Hosting</h4>
                 <ul className="event-list">
-                  {profile.hostingEvents.map((e, i) => (
+                  {(profileData.hostingEvents || []).map((e, i) => (
                     <li key={i}>• {e}</li>
                   ))}
                 </ul>
+
                 <h4 className="events-sub">Attending</h4>
                 <ul className="event-list">
-                  {profile.attendingEvents.map((e, i) => (
+                  {(profileData.attendingEvents || []).map((e, i) => (
                     <li key={i}>• {e}</li>
                   ))}
                 </ul>
@@ -219,7 +469,9 @@ export default function ProfilePage() {
               <span className="text-[18px] leading-none">←</span>
               <span>Back</span>
             </button>
+
             <h2 className="page-title">Friend Requests</h2>
+
             {friendRequests.map((r) => (
               <div key={r.id} className="request-card">
                 <div className="req-avatar">{r.name[0]}</div>

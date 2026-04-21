@@ -20,7 +20,8 @@ const defaultData = {
   account: {
     email: '',
     countryCode: '+1',
-    phoneNumber: ''
+    phoneNumber: '',
+    password: '',
   },
   onboarding: {
     firstName: '',
@@ -32,7 +33,9 @@ const defaultData = {
     headline: '',
     internshipLine: '',
     about: '',
-    interests: []
+    interests: [],
+    major: '',
+    personality: '',
   },
   profile: defaultProfile
 }
@@ -88,20 +91,21 @@ function buildMappedProfile(baseProfile, onboarding, account) {
     .filter(Boolean)
     .join(' | ')
 
-  return {
-    ...baseProfile,
-    name: fullName || baseProfile.name,
-    major: onboarding.headline || baseProfile.major,
-    internship: onboarding.internshipLine || baseProfile.internship,
-    location: locationValue || baseProfile.location,
-    about: onboarding.about || baseProfile.about,
-    interests:
-      onboarding.interests.length > 0
-        ? mapInterestsToDisplay(onboarding.interests)
-        : baseProfile.interests,
-    email: account.email,
-    phone: `${account.countryCode} ${account.phoneNumber}`.trim()
-  }
+    return {
+      ...baseProfile,
+      name: fullName || baseProfile.name,
+      major: onboarding.major || onboarding.headline || baseProfile.major,
+      internship: onboarding.internshipLine || baseProfile.internship,
+      location: locationValue || baseProfile.location,
+      about: onboarding.about || baseProfile.about,
+      personality: onboarding.personality || baseProfile.personality,
+      interests:
+        onboarding.interests.length > 0
+          ? mapInterestsToDisplay(onboarding.interests)
+          : baseProfile.interests,
+      email: account.email,
+      phone: `${account.countryCode} ${account.phoneNumber}`.trim()
+    }
 }
 
 const ProfileContext = createContext(null)

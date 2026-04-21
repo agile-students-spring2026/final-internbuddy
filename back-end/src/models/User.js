@@ -25,6 +25,10 @@ const userSchema = new mongoose.Schema(
     verifiedAt: {
       type: Date,
     },
+    onboardingCompleted: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -5,13 +5,23 @@ function BottomNav() {
   const location = useLocation()
   const navigate = useNavigate()
 
-  const currentTab = location.pathname.startsWith('/profile')
+  const pathname = location.pathname
+  
+  if (
+    pathname === '/' ||
+    pathname.startsWith('/create-account') ||
+    pathname.startsWith('/create-profile')
+  ) {
+    return null
+  }
+
+  const currentTab = pathname.startsWith('/profile')
     ? 'profile'
-    : location.pathname.startsWith('/events')
+    : pathname.startsWith('/events')
       ? 'home'
-      : location.pathname.startsWith('/search')
+      : pathname.startsWith('/search')
         ? 'search'
-        : location.pathname.startsWith('/messages')
+        : pathname.startsWith('/messages')
           ? 'messages'
           : ''
 

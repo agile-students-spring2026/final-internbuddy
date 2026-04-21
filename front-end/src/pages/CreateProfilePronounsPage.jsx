@@ -6,7 +6,7 @@ import './CreateProfileFlow.css'
 function CreateProfilePronounsPage() {
   const navigate = useNavigate()
   const { onboarding, updateOnboarding } = useProfile()
-  const [headline, setHeadline] = useState(onboarding.headline || '')
+  const [major, setMajor] = useState(onboarding.major || onboarding.headline || '')
   const [internshipLine, setInternshipLine] = useState(onboarding.internshipLine || '')
 
   return (
@@ -20,8 +20,8 @@ function CreateProfilePronounsPage() {
           className="create-profile-input"
           type="text"
           placeholder="e.g. CS @ NYU"
-          value={headline}
-          onChange={(e) => setHeadline(e.target.value)}
+          value={major}
+          onChange={(e) => setMajor(e.target.value)}
         />
 
         <input
@@ -35,7 +35,7 @@ function CreateProfilePronounsPage() {
         <button
           className="create-profile-next-btn"
           onClick={() => {
-            updateOnboarding({ headline, internshipLine })
+            updateOnboarding({ major, internshipLine })
             navigate('/create-profile/friend-preference')
           }}
         >
