@@ -76,6 +76,9 @@ Coverage reports:
 
 ### Auth routes (`/api/auth`)
 
+- `POST /api/auth/register` — body: `{ "email": "...", "phone": "...", "password": "..." }` (MongoDB + JWT)
+- `POST /api/auth/login` — body: `{ "email": "...", "password": "..." }` (returns JWT)
+- `GET /api/auth/me` — requires `Authorization: Bearer <token>`
 - `POST /api/auth/signup` — body: `{ "email": "...", "phone": "..." }`
 - `POST /api/auth/verify` — body: `{ "userId": "...", "code": "123456" }`
 - `GET /api/auth/:userId` — get account by userId

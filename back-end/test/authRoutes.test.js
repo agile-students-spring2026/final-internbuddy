@@ -4,6 +4,34 @@ const { expect } = require('chai');
 const app = require('../src/app');
 
 describe('Auth routes', () => {
+  it('validates register payload', async () => {
+    const response = await request(app)
+      .post('/api/auth/register')
+      .send({ email: 'not-an-email', phone: '', password: 'short' });
+
+    expect(response.status).to.equal(400);
+    expect(response.body.error).to.equal('Validation failed');
+    expect(response.body.details).to.be.an('array').that.is.not.empty;
+  });
+
+  it('validates login payload', async () => {
+    const response = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'demo@internbuddy.app' });
+
+    expect(response.status).to.equal(400);
+    expect(response.body.error).to.equal('Validation failed');
+    expect(response.body.details).to.be.an('array').that.is.not.empty;
+  });
+
+  it('requires bearer token on /api/auth/me', async () => {
+    const response = await request(app)
+      .get('/api/auth/me');
+
+    expect(response.status).to.equal(401);
+    expect(response.body.error).to.equal('Authorization token is required');
+  });
+
   it('creates a signup account', async () => {
     const response = await request(app)
       .post('/api/auth/signup')
