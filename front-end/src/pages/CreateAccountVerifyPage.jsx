@@ -61,7 +61,7 @@ function CreateAccountVerifyPage() {
       }
 
       localStorage.setItem('token', data.token)
-      navigate('/create-profile/resume')
+      navigate('/create-profile/name')
     } catch (err) {
       console.error(err)
       alert('Something went wrong')

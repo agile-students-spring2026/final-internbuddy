@@ -73,6 +73,22 @@
   margin: 0 0 14px;
 }
 
+.create-profile-checkbox-row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 4px 0 12px;
+  color: #1e1b4b;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.create-profile-checkbox-row input {
+  width: 16px;
+  height: 16px;
+}
+
 .create-profile-next-btn {
   width: 100%;
   background: linear-gradient(135deg, #7c3aed, #4F46E5);

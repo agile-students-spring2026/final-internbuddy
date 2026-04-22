@@ -28,6 +28,7 @@ const defaultData = {
     lastName: '',
     startMonth: '',
     endMonth: '',
+    currentInternship: false,
     city: '',
     stateCode: '',
     headline: '',
@@ -68,6 +69,14 @@ function buildDateRange(startMonth, endMonth) {
   return formatMonthLabel(startMonth || endMonth)
 }
 
+function buildInternshipDateRange(startMonth, endMonth, currentInternship) {
+  if (currentInternship && startMonth) {
+    return `${formatMonthLabel(startMonth)} - Present`
+  }
+
+  return buildDateRange(startMonth, endMonth)
+}
+
 function mapInterestsToDisplay(interests) {
   const emojiMap = {
     Tennis: '🎾',
@@ -86,7 +95,11 @@ function buildMappedProfile(baseProfile, onboarding, account) {
   const fullName = `${onboarding.firstName} ${onboarding.lastName}`.trim()
   const locationValue = [
     onboarding.city || onboarding.stateCode,
-    buildDateRange(onboarding.startMonth, onboarding.endMonth)
+    buildInternshipDateRange(
+      onboarding.startMonth,
+      onboarding.endMonth,
+      onboarding.currentInternship
+    )
   ]
     .filter(Boolean)
     .join(' | ')

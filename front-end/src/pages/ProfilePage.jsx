@@ -26,6 +26,9 @@ const emptyProfile = {
   about: "",
   interests: [],
   personality: "",
+  resumeFileName: "",
+  resumeUploadedAt: "",
+  resumeText: "",
   connections: 0,
   hostingEvents: [],
   attendingEvents: [],
@@ -50,6 +53,7 @@ export default function ProfilePage() {
   const [showInterestPicker, setShowInterestPicker] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [saving, setSaving] = useState(false);
+  const [resumeExpanded, setResumeExpanded] = useState(false);
 
   const [friendRequests] = useState([
     { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
@@ -115,6 +119,9 @@ export default function ProfilePage() {
           about: backendProfile.about || "",
           interests: backendProfile.interests || [],
           personality: backendProfile.personality || "",
+          resumeFileName: backendProfile.resumeFileName || "",
+          resumeUploadedAt: backendProfile.resumeUploadedAt || "",
+          resumeText: backendProfile.resumeText || "",
           connections: backendProfile.connections || 0,
           hostingEvents: backendProfile.hostingEvents || [],
           attendingEvents: backendProfile.attendingEvents || [],
@@ -185,6 +192,9 @@ export default function ProfilePage() {
         interests: draft.interests,
         personality: draft.personality,
         city: draft.city,
+        resumeFileName: draft.resumeFileName,
+        resumeUploadedAt: draft.resumeUploadedAt,
+        resumeText: draft.resumeText,
       };
 
       const res = await fetch("/api/profile", {
@@ -220,6 +230,9 @@ export default function ProfilePage() {
         about: saved.about || "",
         interests: saved.interests || [],
         personality: saved.personality || "",
+        resumeFileName: saved.resumeFileName || "",
+        resumeUploadedAt: saved.resumeUploadedAt || "",
+        resumeText: saved.resumeText || "",
         connections: saved.connections || 0,
         hostingEvents: saved.hostingEvents || [],
         attendingEvents: saved.attendingEvents || [],
@@ -456,6 +469,46 @@ export default function ProfilePage() {
                   ))}
                 </ul>
               </div>
+            </section>
+
+            <section className="card resume-card">
+              <h3 className="section-heading">Resume</h3>
+
+              {!profileData.resumeFileName && (
+                <p className="about-text">No resume uploaded yet.</p>
+              )}
+
+              {profileData.resumeFileName && !resumeExpanded && (
+                <button
+                  type="button"
+                  className="resume-preview-btn"
+                  onClick={() => setResumeExpanded(true)}
+                >
+                  <span className="resume-doc-icon">📄</span>
+                  <span className="resume-file-name">{profileData.resumeFileName}</span>
+                </button>
+              )}
+
+              {profileData.resumeFileName && resumeExpanded && (
+                <div className="resume-expanded">
+                  <button
+                    type="button"
+                    className="resume-back-btn"
+                    onClick={() => setResumeExpanded(false)}
+                  >
+                    ← Back
+                  </button>
+
+                  <p className="about-text"><strong>File:</strong> {profileData.resumeFileName}</p>
+                  <p className="about-text">
+                    <strong>Uploaded:</strong>{' '}
+                    {profileData.resumeUploadedAt
+                      ? new Date(profileData.resumeUploadedAt).toLocaleString()
+                      : 'Unknown'}
+                  </p>
+                  <p className="about-text">{profileData.resumeText || 'No preview available.'}</p>
+                </div>
+              )}
             </section>
           </>
         )}

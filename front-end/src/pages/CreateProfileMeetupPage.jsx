@@ -13,6 +13,24 @@ const MEETUP_TYPES = [
   { emoji: '💻', label: 'Hackathons' },
 ]
 
+function formatMonth(value) {
+  if (!value) return ''
+  const [year, month] = value.split('-')
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  return `${monthNames[Number(month) - 1] || ''} ${year}`.trim()
+}
+
+function buildTimeline(startMonth, endMonth, currentInternship) {
+  if (!startMonth && !endMonth) return ''
+  if (currentInternship && startMonth) {
+    return `${formatMonth(startMonth)} - Present`
+  }
+  if (startMonth && endMonth) {
+    return `${formatMonth(startMonth)} - ${formatMonth(endMonth)}`
+  }
+  return formatMonth(startMonth || endMonth)
+}
+
 function CreateProfileMeetupPage() {
   const navigate = useNavigate()
   const { onboarding, account, updateOnboarding } = useProfile()
@@ -45,7 +63,16 @@ function CreateProfileMeetupPage() {
       const payload = {
         name: `${nextOnboarding.firstName || ''} ${nextOnboarding.lastName || ''}`.trim(),
         city: nextOnboarding.city || '',
-        location: nextOnboarding.stateCode || '',
+        location: [
+          nextOnboarding.city || nextOnboarding.stateCode || '',
+          buildTimeline(
+            nextOnboarding.startMonth,
+            nextOnboarding.endMonth,
+            nextOnboarding.currentInternship
+          ),
+        ]
+          .filter(Boolean)
+          .join(' | '),
         internship: nextOnboarding.internshipLine || '',
         major: nextOnboarding.major || '',
         personality: nextOnboarding.personality || '',

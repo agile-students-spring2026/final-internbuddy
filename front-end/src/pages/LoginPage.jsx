@@ -37,7 +37,7 @@ function LoginPage() {
       if (data.user?.onboardingCompleted) {
         navigate('/events');
       } else {
-        navigate('/create-profile/resume');
+        navigate('/create-profile/name');
       }
 
     } catch (err) {

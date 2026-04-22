@@ -7,17 +7,65 @@ function CreateProfileResumePage() {
   const [file, setFile] = useState(null)
   const [analyzing, setAnalyzing] = useState(false)
   const [done, setDone] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
   const fileInputRef = useRef()
 
   const handleFileChange = (e) => {
     const f = e.target.files[0]
     if (!f) return
+    setError('')
     setFile(f)
     setAnalyzing(true)
     setTimeout(() => {
       setAnalyzing(false)
       setDone(true)
     }, 2200)
+  }
+
+  const saveResumeAndContinue = async () => {
+    if (!file) return
+
+    try {
+      setSaving(true)
+      setError('')
+
+      const token = localStorage.getItem('token')
+      if (!token) {
+        setError('You must be logged in to continue.')
+        setSaving(false)
+        return
+      }
+
+      const resumeText = `Uploaded resume: ${file.name}. Parsed details are available for profile review.`
+
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          resumeFileName: file.name,
+          resumeUploadedAt: new Date().toISOString(),
+          resumeText,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Failed to save resume')
+        setSaving(false)
+        return
+      }
+
+      navigate('/swipe')
+    } catch (err) {
+      console.error(err)
+      setError('Something went wrong while saving your resume')
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -62,23 +110,25 @@ function CreateProfileResumePage() {
 
         <button
           className="create-profile-next-btn"
-          style={{ opacity: done ? 1 : 0.45, cursor: done ? 'pointer' : 'default' }}
-          disabled={!done}
-          onClick={() => navigate('/swipe')}
+          style={{ opacity: done && !saving ? 1 : 0.45, cursor: done && !saving ? 'pointer' : 'default' }}
+          disabled={!done || saving}
+          onClick={saveResumeAndContinue}
         >
-          {done ? 'Continue to Swipe' : 'Upload to Continue'}
+          {saving ? 'Saving Resume...' : done ? 'Continue to Swipe' : 'Upload to Continue'}
         </button>
+
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
 
         <button
           className="create-profile-link-btn"
           onClick={() => navigate('/swipe')}
+          disabled={saving}
         >
           Skip and Start Exploring
         </button>
       </div>
     </div>
   )
-}
 }
 
 export default CreateProfileResumePage
