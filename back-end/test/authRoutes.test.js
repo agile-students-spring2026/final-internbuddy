@@ -16,7 +16,7 @@ describe('Auth routes', () => {
   it('validates register payload', async () => {
     const response = await request(app)
       .post('/api/auth/register')
-      .send({ email: 'not-an-email', phone: '', password: 'short' });
+      .send({ email: 'not-an-email', password: 'short' });
 
     expect(response.status).to.equal(400);
     expect(response.body.error).to.equal('Validation failed');
@@ -45,7 +45,7 @@ describe('Auth routes', () => {
 
     const response = await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15551234567', password: 'Password123!' });
+      .send({ email, password: 'Password123!' });
 
     expect(response.status).to.equal(201);
     expect(response.body).to.have.property('token');
@@ -58,11 +58,11 @@ describe('Auth routes', () => {
 
     await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15550004444', password: 'Password123!' });
+      .send({ email, password: 'Password123!' });
 
     const response = await request(app)
       .post('/api/auth/register')
-      .send({ email: email.toUpperCase(), phone: '+15550005555', password: 'Password123!' });
+      .send({ email: email.toUpperCase(), password: 'Password123!' });
 
     expect(response.status).to.equal(409);
     expect(response.body.error).to.equal('Account with this email already exists');
@@ -74,7 +74,7 @@ describe('Auth routes', () => {
 
     await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15550006666', password });
+      .send({ email, password });
 
     const response = await request(app)
       .post('/api/auth/login')
@@ -90,7 +90,7 @@ describe('Auth routes', () => {
 
     await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15550007777', password: 'Password123!' });
+      .send({ email, password: 'Password123!' });
 
     const response = await request(app)
       .post('/api/auth/login')
@@ -105,7 +105,7 @@ describe('Auth routes', () => {
 
     const register = await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15550008888', password: 'Password123!' });
+      .send({ email, password: 'Password123!' });
 
     const response = await request(app)
       .get('/api/auth/me')

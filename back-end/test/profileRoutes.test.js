@@ -10,7 +10,7 @@ describe('Profile routes', () => {
     const email = `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@profiletest.internbuddy`;
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ email, phone: '+15551110001', password: 'Password123!' });
+      .send({ email, password: 'Password123!' });
 
     return {
       token: res.body.token,
