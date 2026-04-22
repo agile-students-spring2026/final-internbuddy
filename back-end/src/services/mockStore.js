@@ -6,91 +6,6 @@ const profiles = new Map();
 
 let nextId = 1;
 
-// ── Events mock data ──
-const events = [
-  {
-    id: 'e1',
-    title: 'Intern Sushi Night',
-    description: 'All-you-can-eat sushi with fellow interns in the city!',
-    time: '7:00 PM',
-    date: '2026-05-15',
-    location: '123 Broadway, New York, NY',
-    privacy: 'public',
-    createdBy: 'u1',
-  },
-  {
-    id: 'e2',
-    title: 'Central Park Picnic',
-    description: 'Bring a blanket and snacks — let\'s hang out in the park.',
-    time: '12:00 PM',
-    date: '2026-05-18',
-    location: 'Sheep Meadow, Central Park, NY',
-    privacy: 'public',
-    createdBy: 'u2',
-  },
-  {
-    id: 'e3',
-    title: 'Rooftop Game Night',
-    description: 'Board games, card games, and good vibes on a rooftop.',
-    time: '8:00 PM',
-    date: '2026-05-20',
-    location: '456 W 42nd St, New York, NY',
-    privacy: 'public',
-    createdBy: 'u1',
-  },
-  {
-    id: 'e4',
-    title: 'Coffee & Code',
-    description: 'Casual co-working session at a cafe. Bring your laptop!',
-    time: '10:00 AM',
-    date: '2026-05-22',
-    location: 'Blue Bottle Coffee, Williamsburg, NY',
-    privacy: 'public',
-    createdBy: 'u3',
-  },
-  {
-    id: 'e5',
-    title: 'Sunset Run Club',
-    description: 'Easy 3-mile run along the Hudson River at sunset.',
-    time: '6:30 PM',
-    date: '2026-05-25',
-    location: 'Hudson River Park, Pier 40, NY',
-    privacy: 'public',
-    createdBy: 'u2',
-  },
-  {
-    id: 'e6',
-    title: 'Intern Karaoke Night',
-    description: 'Sing your heart out — no judgment zone!',
-    time: '9:00 PM',
-    date: '2026-05-28',
-    location: '789 St Marks Pl, New York, NY',
-    privacy: 'public',
-    createdBy: 'u3',
-  },
-];
-let nextEventId = 7;
-
-const userEvents = {
-  hosting: [
-    { id: 'h1', title: 'Sushi Night', date: 'June 12' },
-    { id: 'h2', title: 'Movie Night', date: 'June 19' },
-  ],
-  attending: [
-    { id: 'a1', title: 'Central Park Picnic', date: 'June 15' },
-    { id: 'a2', title: 'Rooftop Happy Hour', date: 'June 22' },
-  ],
-  private: [
-    { id: 'p1', title: 'Alex & Friends Dinner', host: 'Alex Chen', date: 'June 14' },
-    { id: 'p2', title: 'Priya Study Session', host: 'Priya S.', date: 'June 17' },
-  ],
-  suggested: [
-    { id: 's1', title: 'Intern Mixer NYC', date: 'June 20' },
-    { id: 's2', title: 'Tech Talk @ WeWork', date: 'June 25' },
-    { id: 's3', title: 'Brooklyn Foodie Tour', date: 'June 28' },
-  ],
-};
-
 // ── Messages mock data ──
 const conversations = [
   {
@@ -234,34 +149,6 @@ function completeProfile(userId) {
   return profile;
 }
 
-// ── Events functions ──
-function getEvents() {
-  return events;
-}
-
-function getEventById(id) {
-  return events.find(e => e.id === id) || null;
-}
-
-function getUserEvents() {
-  return userEvents;
-}
-
-function createEvent({ title, description, location, date, time, privacy }) {
-  const newEvent = {
-    id: 'e' + nextEventId++,
-    title,
-    description: description || '',
-    location: location || '',
-    date: date || '',
-    time: time || '',
-    privacy: privacy || 'public',
-    createdBy: 'u1',
-  };
-  events.unshift(newEvent);
-  return newEvent;
-}
-
 // ── Messages functions ──
 function getConversations() {
   return conversations;
@@ -329,10 +216,6 @@ module.exports = {
   saveProfileStep,
   getProfile,
   completeProfile,
-  getEvents,
-  getEventById,
-  getUserEvents,
-  createEvent,
   getConversations,
   getMessages,
   sendMessage,
