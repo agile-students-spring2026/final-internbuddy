@@ -8,7 +8,7 @@ async function getProfiles(req, res, next) {
     const swipes = await Swipe.find({ userId }).lean();
     const swipedIds = new Set(swipes.map((s) => s.targetProfileId));
 
-    const allProfiles = getSwipeProfiles(userId);
+    const allProfiles = await getSwipeProfiles(userId);
     const unseen = allProfiles.filter((p) => !swipedIds.has(String(p.id)));
 
     return res.status(200).json(unseen);
@@ -25,7 +25,7 @@ async function recordSwipe(req, res, next, action) {
     const swipe = await Swipe.findOneAndUpdate(
       { userId, targetProfileId: String(profileId) },
       { userId, targetProfileId: String(profileId), action },
-      { new: true, upsert: true, runValidators: true }
+      { returnDocument: 'after', upsert: true, runValidators: true }
     );
 
     return res.status(200).json({

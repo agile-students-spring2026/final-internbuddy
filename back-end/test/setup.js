@@ -2,16 +2,19 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { connectDB } = require('../src/db');
 
-before(async function () {
-  this.timeout(20000);
-  if (mongoose.connection.readyState === 0) {
-    await connectDB();
-  }
-});
+if (!process.env.JWT_SECRET) {
+  process.env.JWT_SECRET = 'internbuddy-test-secret';
+}
 
-after(async function () {
-  this.timeout(10000);
-  if (mongoose.connection.readyState !== 0) {
-    await mongoose.disconnect();
-  }
-});
+exports.mochaHooks = {
+  async beforeAll() {
+    if (mongoose.connection.readyState === 0) {
+      await connectDB();
+    }
+  },
+  async afterAll() {
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.disconnect();
+    }
+  },
+};

@@ -12,32 +12,38 @@ function searchUsersHandler(req, res) {
 
     try {
         const matches = searchUsers({ q, company, school, role, city })
-            .filter((u) => u.id !== currentUserId)
-            .map((u) => enrichUser(u, currentUserId))
-            .filter((u) => !u.connected);
-        const total = matches.length;
-        const totalPages = Math.ceil(total / limit);
-        const offset = (page - 1) * limit;
-        const enriched = matches.slice(offset, offset + limit);
+            .filter((u) => u.id !== currentUserId);
+        Promise.all(matches.map((u) => enrichUser(u, currentUserId)))
+            .then((enrichedMatches) => {
+                const visible = enrichedMatches.filter((u) => !u.connected);
+                const total = visible.length;
+                const totalPages = Math.ceil(total / limit);
+                const offset = (page - 1) * limit;
+                const enriched = visible.slice(offset, offset + limit);
 
-        res.json({
-            data: enriched,
-            pagination: {
-                page,
-                limit,
-                total,
-                totalPages,
-                hasNext: page < totalPages,
-                hasPrev: page > 1,
-            },
-        });
+                res.json({
+                    data: enriched,
+                    pagination: {
+                        page,
+                        limit,
+                        total,
+                        totalPages,
+                        hasNext: page < totalPages,
+                        hasPrev: page > 1,
+                    },
+                });
+            })
+            .catch((err) => {
+                console.error("[searchUsers]", err);
+                res.status(500).json({ error: "Internal server error" });
+            });
     } catch (err) {
         console.error("[searchUsers]", err);
         res.status(500).json({ error: "Internal server error" });
     }
 }
 
-function getUserProfileHandler(req, res) {
+async function getUserProfileHandler(req, res) {
   const { id } = req.params;
   const currentUserId = req.headers["x-current-user-id"] || req.query.currentUserId || null;
 
@@ -46,7 +52,8 @@ function getUserProfileHandler(req, res) {
     return res.status(404).json({ error: "User not found" });
   }
 
-  res.json({ data: enrichUser(user, currentUserId) });
+    const enriched = await enrichUser(user, currentUserId);
+    res.json({ data: enriched });
 }
 
 module.exports = {

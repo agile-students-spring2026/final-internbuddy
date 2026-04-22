@@ -145,7 +145,7 @@ async function acceptRequest(req, res, next) {
     const record = await Connection.findByIdAndUpdate(
       requestId,
       { status: 'accepted', acceptedAt: new Date() },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!record) {
@@ -176,7 +176,7 @@ async function rejectRequest(req, res, next) {
     const record = await Connection.findByIdAndUpdate(
       requestId,
       { status: 'rejected', acceptedAt: null },
-      { new: true }
+      { returnDocument: 'after' }
     );
 
     if (!record) {
