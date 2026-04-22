@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "c8 --reporter=text --reporter=html mocha \"test/**/*.test.js\""
+    "test": "c8 --reporter=text --reporter=html mocha --require test/setup.js \"test/**/*.test.js\""
   },
   "keywords": [
     "express",

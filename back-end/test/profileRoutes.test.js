@@ -2,113 +2,93 @@ const request = require('supertest');
 const { expect } = require('chai');
 
 const app = require('../src/app');
+const User = require('../src/models/User');
+const Profile = require('../src/models/Profile');
 
 describe('Profile routes', () => {
-  it('gets a profile by userId', async () => {
-    const signup = await request(app)
-      .post('/api/auth/signup')
-      .send({ email: 'profile1@internbuddy.app', phone: '+15551110001' });
+  async function registerAndGetToken() {
+    const email = `profile-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@profiletest.internbuddy`;
+    const res = await request(app)
+      .post('/api/auth/register')
+      .send({ email, phone: '+15551110001', password: 'Password123!' });
 
-    const userId = signup.body.account.userId;
+    return {
+      token: res.body.token,
+      userId: res.body.user.id,
+      email,
+    };
+  }
 
-    const response = await request(app)
-      .get(`/api/profile/${userId}`);
-
-    expect(response.status).to.equal(200);
-    expect(response.body.profile).to.have.property('userId', userId);
-    expect(response.body.profile).to.have.property('steps');
-    expect(response.body.profile.completed).to.equal(false);
+  afterEach(async () => {
+    await Profile.deleteMany({});
+    await User.deleteMany({ email: /@profiletest\.internbuddy$/i });
   });
 
-  it('returns 404 when profile does not exist', async () => {
+  it('GET /api/profile/me requires auth', async () => {
+    const response = await request(app).get('/api/profile/me');
+
+    expect(response.status).to.equal(401);
+    expect(response.body.error).to.equal('Authorization token is required');
+  });
+
+  it('returns 404 when profile does not exist yet', async () => {
+    const { token } = await registerAndGetToken();
+
     const response = await request(app)
-      .get('/api/profile/999999');
+      .get('/api/profile/me')
+      .set('Authorization', `Bearer ${token}`);
 
     expect(response.status).to.equal(404);
     expect(response.body.error).to.equal('Profile not found');
   });
 
-  it('rejects saveStep when step is missing', async () => {
-    const signup = await request(app)
-      .post('/api/auth/signup')
-      .send({ email: 'profile2@internbuddy.app', phone: '+15551110002' });
-
-    const userId = signup.body.account.userId;
-
+  it('POST /api/profile requires auth', async () => {
     const response = await request(app)
-      .post(`/api/profile/${userId}/step`)
-      .send({ value: 'NYU' });
+      .post('/api/profile')
+      .send({ name: 'No Auth User' });
 
-    expect(response.status).to.equal(400);
-    expect(response.body.error).to.equal('Missing required fields');
-    expect(response.body.required).to.deep.equal(['step', 'value']);
+    expect(response.status).to.equal(401);
+    expect(response.body.error).to.equal('Authorization token is required');
   });
 
-  it('returns 404 when saving a step for a nonexistent account', async () => {
-    const response = await request(app)
-      .post('/api/profile/999999/step')
-      .send({ step: 'school', value: 'NYU' });
-
-    expect(response.status).to.equal(404);
-    expect(response.body.error).to.equal('Account not found');
-  });
-
-  it('saves a profile step', async () => {
-    const signup = await request(app)
-      .post('/api/auth/signup')
-      .send({ email: 'profile3@internbuddy.app', phone: '+15551110003' });
-
-    const userId = signup.body.account.userId;
+  it('saves profile and marks onboarding complete', async () => {
+    const { token, userId } = await registerAndGetToken();
 
     const response = await request(app)
-      .post(`/api/profile/${userId}/step`)
-      .send({ step: 'school', value: 'NYU' });
+      .post('/api/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Profile Test User',
+        school: 'NYU',
+        city: 'New York',
+        interests: ['Music', 'Food'],
+      });
 
     expect(response.status).to.equal(200);
-    expect(response.body.message).to.equal('Profile step saved (mock)');
-    expect(response.body.savedStep).to.equal('school');
-    expect(response.body.profile.userId).to.equal(userId);
-    expect(response.body.profile.steps.school).to.equal('NYU');
-  });
-
-  it('returns the next step when saving a profile step', async () => {
-    const signup = await request(app)
-      .post('/api/auth/signup')
-      .send({ email: 'profile4@internbuddy.app', phone: '+15551110004' });
-
-    const userId = signup.body.account.userId;
-
-    const response = await request(app)
-      .post(`/api/profile/${userId}/step`)
-      .send({ step: 'school', value: 'Columbia' });
-
-    expect(response.status).to.equal(200);
-    expect(response.body).to.have.property('nextStep');
-  });
-
-  it('completes a profile', async () => {
-    const signup = await request(app)
-      .post('/api/auth/signup')
-      .send({ email: 'profile5@internbuddy.app', phone: '+15551110005' });
-
-    const userId = signup.body.account.userId;
-
-    const response = await request(app)
-      .post(`/api/profile/${userId}/complete`)
-      .send();
-
-    expect(response.status).to.equal(200);
-    expect(response.body.message).to.equal('Profile completed (mock)');
-    expect(response.body.profile.completed).to.equal(true);
+    expect(response.body.message).to.equal('Profile saved');
+    expect(response.body.profile).to.have.property('userId', userId);
+    expect(response.body.profile).to.have.property('completed', true);
     expect(response.body.profile).to.have.property('completedAt');
   });
 
-  it('returns 404 when completing a nonexistent profile', async () => {
-    const response = await request(app)
-      .post('/api/profile/999999/complete')
-      .send();
+  it('GET /api/profile/me returns saved profile', async () => {
+    const { token, userId } = await registerAndGetToken();
 
-    expect(response.status).to.equal(404);
-    expect(response.body.error).to.equal('Profile not found');
+    await request(app)
+      .post('/api/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Saved Profile User',
+        major: 'Computer Science',
+      });
+
+    const response = await request(app)
+      .get('/api/profile/me')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(response.status).to.equal(200);
+    expect(response.body.profile).to.have.property('userId', userId);
+    expect(response.body.profile).to.have.property('name', 'Saved Profile User');
+    expect(response.body.profile).to.have.property('major', 'Computer Science');
   });
 });

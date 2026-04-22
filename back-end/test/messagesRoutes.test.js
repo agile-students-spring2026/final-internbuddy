@@ -17,8 +17,6 @@ describe('Messages Routes', function () {
   let conversationId;
 
   before(async function () {
-    await mongoose.connect(process.env.MONGO_URI);
-
     userA = await User.create({
       email: `msgtest-a-${Date.now()}@test.com`,
       phone: '+15550000001',
@@ -37,7 +35,6 @@ describe('Messages Routes', function () {
   after(async function () {
     await Conversation.deleteMany({ participants: { $in: [userA._id, userB._id] } });
     await User.deleteMany({ _id: { $in: [userA._id, userB._id] } });
-    await mongoose.disconnect();
   });
 
   it('GET /api/messages without auth returns 401', async () => {
