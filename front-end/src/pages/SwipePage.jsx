@@ -1,6 +1,12 @@
 import { useState, useEffect, useContext } from 'react'
 import { ConnectionsContext } from '../context/ConnectionsContext'
+import { getToken } from '../utils/auth'
 import './SwipePage.css'
+
+function authHeaders() {
+  const token = getToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 function SwipePage() {
   const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
@@ -12,9 +18,11 @@ function SwipePage() {
   const [requestsTab, setRequestsTab] = useState('received')
 
   useEffect(() => {
-    fetch('/api/swipe/profiles')
+    fetch('/api/swipe/profiles', { headers: authHeaders() })
       .then(res => res.json())
-      .then(data => setProfiles(data))
+      .then(data => {
+        if (Array.isArray(data)) setProfiles(data)
+      })
       .catch(err => console.error('Failed to fetch profiles:', err))
   }, [])
 
@@ -24,7 +32,7 @@ function SwipePage() {
     setSwipeDirection('left')
     fetch('/api/swipe/pass', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ profileId: profile.id }),
     }).catch(err => console.error('Failed to pass:', err))
 
@@ -42,6 +50,12 @@ function SwipePage() {
   const handleAccept = () => {
     setSwipeDirection('right')
     setNotification({ type: 'success', text: `✓ Friend request sent to ${profile.name}!` })
+
+    fetch('/api/swipe/like', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ profileId: profile.id }),
+    }).catch(err => console.error('Failed to record like:', err))
 
     sendRequest(String(profile.id))
       .catch(err => console.error('Failed to send request:', err))

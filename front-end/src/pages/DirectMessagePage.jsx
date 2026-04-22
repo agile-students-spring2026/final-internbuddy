@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { getToken } from "../utils/auth";
+
+function authHeaders() {
+  const token = getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
 
 export default function DirectMessagePage() {
   const navigate = useNavigate();
@@ -9,11 +15,13 @@ export default function DirectMessagePage() {
   const [newText, setNewText] = useState("");
 
   useEffect(() => {
-    fetch(`/api/messages/${id}`)
+    fetch(`/api/messages/${id}`, { headers: authHeaders() })
       .then(res => res.json())
       .then(data => {
-        setConversation(data.conversation);
-        setMessages(data.messages);
+        if (data && data.conversation) {
+          setConversation(data.conversation);
+          setMessages(data.messages || []);
+        }
       })
       .catch(err => console.error('Failed to fetch messages:', err));
   }, [id]);
@@ -24,13 +32,15 @@ export default function DirectMessagePage() {
 
     fetch(`/api/messages/${id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ text: newText }),
     })
       .then(res => res.json())
       .then(msg => {
-        setMessages(prev => [...prev, msg]);
-        setNewText("");
+        if (msg && msg.id) {
+          setMessages(prev => [...prev, msg]);
+          setNewText("");
+        }
       })
       .catch(err => console.error('Failed to send message:', err));
   };

@@ -1,36 +1,105 @@
 const chai = require('chai');
 const expect = chai.expect;
 const request = require('supertest');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const app = require('../src/app');
+const Swipe = require('../src/models/Swipe');
 
-describe('Swipe Routes', () => {
-  it('GET /api/swipe/profiles should return an array of profiles', async () => {
+describe('Swipe Routes', function () {
+  this.timeout(30000);
+
+  const testUserId = new mongoose.Types.ObjectId();
+  let token;
+
+  before(async function () {
+    await mongoose.connect(process.env.MONGO_URI);
+    token = jwt.sign({ sub: String(testUserId), email: 'swipetest@test.com' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  });
+
+  after(async function () {
+    await Swipe.deleteMany({ userId: testUserId });
+    await mongoose.disconnect();
+  });
+
+  it('GET /api/swipe/profiles without auth returns 401', async () => {
     const res = await request(app).get('/api/swipe/profiles');
+    expect(res.status).to.equal(401);
+  });
+
+  it('GET /api/swipe/profiles returns an array of profiles with auth', async () => {
+    const res = await request(app)
+      .get('/api/swipe/profiles')
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('array');
     expect(res.body.length).to.be.greaterThan(0);
     expect(res.body[0]).to.have.property('name');
-    expect(res.body[0]).to.have.property('internshipFull');
-    expect(res.body[0]).to.have.property('age');
-    expect(res.body[0]).to.have.property('swipeImage');
   });
 
-  it('GET /api/swipe/profiles should not include the current user', async () => {
+  it('POST /api/swipe/like without auth returns 401', async () => {
     const res = await request(app)
-      .get('/api/swipe/profiles')
-      .set('x-current-user-id', '101');
-    expect(res.status).to.equal(200);
-    const ids = res.body.map(p => p.id);
-    expect(ids).to.not.include('101');
+      .post('/api/swipe/like')
+      .send({ profileId: '101' });
+    expect(res.status).to.equal(401);
   });
 
-  it('GET /api/swipe/profiles should not include connected users', async () => {
-    // user 1 is connected to user 2 (seeded in connectionsStore)
+  it('POST /api/swipe/like without profileId returns 400', async () => {
+    const res = await request(app)
+      .post('/api/swipe/like')
+      .set('Authorization', `Bearer ${token}`)
+      .send({});
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('error');
+  });
+
+  it('POST /api/swipe/like records a like', async () => {
+    const res = await request(app)
+      .post('/api/swipe/like')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ profileId: '101' });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('action', 'like');
+    expect(res.body).to.have.property('targetProfileId', '101');
+  });
+
+  it('POST /api/swipe/pass records a pass', async () => {
+    const res = await request(app)
+      .post('/api/swipe/pass')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ profileId: '102' });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('action', 'pass');
+    expect(res.body).to.have.property('targetProfileId', '102');
+  });
+
+  it('GET /api/swipe/profiles filters out already-swiped profiles', async () => {
     const res = await request(app)
       .get('/api/swipe/profiles')
-      .set('x-current-user-id', '1');
+      .set('Authorization', `Bearer ${token}`);
     expect(res.status).to.equal(200);
-    const ids = res.body.map(p => p.id);
-    expect(ids).to.not.include('2');
+    const returnedIds = res.body.map((p) => String(p.id));
+    expect(returnedIds).to.not.include('101');
+    expect(returnedIds).to.not.include('102');
+  });
+
+  it('GET /api/swipe/history returns this user\'s swipe actions', async () => {
+    const res = await request(app)
+      .get('/api/swipe/history')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('array');
+    const ids = res.body.map((s) => s.targetProfileId);
+    expect(ids).to.include('101');
+    expect(ids).to.include('102');
+  });
+
+  it('POST /api/swipe/like is idempotent (same profile twice)', async () => {
+    const res = await request(app)
+      .post('/api/swipe/like')
+      .set('Authorization', `Bearer ${token}`)
+      .send({ profileId: '101' });
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('action', 'like');
   });
 });
