@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getToken } from '../utils/auth'
 import './YourEventsPage.css'
 
 export default function YourEventsPage() {
@@ -8,9 +9,14 @@ export default function YourEventsPage() {
   const [data, setData] = useState({ hosting: [], attending: [], private: [], suggested: [] })
 
   useEffect(() => {
-    fetch('/api/events/me')
+    const token = getToken()
+    fetch('/api/events/me', {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
       .then(res => res.json())
-      .then(d => setData(d))
+      .then(d => {
+        if (d && d.hosting) setData(d)
+      })
       .catch(err => console.error('Failed to fetch your events:', err))
   }, [])
 

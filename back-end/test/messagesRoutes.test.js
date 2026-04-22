@@ -1,92 +1,184 @@
 const chai = require('chai');
 const expect = chai.expect;
 const request = require('supertest');
+const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 const app = require('../src/app');
+const Conversation = require('../src/models/Conversation');
+const User = require('../src/models/User');
 
-describe('Messages Routes', () => {
-  it('GET /api/messages should return an array of conversations', async () => {
+describe('Messages Routes', function () {
+  this.timeout(30000);
+
+  let userA;
+  let userB;
+  let tokenA;
+  let tokenB;
+  let conversationId;
+
+  before(async function () {
+    await mongoose.connect(process.env.MONGO_URI);
+
+    userA = await User.create({
+      email: `msgtest-a-${Date.now()}@test.com`,
+      phone: '+15550000001',
+      verified: true,
+    });
+    userB = await User.create({
+      email: `msgtest-b-${Date.now()}@test.com`,
+      phone: '+15550000002',
+      verified: true,
+    });
+
+    tokenA = jwt.sign({ sub: String(userA._id), email: userA.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    tokenB = jwt.sign({ sub: String(userB._id), email: userB.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  });
+
+  after(async function () {
+    await Conversation.deleteMany({ participants: { $in: [userA._id, userB._id] } });
+    await User.deleteMany({ _id: { $in: [userA._id, userB._id] } });
+    await mongoose.disconnect();
+  });
+
+  it('GET /api/messages without auth returns 401', async () => {
     const res = await request(app).get('/api/messages');
+    expect(res.status).to.equal(401);
+  });
+
+  it('GET /api/messages returns empty array when no conversations', async () => {
+    const res = await request(app)
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`);
     expect(res.status).to.equal(200);
     expect(res.body).to.be.an('array');
-    expect(res.body.length).to.be.greaterThan(0);
-    expect(res.body[0]).to.have.property('id');
-    expect(res.body[0]).to.have.property('otherUser');
-    expect(res.body[0]).to.have.property('lastMessage');
   });
 
-  it('GET /api/messages/:conversationId should return conversation and messages', async () => {
-    const res = await request(app).get('/api/messages/c1');
-    expect(res.status).to.equal(200);
-    expect(res.body).to.have.property('conversation');
-    expect(res.body).to.have.property('messages');
-    expect(res.body.messages).to.be.an('array');
-    expect(res.body.messages.length).to.be.greaterThan(0);
-  });
-
-  it('GET /api/messages/:conversationId should return 404 for unknown id', async () => {
-    const res = await request(app).get('/api/messages/c999');
-    expect(res.status).to.equal(404);
-    expect(res.body).to.have.property('error');
-  });
-
-  it('POST /api/messages/:conversationId should send a message', async () => {
+  it('POST /api/messages without otherUserId returns 400', async () => {
     const res = await request(app)
-      .post('/api/messages/c1')
-      .send({ text: 'Hello from test!' });
-    expect(res.status).to.equal(201);
-    expect(res.body).to.have.property('id');
-    expect(res.body).to.have.property('sender', 'me');
-    expect(res.body).to.have.property('text', 'Hello from test!');
-  });
-
-  it('POST /api/messages/:conversationId should return 400 without text', async () => {
-    const res = await request(app)
-      .post('/api/messages/c1')
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`)
       .send({});
     expect(res.status).to.equal(400);
     expect(res.body).to.have.property('error');
   });
 
-  it('POST /api/messages should create a new conversation', async () => {
+  it('POST /api/messages with invalid otherUserId returns 400', async () => {
     const res = await request(app)
       .post('/api/messages')
-      .send({ userId: '1', otherUserId: '103' });
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ otherUserId: 'not-a-valid-id' });
+    expect(res.status).to.equal(400);
+  });
+
+  it('POST /api/messages with self as otherUserId returns 400', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ otherUserId: String(userA._id) });
+    expect(res.status).to.equal(400);
+  });
+
+  it('POST /api/messages with nonexistent user returns 404', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ otherUserId: String(new mongoose.Types.ObjectId()) });
+    expect(res.status).to.equal(404);
+  });
+
+  it('POST /api/messages creates a conversation', async () => {
+    const res = await request(app)
+      .post('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ otherUserId: String(userB._id) });
     expect(res.status).to.equal(201);
     expect(res.body).to.have.property('id');
-    expect(res.body.otherUser).to.have.property('name', 'Alex');
-    expect(res.body.otherUser).to.have.property('id', '103');
+    expect(res.body.otherUser).to.have.property('id', String(userB._id));
+    conversationId = res.body.id;
   });
 
-  it('POST /api/messages should return 400 if userId is missing', async () => {
+  it('POST /api/messages returns existing conversation on duplicate pair', async () => {
     const res = await request(app)
       .post('/api/messages')
-      .send({ otherUserId: '103' });
-    expect(res.status).to.equal(400);
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ otherUserId: String(userB._id) });
+    expect(res.status).to.equal(201);
+    expect(res.body.id).to.equal(conversationId);
   });
 
-  it('POST /api/messages should return 400 if otherUserId is missing', async () => {
+  it('GET /api/messages returns the conversation for participant', async () => {
     const res = await request(app)
-      .post('/api/messages')
-      .send({ userId: '1' });
-    expect(res.status).to.equal(400);
-  });
-
-  it('POST /api/messages should return existing conversation for duplicate pair', async () => {
-    const first = await request(app)
-      .post('/api/messages')
-      .send({ userId: '1', otherUserId: '104' });
-    const second = await request(app)
-      .post('/api/messages')
-      .send({ userId: '1', otherUserId: '104' });
-    expect(first.body.id).to.equal(second.body.id);
-  });
-
-  it('GET /api/messages/:id should work for a newly created conversation', async () => {
-    const created = await request(app)
-      .post('/api/messages')
-      .send({ userId: '1', otherUserId: '105' });
-    const res = await request(app).get(`/api/messages/${created.body.id}`);
+      .get('/api/messages')
+      .set('Authorization', `Bearer ${tokenA}`);
     expect(res.status).to.equal(200);
-    expect(res.body.messages).to.deep.equal([]);
+    const ids = res.body.map((c) => c.id);
+    expect(ids).to.include(conversationId);
+  });
+
+  it('POST /api/messages/:id without text returns 400', async () => {
+    const res = await request(app)
+      .post(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({});
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('error');
+  });
+
+  it('POST /api/messages/:id sends a message', async () => {
+    const res = await request(app)
+      .post(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ text: 'Hello from A' });
+    expect(res.status).to.equal(201);
+    expect(res.body).to.have.property('text', 'Hello from A');
+    expect(res.body).to.have.property('sender', 'me');
+  });
+
+  it('GET /api/messages/:id shows messages with correct sender tags', async () => {
+    await request(app)
+      .post(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenB}`)
+      .send({ text: 'Hi back from B' });
+
+    const res = await request(app)
+      .get(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenA}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('conversation');
+    expect(res.body).to.have.property('messages').that.is.an('array');
+    expect(res.body.messages).to.have.length.greaterThan(1);
+    const senders = res.body.messages.map((m) => m.sender);
+    expect(senders).to.include('me');
+    expect(senders).to.include('them');
+  });
+
+  it('GET /api/messages/:id returns 403 for non-participant', async () => {
+    const outsider = await User.create({
+      email: `msgtest-outsider-${Date.now()}@test.com`,
+      phone: '+15550000003',
+      verified: true,
+    });
+    const outsiderToken = jwt.sign({ sub: String(outsider._id), email: outsider.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const res = await request(app)
+      .get(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${outsiderToken}`);
+    expect(res.status).to.equal(403);
+
+    await User.deleteOne({ _id: outsider._id });
+  });
+
+  it('GET /api/messages/:id returns 404 for invalid id', async () => {
+    const res = await request(app)
+      .get('/api/messages/not-an-id')
+      .set('Authorization', `Bearer ${tokenA}`);
+    expect(res.status).to.equal(404);
+  });
+
+  it('GET /api/messages/:id returns 404 for nonexistent id', async () => {
+    const res = await request(app)
+      .get(`/api/messages/${new mongoose.Types.ObjectId()}`)
+      .set('Authorization', `Bearer ${tokenA}`);
+    expect(res.status).to.equal(404);
   });
 });
