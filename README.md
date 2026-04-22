@@ -8,6 +8,54 @@ InternBuddy - Helping interns find community faster
 - [Alissa Wu](https://github.com/alissawu)
 - [Charlie Li](https://github.com\CharlieLi111)
 
+# Run Locally
+
+## Prerequisites
+- Node.js 18+ and npm
+- A MongoDB Atlas connection string
+
+## 1. Start the backend
+1. Open a terminal and go to `back-end/`.
+2. Install dependencies:
+  ```bash
+  npm install
+  ```
+3. Create `back-end/.env` with:
+  ```env
+  MONGO_URI=your-mongodb-atlas-uri
+  JWT_SECRET=your-long-random-secret
+  PORT=3001
+  ```
+4. Start the backend server:
+  ```bash
+  npm run dev
+  ```
+5. Confirm the API is running at `http://localhost:3001/api/health`.
+
+## 2. Start the frontend
+1. Open a second terminal and go to `front-end/`.
+2. Install dependencies:
+  ```bash
+  npm install
+  ```
+3. Start the frontend dev server:
+  ```bash
+  npm run dev
+  ```
+4. Open the URL printed by Vite (usually `http://localhost:5173`).
+
+## Useful commands
+- Backend tests:
+  ```bash
+  cd back-end
+  npm test
+  ```
+- Frontend production build:
+  ```bash
+  cd front-end
+  npm run build
+  ```
+
 # What and Why?
 
 InternBuddy is a mobile web application designed to help students connect with other students who are interning at the same company, in the same city, or during the same time period. Every summer, thousands of interns relocate to new cities where they know very few people. While internships are professionally exciting, they can also be socially isolating and logistically overwhelming.

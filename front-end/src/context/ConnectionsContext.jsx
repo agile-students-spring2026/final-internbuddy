@@ -2,37 +2,75 @@ import { createContext, useState, useEffect } from 'react'
 
 export const ConnectionsContext = createContext()
 
-// hardcoded for now since we don't have real auth yet
-const MY_USER_ID = '1'
-
 export function ConnectionsProvider({ children }) {
+  const [currentUserId, setCurrentUserId] = useState(null)
   const [pending, setPending] = useState([])
   const [sent, setSent] = useState([])
   const [accepted, setAccepted] = useState([])
 
   useEffect(() => {
-    fetch(`/api/connections/${MY_USER_ID}/pending`)
-      .then(res => res.json())
-      .then(data => setPending(data.pending))
+    const token = localStorage.getItem('token')
 
-    fetch(`/api/connections/${MY_USER_ID}/sent`)
-      .then(res => res.json())
-      .then(data => setSent(data.sent))
+    if (!token) {
+      setCurrentUserId(null)
+      setPending([])
+      setSent([])
+      setAccepted([])
+      return
+    }
 
-    fetch(`/api/connections/${MY_USER_ID}`)
-      .then(res => res.json())
-      .then(data => setAccepted(data.accepted))
+    fetch('/api/auth/me', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(res => (res.ok ? res.json() : null))
+      .then(data => {
+        const userId = data?.user?.id || null
+        setCurrentUserId(userId)
+
+        if (!userId) {
+          setPending([])
+          setSent([])
+          setAccepted([])
+          return
+        }
+
+        fetch(`/api/connections/${userId}/pending`)
+          .then(res => res.json())
+          .then(data => setPending(data.pending || []))
+
+        fetch(`/api/connections/${userId}/sent`)
+          .then(res => res.json())
+          .then(data => setSent(data.sent || []))
+
+        fetch(`/api/connections/${userId}`)
+          .then(res => res.json())
+          .then(data => setAccepted(data.accepted || []))
+      })
+      .catch(() => {
+        setCurrentUserId(null)
+        setPending([])
+        setSent([])
+        setAccepted([])
+      })
   }, [])
 
   function sendRequest(toUserId) {
+    if (!currentUserId) {
+      return Promise.reject(new Error('Must be logged in to send connection requests'))
+    }
+
     return fetch('/api/connections/request', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fromUserId: MY_USER_ID, toUserId })
+      body: JSON.stringify({ fromUserId: currentUserId, toUserId })
     })
       .then(res => res.json())
       .then(data => {
-        setSent(prev => [...prev, data.request])
+        if (data.request) {
+          setSent(prev => [...prev, data.request])
+        }
         return data
       })
   }

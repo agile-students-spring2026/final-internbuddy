@@ -71,7 +71,8 @@ function CreateProfileMeetupPage() {
         return
       }
 
-      navigate('/profile')
+      // Navigate to optional resume upload page after profile is saved
+      navigate('/create-profile/resume-upload')
     } catch (err) {
       console.error(err)
       setError('Something went wrong while saving your profile')
@@ -110,7 +111,7 @@ function CreateProfileMeetupPage() {
           onClick={handleFinish}
           disabled={loading}
         >
-          {loading ? 'Saving...' : "Let's go! 🎉"}
+          {loading ? 'Saving...' : 'Add Resume (Optional)'}
         </button>
 
         <button
