@@ -55,6 +55,20 @@ function formatTimestamp(date) {
   return `${diffDay}d`;
 }
 
+async function getUnreadCount(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const myObjectId = new mongoose.Types.ObjectId(userId);
+    const count = await Conversation.countDocuments({
+      participants: myObjectId,
+      lastMessage: { $ne: '' },
+    });
+    return res.status(200).json({ count });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function getConversations(req, res, next) {
   try {
     const userId = req.auth.userId;
@@ -226,6 +240,7 @@ async function createConversation(req, res, next) {
 
 module.exports = {
   getConversations,
+  getUnreadCount,
   getMessages,
   sendMessage,
   createConversation,

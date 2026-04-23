@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {
   getConversations,
+  getUnreadCount,
   getMessages,
   sendMessage,
   createConversation,
@@ -12,6 +13,7 @@ const { requireAuth } = require('../middleware/authMiddleware');
 const { validateRequest } = require('../middleware/validateRequest');
 
 router.get('/', requireAuth, getConversations);
+router.get('/unread/count', requireAuth, getUnreadCount);
 
 router.post(
   '/',
