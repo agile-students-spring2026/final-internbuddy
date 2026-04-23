@@ -10,7 +10,7 @@ const ROLES = ['SWE Intern', 'PM Intern', 'Design Intern', 'Data Intern', 'Finan
 const CITIES = ['New York, NY', 'San Francisco, CA', 'Seattle, WA', 'Austin, TX', 'Boston, MA', 'Chicago, IL']
 const RADII = ['5 mi', '10 mi', '25 mi', '50 mi', 'Any']
 
-const CURRENT_USER_ID = '1'
+const CURRENT_USER_ID = '69e981e0e9a269d24b300cb6'
 
 function Degreebadge({ degree }) {
   const labels = {1: '1st', 2: '2nd', 3: '3rd'}
