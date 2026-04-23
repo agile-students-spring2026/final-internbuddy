@@ -28,6 +28,62 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    name: {
+      type: String,
+      trim: true
+    },
+    role: {
+      type: String,
+      trim: true
+    },
+    company: {
+      type: String,
+      trim: true
+    },
+    school: {
+      type: String,
+      trim: true
+    },
+    city: {
+      type: String,
+      trim: true
+    },
+    image: {
+      type: String,
+    },
+    swipeImage: {
+      type: String,
+    },
+    age: {
+      type: String,
+      trim: true
+    },
+    major: {
+      type: String,
+      trim: true
+    },
+    internshipFull: {
+      type: String
+    },
+    locationFull: {
+      type: String
+    },
+    about: {
+      type: String
+    },
+    pronouns: {
+      type: String
+    },
+    interests: [{
+      type: String
+    }],
+    drinks: {
+      type: String
+    },
+    connections: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }],
   },
   { timestamps: true }
 );
