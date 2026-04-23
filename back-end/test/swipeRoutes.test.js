@@ -92,6 +92,23 @@ describe('Swipe Routes', function () {
     expect(ids).to.include('102');
   });
 
+  it('GET /api/swipe/stats without auth returns 401', async () => {
+    const res = await request(app).get('/api/swipe/stats');
+    expect(res.status).to.equal(401);
+  });
+
+  it('GET /api/swipe/stats returns like and pass counts with total', async () => {
+    const res = await request(app)
+      .get('/api/swipe/stats')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('likes').that.is.a('number');
+    expect(res.body).to.have.property('passes').that.is.a('number');
+    expect(res.body).to.have.property('total', res.body.likes + res.body.passes);
+    expect(res.body.likes).to.be.at.least(1);
+    expect(res.body.passes).to.be.at.least(1);
+  });
+
   it('POST /api/swipe/like is idempotent (same profile twice)', async () => {
     const res = await request(app)
       .post('/api/swipe/like')
