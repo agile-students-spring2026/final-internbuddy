@@ -8,6 +8,7 @@ function CreateProfileDobPage() {
   const { onboarding, updateOnboarding } = useProfile()
   const [startMonth, setStartMonth] = useState(onboarding.startMonth || '')
   const [endMonth, setEndMonth] = useState(onboarding.endMonth || '')
+  const [currentInternship, setCurrentInternship] = useState(Boolean(onboarding.currentInternship))
   const [city, setCity] = useState(onboarding.city || '')
   const [stateCode, setStateCode] = useState(onboarding.stateCode || '')
 
@@ -25,12 +26,29 @@ function CreateProfileDobPage() {
           onChange={(e) => setStartMonth(e.target.value)}
         />
 
-        <input
-          className="create-profile-input"
-          type="month"
-          value={endMonth}
-          onChange={(e) => setEndMonth(e.target.value)}
-        />
+        <label className="create-profile-checkbox-row">
+          <input
+            type="checkbox"
+            checked={currentInternship}
+            onChange={(e) => {
+              const isCurrent = e.target.checked
+              setCurrentInternship(isCurrent)
+              if (isCurrent) {
+                setEndMonth('')
+              }
+            }}
+          />
+          <span>Current internship</span>
+        </label>
+
+        {!currentInternship && (
+          <input
+            className="create-profile-input"
+            type="month"
+            value={endMonth}
+            onChange={(e) => setEndMonth(e.target.value)}
+          />
+        )}
 
         <input
           className="create-profile-input"
@@ -53,7 +71,13 @@ function CreateProfileDobPage() {
         <button
           className="create-profile-next-btn"
           onClick={() => {
-            updateOnboarding({ startMonth, endMonth, city, stateCode })
+            updateOnboarding({
+              startMonth,
+              endMonth: currentInternship ? '' : endMonth,
+              currentInternship,
+              city,
+              stateCode,
+            })
             navigate('/create-profile/pronouns')
           }}
         >

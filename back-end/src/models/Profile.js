@@ -36,6 +36,9 @@ const profileSchema = new mongoose.Schema(
 
     image: { type: String },
     swipeImage: { type: String },
+    resumeFileName: { type: String, trim: true },
+    resumeUploadedAt: { type: Date },
+    resumeText: { type: String, trim: true },
 
     // 🔥 NEW FIELDS
     personality: { type: String, trim: true },

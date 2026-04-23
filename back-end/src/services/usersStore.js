@@ -1,5 +1,6 @@
 //const { use } = require("react");
 //Both search and swipe read from here now
+const Connection = require('../models/Connection');
 
 // mock user profiles for connections UI
 const users = new Map([
@@ -71,10 +72,29 @@ function getMutualCount(userId, targetId) {
   return target.connections.filter((id) => userSet.has(id)).length;
 }
 
-function enrichUser(user, currentUserId) {
-  const { getRelationship } = require('./connectionsStore');
+async function getRelationship(currentUserId, otherUserId) {
+  const relationship = await Connection.findOne({
+    $or: [
+      { fromUserId: String(currentUserId), toUserId: String(otherUserId) },
+      { fromUserId: String(otherUserId), toUserId: String(currentUserId) },
+    ],
+  }).lean();
+
+  if (!relationship) return null;
+  if (relationship.status === 'accepted') return 'accepted';
+  if (relationship.status === 'pending') {
+    return relationship.toUserId === String(currentUserId)
+      ? 'pending-incoming'
+      : 'pending-outgoing';
+  }
+  return null;
+}
+
+async function enrichUser(user, currentUserId) {
   const { connections, ...publicUser } = user;
-  const relationship = currentUserId ? getRelationship(currentUserId, user.id) : null;
+  const relationship = currentUserId
+    ? await getRelationship(currentUserId, user.id)
+    : null;
   return {
     ...publicUser,
     degree: currentUserId ? getConnectionDegree(currentUserId, user.id) : null,
@@ -85,15 +105,21 @@ function enrichUser(user, currentUserId) {
 }
 
 // returns swipe-ready profiles, filtered by connection status
-function getSwipeProfiles(currentUserId) {
-  const { getRelationship } = require('./connectionsStore');
-  return Array.from(users.values())
-    .filter(u => u.swipeImage)
-    .filter(u => u.id !== currentUserId)
-    .filter(u => {
-      const rel = getRelationship(currentUserId, u.id);
-      return rel !== 'accepted' && rel !== 'pending-outgoing';
-    });
+async function getSwipeProfiles(currentUserId) {
+  const swipeCandidates = Array.from(users.values())
+    .filter((u) => u.swipeImage)
+    .filter((u) => u.id !== currentUserId);
+
+  const enriched = await Promise.all(
+    swipeCandidates.map(async (user) => ({
+      user,
+      relationship: await getRelationship(currentUserId, user.id),
+    }))
+  );
+
+  return enriched
+    .filter((item) => item.relationship !== 'accepted' && item.relationship !== 'pending-outgoing')
+    .map((item) => item.user);
 }
 
 module.exports = { getUserById, searchUsers, getAllUsers, getConnectionDegree, getMutualCount, enrichUser, getSwipeProfiles }

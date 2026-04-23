@@ -30,7 +30,7 @@ async function saveProfile(req, res, next) {
         completedAt: new Date(),
       },
       {
-        new: true,
+        returnDocument: 'after',
         upsert: true,
         runValidators: true,
       }

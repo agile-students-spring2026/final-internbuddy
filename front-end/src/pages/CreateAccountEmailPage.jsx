@@ -12,7 +12,9 @@ function CreateAccountEmailPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
 
-  const handleNext = () => {
+  const [loading, setLoading] = useState(false)
+
+  const handleNext = async () => {
     if (!email.trim()) {
       setError('Email is required')
       return
@@ -33,12 +35,47 @@ function CreateAccountEmailPage() {
       return
     }
 
+    setLoading(true)
     setError('')
     updateAccount({
       email: email.trim(),
       password,
     })
-    navigate('/create-account/phone')
+    
+    // Register account directly, skipping phone verification
+    try {
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        // Extract specific validation error messages
+        if (data.details && Array.isArray(data.details)) {
+          const errorMessages = data.details.map(err => err.message).join(', ')
+          setError(errorMessages)
+        } else {
+          setError(data.error || 'Registration failed')
+        }
+        setLoading(false)
+        return
+      }
+
+      localStorage.setItem('token', data.token)
+      navigate('/create-profile/name')
+    } catch (err) {
+      console.error(err)
+      setError('Something went wrong')
+      setLoading(false)
+    }
   }
 
   return (
@@ -46,7 +83,7 @@ function CreateAccountEmailPage() {
       <div className="create-account-card">
         <h1 className="create-account-title">Create Account</h1>
         <p className="create-account-subtitle">
-          Step 1 of 2: Enter your email and create a password
+          Enter your email and create a password
         </p>
 
         <input
@@ -92,8 +129,9 @@ function CreateAccountEmailPage() {
         <button
           className="create-account-next-btn mt-4"
           onClick={handleNext}
+          disabled={loading}
         >
-          Next
+          {loading ? 'Creating Account...' : 'Create Account'}
         </button>
 
         <button

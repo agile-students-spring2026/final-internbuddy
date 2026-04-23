@@ -14,13 +14,11 @@ describe('Events Routes', function () {
   let createdEventId;
 
   before(async function () {
-    await mongoose.connect(process.env.MONGO_URI);
     token = jwt.sign({ sub: String(testUserId), email: 'eventtest@test.com' }, process.env.JWT_SECRET, { expiresIn: '1h' });
   });
 
   after(async function () {
     await Event.deleteMany({ createdBy: testUserId });
-    await mongoose.disconnect();
   });
 
   it('GET /api/events should return an array of events', async () => {

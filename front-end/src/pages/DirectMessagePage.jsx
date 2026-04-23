@@ -49,7 +49,7 @@ export default function DirectMessagePage() {
 
   return (
     <div className="min-h-screen bg-[#eeeef8] p-4">
-      <div className="max-w-[430px] mx-auto flex flex-col h-[calc(95vh-2rem)] bg-white rounded-2xl overflow-hidden">
+      <div className="max-w-[390px] mx-auto flex flex-col h-[calc(95vh-2rem)] bg-white rounded-2xl overflow-hidden">
 
         {/* Header */}
         <div className="flex items-center gap-3 p-4 border-b border-gray-100">

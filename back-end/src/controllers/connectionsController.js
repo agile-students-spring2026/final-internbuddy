@@ -1,17 +1,23 @@
-const {
-  addRequest,
-  getPendingForUser,
-  getSentForUser,
-  getAcceptedForUser,
-  acceptRequestById,
-  rejectRequestById,
-  deleteConnectionById
-} = require('../services/connectionsStore');
+const Connection = require('../models/Connection');
+const mongoose = require('mongoose');
 const { getUserById } = require('../services/usersStore');
 const { createConversation } = require('../services/mockStore');
 
-function sendRequest(req, res) {
-  const { fromUserId, toUserId } = req.body;
+function mapConnectionRecord(record) {
+  return {
+    id: String(record._id),
+    fromUserId: record.fromUserId,
+    toUserId: record.toUserId,
+    status: record.status,
+    createdAt: record.createdAt,
+    acceptedAt: record.acceptedAt,
+  };
+}
+
+async function sendRequest(req, res, next) {
+  const { fromUserId: rawFromUserId, toUserId: rawToUserId } = req.body;
+  const fromUserId = String(rawFromUserId || '').trim();
+  const toUserId = String(rawToUserId || '').trim();
 
   if (!fromUserId || !toUserId) {
     return res.status(400).json({
@@ -20,75 +26,193 @@ function sendRequest(req, res) {
     });
   }
 
-  const record = addRequest(fromUserId, toUserId);
+  if (fromUserId === toUserId) {
+    return res.status(400).json({ error: 'Cannot connect to yourself' });
+  }
 
-  return res.status(201).json({
-    message: 'Connection request sent (mock)',
-    request: { ...record, toUser: getUserById(toUserId) }
-  });
+  try {
+    const existing = await Connection.findOne({
+      $or: [
+        { fromUserId, toUserId },
+        { fromUserId: toUserId, toUserId: fromUserId },
+      ],
+    });
+
+    if (existing) {
+      if (existing.status === 'accepted') {
+        return res.status(409).json({ error: 'Users are already connected' });
+      }
+      if (existing.status === 'pending') {
+        return res.status(409).json({ error: 'A pending connection request already exists' });
+      }
+    }
+
+    const created = await Connection.create({
+      fromUserId,
+      toUserId,
+      status: 'pending',
+    });
+
+    const request = mapConnectionRecord(created);
+
+    return res.status(201).json({
+      message: 'Connection request sent',
+      request: { ...request, toUser: getUserById(toUserId) }
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function getPending(req, res) {
+async function getPending(req, res, next) {
   const { userId } = req.params;
-  const pending = getPendingForUser(userId);
-  return res.status(200).json({ pending });
+
+  try {
+    const rows = await Connection.find({
+      toUserId: String(userId),
+      status: 'pending',
+    }).sort({ createdAt: -1 });
+
+    const pending = rows.map((row) => {
+      const record = mapConnectionRecord(row);
+      return {
+        ...record,
+        fromUser: getUserById(record.fromUserId),
+      };
+    });
+
+    return res.status(200).json({ pending });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function getAccepted(req, res) {
+async function getAccepted(req, res, next) {
   const { userId } = req.params;
-  const accepted = getAcceptedForUser(userId);
-  return res.status(200).json({ accepted });
+
+  try {
+    const rows = await Connection.find({
+      status: 'accepted',
+      $or: [{ fromUserId: String(userId) }, { toUserId: String(userId) }],
+    }).sort({ acceptedAt: -1, createdAt: -1 });
+
+    const accepted = rows.map((row) => {
+      const record = mapConnectionRecord(row);
+      const otherUserId = record.fromUserId === String(userId) ? record.toUserId : record.fromUserId;
+      return {
+        ...record,
+        otherUser: getUserById(otherUserId),
+      };
+    });
+
+    return res.status(200).json({ accepted });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function getSent(req, res) {
+async function getSent(req, res, next) {
   const { userId } = req.params;
-  const sent = getSentForUser(userId);
-  return res.status(200).json({ sent });
+
+  try {
+    const rows = await Connection.find({
+      fromUserId: String(userId),
+      status: 'pending',
+    }).sort({ createdAt: -1 });
+
+    const sent = rows.map((row) => {
+      const record = mapConnectionRecord(row);
+      return {
+        ...record,
+        toUser: getUserById(record.toUserId),
+      };
+    });
+
+    return res.status(200).json({ sent });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function acceptRequest(req, res) {
+async function acceptRequest(req, res, next) {
   const { requestId } = req.params;
-  const record = acceptRequestById(requestId);
 
-  if (!record) {
+  if (!mongoose.isValidObjectId(requestId)) {
     return res.status(404).json({ error: 'Connection request not found' });
   }
 
-  const conversation = createConversation(record.toUserId, record.fromUserId);
+  try {
+    const record = await Connection.findByIdAndUpdate(
+      requestId,
+      { status: 'accepted', acceptedAt: new Date() },
+      { returnDocument: 'after' }
+    );
 
-  return res.status(200).json({
-    message: 'Connection request accepted (mock)',
-    request: record,
-    conversation,
-  });
+    if (!record) {
+      return res.status(404).json({ error: 'Connection request not found' });
+    }
+
+    const mapped = mapConnectionRecord(record);
+    const conversation = createConversation(mapped.toUserId, mapped.fromUserId);
+
+    return res.status(200).json({
+      message: 'Connection request accepted',
+      request: mapped,
+      conversation,
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function rejectRequest(req, res) {
+async function rejectRequest(req, res, next) {
   const { requestId } = req.params;
-  const record = rejectRequestById(requestId);
 
-  if (!record) {
+  if (!mongoose.isValidObjectId(requestId)) {
     return res.status(404).json({ error: 'Connection request not found' });
   }
 
-  return res.status(200).json({
-    message: 'Connection request rejected (mock)',
-    request: record
-  });
+  try {
+    const record = await Connection.findByIdAndUpdate(
+      requestId,
+      { status: 'rejected', acceptedAt: null },
+      { returnDocument: 'after' }
+    );
+
+    if (!record) {
+      return res.status(404).json({ error: 'Connection request not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Connection request rejected',
+      request: mapConnectionRecord(record)
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
-function deleteConnection(req, res) {
+async function deleteConnection(req, res, next) {
   const { requestId } = req.params;
-  const record = deleteConnectionById(requestId);
 
-  if (!record) {
+  if (!mongoose.isValidObjectId(requestId)) {
     return res.status(404).json({ error: 'Connection not found' });
   }
 
-  return res.status(200).json({
-    message: 'Connection deleted (mock)',
-    deleted: record
-  });
+  try {
+    const record = await Connection.findByIdAndDelete(requestId);
+
+    if (!record) {
+      return res.status(404).json({ error: 'Connection not found' });
+    }
+
+    return res.status(200).json({
+      message: 'Connection deleted',
+      deleted: mapConnectionRecord(record)
+    });
+  } catch (err) {
+    return next(err);
+  }
 }
 
 module.exports = {

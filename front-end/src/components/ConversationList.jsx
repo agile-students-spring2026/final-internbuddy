@@ -128,7 +128,7 @@ export default function ConversationList({ conversations }) {
 
   return (
     <div className="min-h-screen bg-[#eeeef8] p-4">
-      <div className="mx-auto max-w-[430px] bg-white rounded-2xl p-5">
+      <div className="mx-auto max-w-[390px] bg-white rounded-2xl p-5">
         <h1 className="text-xl font-bold text-gray-900 mb-1">Messages</h1>
         <p className="text-sm text-gray-400 mb-3">Chat with your connections</p>
 

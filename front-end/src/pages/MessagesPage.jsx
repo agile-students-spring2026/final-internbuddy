@@ -20,10 +20,6 @@ export default function MessagesPage() {
   }, [location.key]);
 
   return (
-    <div className="flex justify-center">
-      <div className="max-w-[390px]">
-        <ConversationList conversations={conversations} />
-      </div>
-    </div>
+    <ConversationList conversations={conversations} />
   );
 }

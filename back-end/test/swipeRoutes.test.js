@@ -13,13 +13,11 @@ describe('Swipe Routes', function () {
   let token;
 
   before(async function () {
-    await mongoose.connect(process.env.MONGO_URI);
     token = jwt.sign({ sub: String(testUserId), email: 'swipetest@test.com' }, process.env.JWT_SECRET, { expiresIn: '1h' });
   });
 
   after(async function () {
     await Swipe.deleteMany({ userId: testUserId });
-    await mongoose.disconnect();
   });
 
   it('GET /api/swipe/profiles without auth returns 401', async () => {

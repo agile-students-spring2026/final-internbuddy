@@ -19,12 +19,12 @@ function signAuthToken(user) {
 
 async function register(req, res, next) {
   try {
-    const { email, phone, password } = req.body;
+    const { email, password } = req.body;
 
-    if (!email || !phone || !password) {
+    if (!email || !password) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['email', 'phone', 'password'],
+        required: ['email', 'password'],
       });
     }
 
@@ -35,7 +35,7 @@ async function register(req, res, next) {
       return res.status(409).json({ error: 'Account with this email already exists' });
     }
 
-    const user = new User({ email: normalizedEmail, phone, verified: true, verifiedAt: new Date() });
+    const user = new User({ email: normalizedEmail, verified: true, verifiedAt: new Date() });
     await user.setPassword(password);
     await user.save();
 
@@ -47,7 +47,6 @@ async function register(req, res, next) {
       user: {
         id: String(user._id),
         email: user.email,
-        phone: user.phone,
         verified: user.verified,
         onboardingCompleted: user.onboardingCompleted,
       },
@@ -88,7 +87,6 @@ async function login(req, res, next) {
       user: {
         id: String(user._id),
         email: user.email,
-        phone: user.phone,
         verified: user.verified,
         onboardingCompleted: user.onboardingCompleted,
       },

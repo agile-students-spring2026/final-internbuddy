@@ -6,8 +6,7 @@ import { ConnectionsProvider } from './context/ConnectionsContext';
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage';
-import CreateAccountPhonePage from './pages/CreateAccountPhonePage';
-import CreateAccountVerifyPage from './pages/CreateAccountVerifyPage';
+
 import CreateProfileResumePage from './pages/CreateProfileResumePage';
 import CreateProfileNamePage from './pages/CreateProfileNamePage';
 import CreateProfileDobPage from './pages/CreateProfileDobPage';
@@ -48,12 +47,10 @@ function App() {
               <Route path="/" element={<LoginPage />} />
               <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/create-account/email" element={<CreateAccountEmailPage />} />
-              <Route path="/create-account/phone" element={<CreateAccountPhonePage />} />
-              <Route path="/create-account/verify" element={<CreateAccountVerifyPage />} />
 
               {/* protected routes */}
               <Route element={<ProtectedLayout />}>
-                <Route path="/create-profile/resume" element={<CreateProfileResumePage />} />
+                <Route path="/create-profile/resume-upload" element={<CreateProfileResumePage />} />
                 <Route path="/create-profile/name" element={<CreateProfileNamePage />} />
                 <Route path="/create-profile/dob" element={<CreateProfileDobPage />} />
                 <Route path="/create-profile/location" element={<CreateProfileLocationPage />} />

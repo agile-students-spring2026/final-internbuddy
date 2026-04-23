@@ -42,7 +42,7 @@ function CreateProfileNamePage() {
           Next
         </button>
 
-        <button className="create-profile-link-btn" onClick={() => navigate('/create-profile/resume')}>
+        <button className="create-profile-link-btn" onClick={() => navigate('/create-account/email')}>
           Back
         </button>
       </div>
