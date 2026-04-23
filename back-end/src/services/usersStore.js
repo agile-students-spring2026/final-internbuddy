@@ -26,7 +26,7 @@ async function searchUsers({ q, company, school, role, city } = {}) {
 }
 
 // connection helpers
-function getConnectionDegree(userId, targetId, maxHops = 3) {
+async function getConnectionDegree(userId, targetId, maxHops = 3) {
   if (userId === targetId) return 0;
   const visited = new Set([userId]);
   let frontier = [userId];
@@ -34,13 +34,14 @@ function getConnectionDegree(userId, targetId, maxHops = 3) {
   for (let hop = 1; hop <= maxHops; hop++) {
     const nextFrontier = [];
     for (const nodeId of frontier) {
-      const node = getUserById(nodeId);
+      const node = await getUserById(nodeId);
       if (!node) continue;
-      for (const neighbourId of node.connections) {
-        if (neighbourId === targetId) return hop;
-        if (!visited.has(neighbourId)) {
-          visited.add(neighbourId);
-          nextFrontier.push(neighbourId);
+      for (const neighbourId of (node.connections || [])) {
+        const nId = neighbourId.toString();
+        if (nId === targetId) return hop;
+        if (!visited.has(nId)) {
+          visited.add(nId);
+          nextFrontier.push(nId);
         }
       }
     }
@@ -50,13 +51,11 @@ function getConnectionDegree(userId, targetId, maxHops = 3) {
   return null;
 }
 
-function getMutualCount(userId, targetId) {
-  const user = getUserById(userId);
-  const target = getUserById(targetId);
+async function getMutualCount(userId, targetId) {
+  const [user, target] = await Promise.all([getUserById(userId), getUserById(targetId)]);
   if (!user || !target) return 0;
-
-  const userSet = new Set(user.connections);
-  return target.connections.filter((id) => userSet.has(id)).length;
+  const userSet = new Set((user.connections || []).map(id => id.toString()));
+  return (target.connections || []).filter(id => userSet.has(id.toString())).length;
 }
 
 async function getRelationship(currentUserId, otherUserId) {
