@@ -31,6 +31,15 @@ async function getAllEvents(req, res, next) {
   }
 }
 
+async function getEventsCount(req, res, next) {
+  try {
+    const count = await Event.countDocuments({ privacy: 'public' });
+    return res.status(200).json({ count });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function getEventById(req, res, next) {
   try {
     const { id } = req.params;
@@ -105,4 +114,4 @@ async function createEvent(req, res, next) {
   }
 }
 
-module.exports = { getAllEvents, getEventById, getUserEvents, createEvent };
+module.exports = { getAllEvents, getEventsCount, getEventById, getUserEvents, createEvent };

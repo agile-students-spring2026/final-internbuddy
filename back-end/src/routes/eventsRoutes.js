@@ -4,6 +4,7 @@ const router = express.Router();
 
 const {
   getAllEvents,
+  getEventsCount,
   getEventById,
   getUserEvents,
   createEvent,
@@ -12,6 +13,7 @@ const { requireAuth } = require('../middleware/authMiddleware');
 const { validateRequest } = require('../middleware/validateRequest');
 
 router.get('/', getAllEvents);
+router.get('/count', getEventsCount);
 router.get('/me', requireAuth, getUserEvents);
 router.get('/:id', getEventById);
 
