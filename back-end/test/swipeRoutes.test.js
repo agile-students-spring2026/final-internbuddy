@@ -109,6 +109,31 @@ describe('Swipe Routes', function () {
     expect(res.body.passes).to.be.at.least(1);
   });
 
+  it('DELETE /api/swipe/:profileId without auth returns 401', async () => {
+    const res = await request(app).delete('/api/swipe/999');
+    expect(res.status).to.equal(401);
+  });
+
+  it('DELETE /api/swipe/:profileId returns 404 for a profile never swiped', async () => {
+    const res = await request(app)
+      .delete('/api/swipe/does-not-exist')
+      .set('Authorization', `Bearer ${token}`);
+    expect(res.status).to.equal(404);
+  });
+
+  it('DELETE /api/swipe/:profileId removes a previously recorded swipe', async () => {
+    const del = await request(app)
+      .delete('/api/swipe/101')
+      .set('Authorization', `Bearer ${token}`);
+    expect(del.status).to.equal(200);
+    expect(del.body).to.have.property('removed', '101');
+    const history = await request(app)
+      .get('/api/swipe/history')
+      .set('Authorization', `Bearer ${token}`);
+    const ids = history.body.map((s) => s.targetProfileId);
+    expect(ids).to.not.include('101');
+  });
+
   it('POST /api/swipe/like is idempotent (same profile twice)', async () => {
     const res = await request(app)
       .post('/api/swipe/like')
