@@ -80,6 +80,24 @@ describe('Events Routes', function () {
     expect(res.status).to.equal(401);
   });
 
+  it('GET /api/events should respect limit query param', async () => {
+    const res = await request(app).get('/api/events?limit=1');
+    expect(res.status).to.equal(200);
+    expect(res.body).to.be.an('array');
+    expect(res.body.length).to.be.at.most(1);
+  });
+
+  it('GET /api/events should respect skip query param', async () => {
+    const firstPage = await request(app).get('/api/events?limit=5&skip=0');
+    const secondPage = await request(app).get('/api/events?limit=5&skip=5');
+    expect(firstPage.status).to.equal(200);
+    expect(secondPage.status).to.equal(200);
+    const firstIds = firstPage.body.map((e) => e.id);
+    const secondIds = secondPage.body.map((e) => e.id);
+    const overlap = firstIds.filter((id) => secondIds.includes(id));
+    expect(overlap).to.have.lengthOf(0);
+  });
+
   it('GET /api/events/me should return user events with all categories', async () => {
     const res = await request(app)
       .get('/api/events/me')
