@@ -47,6 +47,19 @@ function passProfile(req, res, next) {
   return recordSwipe(req, res, next, 'pass');
 }
 
+async function getStats(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const [likes, passes] = await Promise.all([
+      Swipe.countDocuments({ userId, action: 'like' }),
+      Swipe.countDocuments({ userId, action: 'pass' }),
+    ]);
+    return res.status(200).json({ likes, passes, total: likes + passes });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function getHistory(req, res, next) {
   try {
     const userId = req.auth.userId;
@@ -64,4 +77,4 @@ async function getHistory(req, res, next) {
   }
 }
 
-module.exports = { getProfiles, likeProfile, passProfile, getHistory };
+module.exports = { getProfiles, likeProfile, passProfile, getHistory, getStats };
