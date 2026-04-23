@@ -28,7 +28,10 @@ router.get('/:conversationId', requireAuth, getMessages);
 router.post(
   '/:conversationId',
   requireAuth,
-  [body('text').trim().notEmpty().withMessage('text is required')],
+  [
+    body('text').trim().notEmpty().withMessage('text is required'),
+    body('text').isLength({ max: 2000 }).withMessage('text must be 2000 characters or fewer'),
+  ],
   validateRequest,
   sendMessage
 );
