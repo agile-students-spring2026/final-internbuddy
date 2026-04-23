@@ -1,7 +1,7 @@
 const Connection = require('../models/Connection');
 const mongoose = require('mongoose');
 const { getUserById } = require('../services/usersStore');
-const { createConversation } = require('../services/mockStore');
+const Conversation = require('../models/Conversation');
 
 function mapConnectionRecord(record) {
   return {
@@ -160,12 +160,21 @@ async function acceptRequest(req, res, next) {
     }
 
     const mapped = mapConnectionRecord(record);
-    const conversation = createConversation(mapped.toUserId, mapped.fromUserId);
+
+    const fromId = new mongoose.Types.ObjectId(mapped.fromUserId);
+    const toId = new mongoose.Types.ObjectId(mapped.toUserId);
+    let conversation = await Conversation.findOne({
+      participants: { $all: [fromId, toId], $size: 2 },
+    }).lean();
+    if (!conversation) {
+      conversation = await Conversation.create({ participants: [fromId, toId], messages: [] });
+      conversation = conversation.toObject();
+    }
 
     return res.status(200).json({
       message: 'Connection request accepted',
       request: mapped,
-      conversation,
+      conversation: { id: String(conversation._id) },
     });
   } catch (err) {
     return next(err);
