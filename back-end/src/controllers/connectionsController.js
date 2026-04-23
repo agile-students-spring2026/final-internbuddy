@@ -54,10 +54,11 @@ async function sendRequest(req, res, next) {
     });
 
     const request = mapConnectionRecord(created);
+    const toUser = await getUserById(toUserId);
 
     return res.status(201).json({
       message: 'Connection request sent',
-      request: { ...request, toUser: getUserById(toUserId) }
+      request: { ...request, toUser }
     });
   } catch (err) {
     return next(err);
@@ -73,13 +74,15 @@ async function getPending(req, res, next) {
       status: 'pending',
     }).sort({ createdAt: -1 });
 
-    const pending = rows.map((row) => {
-      const record = mapConnectionRecord(row);
-      return {
-        ...record,
-        fromUser: getUserById(record.fromUserId),
-      };
-    });
+    const pending = await Promise.all(
+      rows.map(async (row) => {
+        const record = mapConnectionRecord(row);
+        return {
+          ...record,
+          fromUser: await getUserById(record.fromUserId),
+        };
+      })
+    );
 
     return res.status(200).json({ pending });
   } catch (err) {
@@ -96,14 +99,16 @@ async function getAccepted(req, res, next) {
       $or: [{ fromUserId: String(userId) }, { toUserId: String(userId) }],
     }).sort({ acceptedAt: -1, createdAt: -1 });
 
-    const accepted = rows.map((row) => {
-      const record = mapConnectionRecord(row);
-      const otherUserId = record.fromUserId === String(userId) ? record.toUserId : record.fromUserId;
-      return {
-        ...record,
-        otherUser: getUserById(otherUserId),
-      };
-    });
+    const accepted = await Promise.all(
+      rows.map(async (row) => {
+        const record = mapConnectionRecord(row);
+        const otherUserId = record.fromUserId === String(userId) ? record.toUserId : record.fromUserId;
+        return {
+          ...record,
+          otherUser: await getUserById(otherUserId),
+        };
+      })
+    );
 
     return res.status(200).json({ accepted });
   } catch (err) {
@@ -120,13 +125,15 @@ async function getSent(req, res, next) {
       status: 'pending',
     }).sort({ createdAt: -1 });
 
-    const sent = rows.map((row) => {
-      const record = mapConnectionRecord(row);
-      return {
-        ...record,
-        toUser: getUserById(record.toUserId),
-      };
-    });
+    const sent = await Promise.all(
+      rows.map(async (row) => {
+        const record = mapConnectionRecord(row);
+        return {
+          ...record,
+          toUser: await getUserById(record.toUserId),
+        };
+      })
+    );
 
     return res.status(200).json({ sent });
   } catch (err) {
