@@ -165,6 +165,40 @@ describe('Messages Routes', function () {
     await User.deleteOne({ _id: outsider._id });
   });
 
+  it('GET /api/messages/unread/count without auth returns 401', async () => {
+    const res = await request(app).get('/api/messages/unread/count');
+    expect(res.status).to.equal(401);
+  });
+
+  it('GET /api/messages/unread/count returns a numeric count', async () => {
+    const res = await request(app)
+      .get('/api/messages/unread/count')
+      .set('Authorization', `Bearer ${tokenA}`);
+    expect(res.status).to.equal(200);
+    expect(res.body).to.have.property('count').that.is.a('number');
+    expect(res.body.count).to.be.at.least(1);
+  });
+
+  it('POST /api/messages/:id rejects text over 2000 characters', async () => {
+    const longText = 'x'.repeat(2001);
+    const res = await request(app)
+      .post(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ text: longText });
+    expect(res.status).to.equal(400);
+    expect(res.body).to.have.property('error');
+  });
+
+  it('POST /api/messages/:id accepts text at exactly 2000 characters', async () => {
+    const exactText = 'y'.repeat(2000);
+    const res = await request(app)
+      .post(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenA}`)
+      .send({ text: exactText });
+    expect(res.status).to.equal(201);
+    expect(res.body.text).to.have.lengthOf(2000);
+  });
+
   it('GET /api/messages/:id returns 404 for invalid id', async () => {
     const res = await request(app)
       .get('/api/messages/not-an-id')
