@@ -47,6 +47,33 @@ function passProfile(req, res, next) {
   return recordSwipe(req, res, next, 'pass');
 }
 
+async function undoSwipe(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const { profileId } = req.params;
+    const deleted = await Swipe.findOneAndDelete({ userId, targetProfileId: String(profileId) });
+    if (!deleted) {
+      return res.status(404).json({ error: 'Swipe not found' });
+    }
+    return res.status(200).json({ removed: deleted.targetProfileId });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function getStats(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const [likes, passes] = await Promise.all([
+      Swipe.countDocuments({ userId, action: 'like' }),
+      Swipe.countDocuments({ userId, action: 'pass' }),
+    ]);
+    return res.status(200).json({ likes, passes, total: likes + passes });
+  } catch (err) {
+    return next(err);
+  }
+}
+
 async function getHistory(req, res, next) {
   try {
     const userId = req.auth.userId;
@@ -64,4 +91,4 @@ async function getHistory(req, res, next) {
   }
 }
 
-module.exports = { getProfiles, likeProfile, passProfile, getHistory };
+module.exports = { getProfiles, likeProfile, passProfile, getHistory, getStats, undoSwipe };
