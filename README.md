@@ -6,7 +6,7 @@ InternBuddy - Helping interns find community faster
 - [Grace He](https://github.com/gracehe04)
 - [Angelina Wu](https://github.com/tangelinawu)
 - [Alissa Wu](https://github.com/alissawu)
-- [Charlie Li](https://github.com\CharlieLi111)
+- [Charlie Li](https://github.com/CharlieLi111)
 
 # Run Locally
 
@@ -119,3 +119,9 @@ Once a stable initial product is deployed, the following stretch goals can be pu
   Users may opt in to viewing nearby interns on a map using coarse, privacy-preserving location data without revealing exact addresses or sensitive information.
 
 Stretch goals will only be implemented after core functionality is complete and will be used to demonstrate user-centered design considerations.
+
+### Demo Video
+
+Link to demo video:
+
+<video src="internbuddysprint2.mov" height="500">
