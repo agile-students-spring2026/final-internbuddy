@@ -4,6 +4,7 @@ import { ProfileProvider } from './context/ProfileContext';
 import { ConnectionsProvider } from './context/ConnectionsContext';
 
 import LoginPage from './pages/LoginPage';
+import ConnectionsPage from "./pages/ConnectionsPage";
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage';
 
 import CreateProfileResumePage from './pages/CreateProfileResumePage';
@@ -74,6 +75,7 @@ function App() {
                 <Route path="/swipe" element={<SwipePage />} />
                 <Route path="/message/:id" element={<DirectMessagePage />} />
                 <Route path="/search" element={<SearchPage />} />
+                <Route path="/connections" element={<ConnectionsPage />} />
               </Route>
             </Routes>
           </Router>
