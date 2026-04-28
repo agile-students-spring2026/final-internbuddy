@@ -10,7 +10,7 @@ export function EventsProvider({ children }) {
     fetch('/api/events')
       .then(res => (res.ok ? res.json() : []))
       .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
+        if (Array.isArray(data)) {
           setEvents(data)
         }
       })
