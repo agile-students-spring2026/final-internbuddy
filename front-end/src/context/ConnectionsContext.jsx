@@ -115,7 +115,7 @@ export function ConnectionsProvider({ children }) {
   }
 
   return (
-    <ConnectionsContext.Provider value={{ pending, sent, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
+    <ConnectionsContext.Provider value={{ currentUserId, pending, sent, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
       {children}
     </ConnectionsContext.Provider>
   )
