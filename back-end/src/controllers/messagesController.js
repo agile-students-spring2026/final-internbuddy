@@ -59,10 +59,8 @@ async function getUnreadCount(req, res, next) {
   try {
     const userId = req.auth.userId;
     const myObjectId = new mongoose.Types.ObjectId(userId);
-    const count = await Conversation.countDocuments({
-      participants: myObjectId,
-      lastMessage: { $ne: '' },
-    });
+    const convos = await Conversation.find({ participants: myObjectId }).lean();
+    const count = convos.reduce((sum, c) => sum + (c.unreadCounts?.[userId] || 0), 0);
     return res.status(200).json({ count });
   } catch (err) {
     return next(err);
@@ -89,7 +87,7 @@ async function getConversations(req, res, next) {
           otherUser,
           lastMessage: c.lastMessage || '',
           timestamp: formatTimestamp(c.lastMessageAt || c.updatedAt),
-          unreadCount: 0,
+          unreadCount: c.unreadCounts?.[userId] || 0,
         };
       })
     );
@@ -120,6 +118,10 @@ async function getMessages(req, res, next) {
     if (!isParticipant) {
       return res.status(403).json({ error: 'Not a participant in this conversation' });
     }
+
+    await Conversation.findByIdAndUpdate(conversationId, {
+      $set: { [`unreadCounts.${userId}`]: 0 },
+    });
 
     const otherUserId = (convo.participants || []).find(
       (p) => String(p) !== String(userId)
@@ -177,6 +179,12 @@ async function sendMessage(req, res, next) {
     convo.messages.push(message);
     convo.lastMessage = text;
     convo.lastMessageAt = new Date();
+    for (const participantId of convo.participants) {
+      if (String(participantId) !== String(userId)) {
+        const key = String(participantId);
+        convo.unreadCounts.set(key, (convo.unreadCounts.get(key) || 0) + 1);
+      }
+    }
     await convo.save();
 
     const saved = convo.messages[convo.messages.length - 1];
