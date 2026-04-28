@@ -6,7 +6,7 @@ InternBuddy - Helping interns find community faster
 - [Grace He](https://github.com/gracehe04)
 - [Angelina Wu](https://github.com/tangelinawu)
 - [Alissa Wu](https://github.com/alissawu)
-- [Charlie Li](https://github.com\CharlieLi111)
+- [Charlie Li](https://github.com/CharlieLi111)
 
 # Run Locally
 

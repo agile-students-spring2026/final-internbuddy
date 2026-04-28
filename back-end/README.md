@@ -10,30 +10,49 @@ back-end/
     index.html
   src/
     app.js
+    db.js
     server.js
     controllers/
       authController.js
+      connectionsController.js
       eventsController.js
       messagesController.js
       profileController.js
       swipeController.js
+      userController.js
     data/
       profileStepOrder.js
     middleware/
+      authMiddleware.js
       errorHandlers.js
+      validateRequest.js
+    models/
+      Connection.js
+      Conversation.js
+      Event.js
+      Profile.js
+      Swipe.js
+      User.js
     routes/
       authRoutes.js
+      connectionsRoutes.js
       eventsRoutes.js
       messagesRoutes.js
       profileRoutes.js
       swipeRoutes.js
+      userRoutes.js
+    scripts/
+      seedUsers.js
     services/
       mockStore.js
+      usersStore.js
   test/
     authRoutes.test.js
+    connectionsRoutes.test.js
     eventsRoutes.test.js
     messagesRoutes.test.js
     profileRoutes.test.js
+    setup.js
     swipeRoutes.test.js
   package.json
 ```
