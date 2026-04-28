@@ -1,6 +1,12 @@
 import { createContext, useState, useEffect } from 'react'
+import { getToken } from '../utils/auth'
 
 export const ConnectionsContext = createContext()
+
+function authHeaders() {
+  const token = getToken()
+  return token ? { Authorization: `Bearer ${token}` } : {}
+}
 
 export function ConnectionsProvider({ children }) {
   const [currentUserId, setCurrentUserId] = useState(null)
@@ -9,7 +15,7 @@ export function ConnectionsProvider({ children }) {
   const [accepted, setAccepted] = useState([])
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
+    const token = getToken()
 
     if (!token) {
       setCurrentUserId(null)
@@ -20,9 +26,7 @@ export function ConnectionsProvider({ children }) {
     }
 
     fetch('/api/auth/me', {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => (res.ok ? res.json() : null))
       .then(data => {
@@ -36,15 +40,15 @@ export function ConnectionsProvider({ children }) {
           return
         }
 
-        fetch(`/api/connections/${userId}/pending`)
+        fetch(`/api/connections/${userId}/pending`, { headers: authHeaders() })
           .then(res => res.json())
           .then(data => setPending(data.pending || []))
 
-        fetch(`/api/connections/${userId}/sent`)
+        fetch(`/api/connections/${userId}/sent`, { headers: authHeaders() })
           .then(res => res.json())
           .then(data => setSent(data.sent || []))
 
-        fetch(`/api/connections/${userId}`)
+        fetch(`/api/connections/${userId}`, { headers: authHeaders() })
           .then(res => res.json())
           .then(data => setAccepted(data.accepted || []))
       })
@@ -63,8 +67,8 @@ export function ConnectionsProvider({ children }) {
 
     return fetch('/api/connections/request', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fromUserId: currentUserId, toUserId })
+      headers: { 'Content-Type': 'application/json', ...authHeaders() },
+      body: JSON.stringify({ toUserId }),
     })
       .then(res => res.json())
       .then(data => {
@@ -76,7 +80,10 @@ export function ConnectionsProvider({ children }) {
   }
 
   function acceptRequest(requestId) {
-    return fetch(`/api/connections/${requestId}/accept`, { method: 'POST' })
+    return fetch(`/api/connections/${requestId}/accept`, {
+      method: 'POST',
+      headers: authHeaders(),
+    })
       .then(res => res.json())
       .then(data => {
         setPending(prev => prev.filter(r => r.id !== requestId))
@@ -85,7 +92,10 @@ export function ConnectionsProvider({ children }) {
   }
 
   function rejectRequest(requestId) {
-    return fetch(`/api/connections/${requestId}/reject`, { method: 'POST' })
+    return fetch(`/api/connections/${requestId}/reject`, {
+      method: 'POST',
+      headers: authHeaders(),
+    })
       .then(res => res.json())
       .then(() => {
         setPending(prev => prev.filter(r => r.id !== requestId))
@@ -93,7 +103,10 @@ export function ConnectionsProvider({ children }) {
   }
 
   function cancelRequest(requestId) {
-    return fetch(`/api/connections/${requestId}`, { method: 'DELETE' })
+    return fetch(`/api/connections/${requestId}`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    })
       .then(res => res.json())
       .then(data => {
         setSent(prev => prev.filter(r => r.id !== requestId))
