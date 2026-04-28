@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './LoginPage.css'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
@@ -84,10 +84,6 @@ function LoginPage() {
         <p className="login-fine-print">
           By tapping Sign In or Create Account, you agree to our Terms of Service.
         </p>
-
-        <Link to="/forgot-password" className="login-link">
-          Forgot password?
-        </Link>
       </div>
     </div>
   )
