@@ -193,12 +193,12 @@ export default function SearchPage() {
           value={query}
           onChange={e => setQuery(e.target.value)}
         />
-        <button
+        {/* <button
           className={`sp-filter-btn ${activeFilterCount > 0 ? 'sp-filter-btn--active' : ''}`}
           onClick={() => setShowFilters(true)}
         >
           Filters {activeFilterCount > 0 && <span className="sp-filter-badge">{activeFilterCount}</span>}
-        </button>
+        </button> */}
       </div>
 
       <div className="sp-sort-row">
