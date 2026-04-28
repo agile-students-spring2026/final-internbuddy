@@ -523,20 +523,27 @@ export default function ProfilePage() {
 
             <h2 className="page-title">Friend Requests</h2>
 
-            {friendRequests.map((r) => (
-              <div key={r.id} className="request-card">
-                <div className="req-avatar">{r.name[0]}</div>
-                <div className="req-info">
-                  <p className="req-name">{r.name}</p>
-                  <p className="req-role">{r.role}</p>
-                  <p className="req-mutual">{r.mutual} mutual connections</p>
+            {friendRequests.length === 0 && (
+              <p className="about-text">No pending friend requests.</p>
+            )}
+            {friendRequests.map((r) => {
+              const fromUser = r.fromUser || {};
+              const displayName = fromUser.name || "Unknown User";
+              const displayRole = [fromUser.role, fromUser.company].filter(Boolean).join(" @ ");
+              return (
+                <div key={r.id} className="request-card">
+                  <div className="req-avatar">{displayName[0]}</div>
+                  <div className="req-info">
+                    <p className="req-name">{displayName}</p>
+                    <p className="req-role">{displayRole}</p>
+                  </div>
+                  <div className="req-actions">
+                    <button className="btn-primary small" onClick={() => acceptRequest(r.id)}>Accept</button>
+                    <button className="btn-ghost small" onClick={() => rejectRequest(r.id)}>Ignore</button>
+                  </div>
                 </div>
-                <div className="req-actions">
-                  <button className="btn-primary small">Accept</button>
-                  <button className="btn-ghost small">Ignore</button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
