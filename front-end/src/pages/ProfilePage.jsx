@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ConnectionsContext } from "../context/ConnectionsContext";
 import "./ProfilePage.css";
 
 const ALL_INTERESTS = [
