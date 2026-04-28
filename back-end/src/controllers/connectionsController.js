@@ -2,8 +2,11 @@ const Connection = require('../models/Connection');
 const mongoose = require('mongoose');
 const { getUserById } = require('../services/usersStore');
 const Conversation = require('../models/Conversation');
+const User = require('../models/User');
+const Profile = require('../models/Profile');
 
 function mapConnectionRecord(record) {
+  
   return {
     id: String(record._id),
     fromUserId: record.fromUserId,
@@ -152,6 +155,24 @@ async function acceptRequest(req, res, next) {
     }
 
     const mapped = mapConnectionRecord(record);
+
+    await User.findByIdAndUpdate(mapped.fromUserId, {
+      $addToSet: { connections: mapped.toUserId },
+    });
+    
+    await User.findByIdAndUpdate(mapped.toUserId, {
+      $addToSet: { connections: mapped.fromUserId },
+    });
+    
+    await Profile.findOneAndUpdate(
+      { userId: mapped.fromUserId },
+      { $inc: { connections: 1 } }
+    );
+    
+    await Profile.findOneAndUpdate(
+      { userId: mapped.toUserId },
+      { $inc: { connections: 1 } }
+    );
 
     let conversationData = null;
     if (mongoose.isValidObjectId(mapped.fromUserId) && mongoose.isValidObjectId(mapped.toUserId)) {

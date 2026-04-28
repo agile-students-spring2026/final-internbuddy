@@ -106,24 +106,42 @@ export default function SearchPage() {
     radius: 'Any',
   })
 
+  // useEffect(() => {
+  //   const params = new URLSearchParams()
+  //   if (query) params.set('q', query)
+  //   if (applied.companies.length === 1) params.set('company', applied.companies[0])
+  //   if (applied.schools.length === 1) params.set('school', applied.schools[0])
+  //   if (applied.roles.length === 1) params.set('role', applied.roles[0])
+  //   if (applied.city) params.set('city', applied.city)
+  //   if (applied.radius !== 'Any') params.set('radius', applied.radius)
+
+  //   setLoading(true)
+  //   fetch(`/api/users/search?${params}`, {
+  //     headers: currentUserId ? { 'x-current-user-id': currentUserId } : {},
+  //   })
+  //     .then(res => res.json())
+  //     .then(json => setPeople(json.data || []))
+  //     .catch(err => console.error('Search fetch failed:', err))
+  //     .finally(() => setLoading(false))
+  // }, [query, applied, pending, accepted, currentUserId])
+
   useEffect(() => {
     const params = new URLSearchParams()
+  
     if (query) params.set('q', query)
-    if (applied.companies.length === 1) params.set('company', applied.companies[0])
-    if (applied.schools.length === 1) params.set('school', applied.schools[0])
-    if (applied.roles.length === 1) params.set('role', applied.roles[0])
-    if (applied.city) params.set('city', applied.city)
-    if (applied.radius !== 'Any') params.set('radius', applied.radius)
-
+  
     setLoading(true)
     fetch(`/api/users/search?${params}`, {
       headers: currentUserId ? { 'x-current-user-id': currentUserId } : {},
     })
       .then(res => res.json())
-      .then(json => setPeople(json.data || []))
+      .then(json => {
+        console.log('Search response:', json)
+        setPeople(json.data || [])
+      })
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, applied, pending, accepted, currentUserId])
+  }, [query, pending, accepted, currentUserId])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {

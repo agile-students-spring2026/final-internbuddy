@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { ConnectionsContext } from "../context/ConnectionsContext";
 import "./ProfilePage.css";
 
 const ALL_INTERESTS = [
@@ -55,10 +56,12 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [resumeExpanded, setResumeExpanded] = useState(false);
 
-  const [friendRequests] = useState([
-    { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
-    { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
-  ]);
+  const { pending, acceptRequest, rejectRequest } = useContext(ConnectionsContext);
+
+  // const [friendRequests] = useState([
+  //   { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
+  //   { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
+  // ]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -401,8 +404,18 @@ export default function ProfilePage() {
 
             <div className="connections-row">
               <div className="conn-badge">
-                <span className="conn-num">{profileData.connections}</span>
-                <span className="conn-label">Connections</span>
+                <button
+                  onClick={() => navigate("/connections")}
+                  className="group flex items-center gap-2 bg-transparent border-none p-0 cursor-pointer"
+                >
+                  <span className="conn-num text-indigo-600 transition-colors duration-150 group-hover:text-indigo-700">
+                    {profileData.connections}
+                  </span>
+                  <span className="conn-label relative">
+                    Connections
+                    <span className="absolute left-0 -bottom-0.5 h-[2px] w-0 bg-indigo-600 transition-all duration-200 group-hover:w-full"></span>
+                  </span>
+                </button>
               </div>
             </div>
 
@@ -525,7 +538,7 @@ export default function ProfilePage() {
 
             <h2 className="page-title">Friend Requests</h2>
 
-            {friendRequests.map((r) => (
+            {/* {pending.map((r) => (
               <div key={r.id} className="request-card">
                 <div className="req-avatar">{r.name[0]}</div>
                 <div className="req-info">
@@ -534,11 +547,62 @@ export default function ProfilePage() {
                   <p className="req-mutual">{r.mutual} mutual connections</p>
                 </div>
                 <div className="req-actions">
-                  <button className="btn-primary small">Accept</button>
-                  <button className="btn-ghost small">Ignore</button>
+                <button
+                  className="btn-primary small"
+                  onClick={() => acceptRequest(r.id)}
+                >
+                  Accept
+                </button>
+
+                <button
+                  className="btn-ghost small"
+                  onClick={() => rejectRequest(r.id)}
+                >
+                  Ignore
+                </button>
                 </div>
               </div>
-            ))}
+            ))} */}
+            
+            {pending.length === 0 ? (
+              <p className="about-text">No friend requests yet.</p>
+            ) : (
+              pending.map((r) => {
+                const user = r.fromUser || {};
+                const displayName = user.name || user.email || "Unknown User";
+
+                return (
+                  <div key={r.id} className="request-card">
+                    <div className="req-avatar">{displayName[0]}</div>
+
+                    <div className="req-info">
+                      <p className="req-name">{displayName}</p>
+                      <p className="req-role">{user.role || "InternBuddy user"}</p>
+                      <p className="req-mutual">Pending request</p>
+                    </div>
+
+                    <div className="req-actions">
+                      <button
+                        className="btn-primary small"
+                        onClick={() => acceptRequest(r.id)}
+                      >
+                        Accept
+                      </button>
+
+                      <button
+                        className="btn-ghost small"
+                        onClick={() => rejectRequest(r.id)}
+                      >
+                        Ignore
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+
+
+
           </div>
         )}
       </div>
