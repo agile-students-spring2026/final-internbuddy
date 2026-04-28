@@ -56,10 +56,7 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [resumeExpanded, setResumeExpanded] = useState(false);
 
-  const [friendRequests] = useState([
-    { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
-    { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
-  ]);
+  const { pending: friendRequests, acceptRequest, rejectRequest } = useContext(ConnectionsContext);
 
   useEffect(() => {
     const fetchData = async () => {
