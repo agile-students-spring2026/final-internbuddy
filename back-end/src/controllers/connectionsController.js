@@ -15,16 +15,8 @@ function mapConnectionRecord(record) {
 }
 
 async function sendRequest(req, res, next) {
-  const { fromUserId: rawFromUserId, toUserId: rawToUserId } = req.body;
-  const fromUserId = String(rawFromUserId || '').trim();
-  const toUserId = String(rawToUserId || '').trim();
-
-  if (!fromUserId || !toUserId) {
-    return res.status(400).json({
-      error: 'Missing required fields',
-      required: ['fromUserId', 'toUserId']
-    });
-  }
+  const fromUserId = req.auth.userId;
+  const toUserId = String(req.body.toUserId || '').trim();
 
   if (fromUserId === toUserId) {
     return res.status(400).json({ error: 'Cannot connect to yourself' });
@@ -161,20 +153,36 @@ async function acceptRequest(req, res, next) {
 
     const mapped = mapConnectionRecord(record);
 
-    const fromId = new mongoose.Types.ObjectId(mapped.fromUserId);
-    const toId = new mongoose.Types.ObjectId(mapped.toUserId);
-    let conversation = await Conversation.findOne({
-      participants: { $all: [fromId, toId], $size: 2 },
-    }).lean();
-    if (!conversation) {
-      conversation = await Conversation.create({ participants: [fromId, toId], messages: [] });
-      conversation = conversation.toObject();
+    let conversationData = null;
+    if (mongoose.isValidObjectId(mapped.fromUserId) && mongoose.isValidObjectId(mapped.toUserId)) {
+      const fromId = new mongoose.Types.ObjectId(mapped.fromUserId);
+      const toId = new mongoose.Types.ObjectId(mapped.toUserId);
+      let conversation = await Conversation.findOne({
+        participants: { $all: [fromId, toId], $size: 2 },
+      }).lean();
+      if (!conversation) {
+        conversation = await Conversation.create({ participants: [fromId, toId], messages: [] });
+        conversation = conversation.toObject();
+      }
+
+      const otherUserId = mapped.fromUserId === req.auth.userId ? mapped.toUserId : mapped.fromUserId;
+      const otherUserData = await getUserById(otherUserId);
+      conversationData = {
+        id: String(conversation._id),
+        otherUser: {
+          id: otherUserId,
+          name: otherUserData.name || 'Unknown User',
+          username: otherUserData.email ? otherUserData.email.split('@')[0] : '',
+          avatar: otherUserData.image || `https://picsum.photos/seed/${otherUserId}/100/100`,
+          subtitle: otherUserData.role || '',
+        },
+      };
     }
 
     return res.status(200).json({
       message: 'Connection request accepted',
       request: mapped,
-      conversation: { id: String(conversation._id) },
+      conversation: conversationData,
     });
   } catch (err) {
     return next(err);
