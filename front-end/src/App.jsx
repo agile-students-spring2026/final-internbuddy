@@ -4,7 +4,6 @@ import { ProfileProvider } from './context/ProfileContext';
 import { ConnectionsProvider } from './context/ConnectionsContext';
 
 import LoginPage from './pages/LoginPage';
-import ForgotPasswordPage from './pages/ForgotPasswordPage';
 import CreateAccountEmailPage from './pages/CreateAccountEmailPage';
 
 import CreateProfileResumePage from './pages/CreateProfileResumePage';
@@ -45,7 +44,6 @@ function App() {
             <Routes>
               {/* public routes */}
               <Route path="/" element={<LoginPage />} />
-              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
               <Route path="/create-account/email" element={<CreateAccountEmailPage />} />
 
               {/* protected routes */}
