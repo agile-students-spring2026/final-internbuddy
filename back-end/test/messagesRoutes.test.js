@@ -170,13 +170,27 @@ describe('Messages Routes', function () {
     expect(res.status).to.equal(401);
   });
 
-  it('GET /api/messages/unread/count returns a numeric count', async () => {
+  it('GET /api/messages/unread/count returns correct count for recipient', async () => {
+    // tokenA read the conversation earlier, resetting their count to 0
+    // tokenB received tokenA's message and has not read yet, so count should be >= 1
     const res = await request(app)
       .get('/api/messages/unread/count')
-      .set('Authorization', `Bearer ${tokenA}`);
+      .set('Authorization', `Bearer ${tokenB}`);
     expect(res.status).to.equal(200);
     expect(res.body).to.have.property('count').that.is.a('number');
     expect(res.body.count).to.be.at.least(1);
+  });
+
+  it('reading a conversation resets the unread count to 0', async () => {
+    await request(app)
+      .get(`/api/messages/${conversationId}`)
+      .set('Authorization', `Bearer ${tokenB}`);
+
+    const res = await request(app)
+      .get('/api/messages/unread/count')
+      .set('Authorization', `Bearer ${tokenB}`);
+    expect(res.status).to.equal(200);
+    expect(res.body.count).to.equal(0);
   });
 
   it('POST /api/messages/:id rejects text over 2000 characters', async () => {
