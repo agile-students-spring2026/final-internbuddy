@@ -83,8 +83,8 @@ async function enrichUser(user, currentUserId) {
     : null;
   return {
     ...publicUser,
-    degree: currentUserId ? getConnectionDegree(currentUserId, user.id) : null,
-    mutualCount: currentUserId ? getMutualCount(currentUserId, user.id) : 0,
+    degree: currentUserId ? await getConnectionDegree(currentUserId, user.id) : null,
+    mutualCount: currentUserId ? await getMutualCount(currentUserId, user.id) : 0,
     connected: relationship === 'accepted',
     connectionStatus: relationship,
   };

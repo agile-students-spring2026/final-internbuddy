@@ -10,8 +10,6 @@ const ROLES = ['SWE Intern', 'PM Intern', 'Design Intern', 'Data Intern', 'Finan
 const CITIES = ['New York, NY', 'San Francisco, CA', 'Seattle, WA', 'Austin, TX', 'Boston, MA', 'Chicago, IL']
 const RADII = ['5 mi', '10 mi', '25 mi', '50 mi', 'Any']
 
-const CURRENT_USER_ID = '69e981e0e9a269d24b300cb6'
-
 function Degreebadge({ degree }) {
   const labels = {1: '1st', 2: '2nd', 3: '3rd'}
   const d = degree ?? 3
@@ -86,7 +84,7 @@ function PersonCard({ person, onConnect, onCancel, onAccept }) {
 }
 
 export default function SearchPage() {
-  const { sendRequest, cancelRequest, pending, accepted, acceptRequest } = useContext(ConnectionsContext)
+  const { currentUserId, sendRequest, cancelRequest, pending, accepted, acceptRequest } = useContext(ConnectionsContext)
   const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(false)
   const [swipeMode, setSwipeMode] = useState(false)
@@ -109,7 +107,6 @@ export default function SearchPage() {
   })
 
   useEffect(() => {
-    console.log('useEffect running, applied:', applied)
     const params = new URLSearchParams()
     if (query) params.set('q', query)
     if (applied.companies.length === 1) params.set('company', applied.companies[0])
@@ -118,16 +115,15 @@ export default function SearchPage() {
     if (applied.city) params.set('city', applied.city)
     if (applied.radius !== 'Any') params.set('radius', applied.radius)
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLoading(true)
     fetch(`/api/users/search?${params}`, {
-      headers: { 'x-current-user-id': CURRENT_USER_ID }
+      headers: currentUserId ? { 'x-current-user-id': currentUserId } : {},
     })
       .then(res => res.json())
       .then(json => setPeople(json.data || []))
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, applied, pending, accepted])
+  }, [query, applied, pending, accepted, currentUserId])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
