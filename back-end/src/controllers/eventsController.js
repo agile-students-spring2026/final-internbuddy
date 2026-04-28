@@ -18,10 +18,23 @@ function serializeEvent(event) {
 
 async function getAllEvents(req, res, next) {
   try {
+    const limit = Math.min(parseInt(req.query.limit, 10) || 50, 100);
+    const skip = Math.max(parseInt(req.query.skip, 10) || 0, 0);
     const events = await Event.find({ privacy: 'public' })
       .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
       .lean();
     return res.status(200).json(events.map(serializeEvent));
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function getEventsCount(req, res, next) {
+  try {
+    const count = await Event.countDocuments({ privacy: 'public' });
+    return res.status(200).json({ count });
   } catch (err) {
     return next(err);
   }
@@ -101,4 +114,4 @@ async function createEvent(req, res, next) {
   }
 }
 
-module.exports = { getAllEvents, getEventById, getUserEvents, createEvent };
+module.exports = { getAllEvents, getEventsCount, getEventById, getUserEvents, createEvent };
