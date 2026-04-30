@@ -1,16 +1,25 @@
 const mongoose = require('mongoose');
 const User = require('../models/User');
+const Profile = require('../models/Profile');
+const Connection = require('../models/Connection');
 require('dotenv').config();
 
 const seedUsers = [
   {
     email: 'lisa@seed.com',
-    name: 'Lisa',
+    name: 'Lisa Chen',
     role: 'SWE Intern',
     school: 'Stanford University',
     company: 'Airbnb',
     city: 'San Francisco, CA',
-    image: 'https://picsum.photos/seed/user1/100/100',
+    image: 'https://picsum.photos/seed/lisa/100/100',
+    swipeImage: 'https://picsum.photos/seed/lisa/400/500',
+    major: 'Computer Science @ Stanford',
+    internship: 'SWE Intern @ Airbnb',
+    location: 'San Francisco, CA | May 2026 - Aug 2026',
+    about: 'Full-stack intern who loves coffee shops, design systems, and weekend hikes.',
+    pronouns: 'she/her',
+    interests: ['☕ Cafes', '✈️ Travel', '🎵 Concerts'],
   },
   {
     email: 'john@seed.com',
@@ -19,153 +28,205 @@ const seedUsers = [
     school: 'University of Waterloo',
     company: 'Google',
     city: 'New York, NY',
-    image: 'https://picsum.photos/seed/user2/100/100',
+    image: 'https://picsum.photos/seed/john/100/100',
+    swipeImage: 'https://picsum.photos/seed/john/400/500',
+    major: 'Software Engineering @ Waterloo',
+    internship: 'SWE Intern @ Google',
+    location: 'New York, NY | Jun 2026 - Sep 2026',
+    about: 'Backend intern into distributed systems, basketball, and late-night pizza.',
+    pronouns: 'he/him',
+    interests: ['🍕 Foodie', '🎮 Gaming', '📚 Reading'],
   },
   {
     email: 'priya@seed.com',
-    name: 'Priya S.',
+    name: 'Priya Shah',
     role: 'Design Intern',
     school: 'NYU',
     company: 'Figma',
     city: 'New York, NY',
-    image: 'https://picsum.photos/seed/user3/100/100',
+    image: 'https://picsum.photos/seed/priya/100/100',
+    swipeImage: 'https://picsum.photos/seed/priya/400/500',
+    major: 'Design @ NYU',
+    internship: 'Design Intern @ Figma',
+    location: 'New York, NY | May 2026 - Aug 2026',
+    about: 'Product design intern. Always down for galleries, cafes, and photo walks.',
+    pronouns: 'she/her',
+    interests: ['🎨 Art', '📷 Photography', '☕ Cafes'],
   },
   {
     email: 'jordan@seed.com',
-    name: 'Jordan K.',
+    name: 'Jordan Kim',
     role: 'PM Intern',
     school: 'MIT',
     company: 'Stripe',
     city: 'Boston, MA',
-    image: 'https://picsum.photos/seed/user4/100/100',
+    image: 'https://picsum.photos/seed/jordan/100/100',
+    swipeImage: 'https://picsum.photos/seed/jordan/400/500',
+    major: 'Computer Science + Econ @ MIT',
+    internship: 'PM Intern @ Stripe',
+    location: 'Boston, MA | May 2026 - Aug 2026',
+    about: 'PM intern interested in fintech, startups, and good ramen spots.',
+    pronouns: 'they/them',
+    interests: ['🍕 Foodie', '🎤 Karaoke', '📚 Reading'],
   },
   {
     email: 'sarah@seed.com',
-    name: 'Sarah',
+    name: 'Sarah Lee',
     role: 'Data Science Intern',
     school: 'UIUC',
     company: 'Google',
     city: 'Chicago, IL',
-    image: 'https://picsum.photos/seed/profile1/100/100',
-    swipeImage: 'https://picsum.photos/seed/profile1/400/500',
-    age: 21,
+    image: 'https://picsum.photos/seed/sarah/100/100',
+    swipeImage: 'https://picsum.photos/seed/sarah/400/500',
     major: 'Data Science @ UIUC',
-    internshipFull: 'Data Science Intern @ Google',
-    locationFull: 'Chicago, IL | May – Aug 2026',
-    about: 'I love data, coffee, and exploring new neighborhoods. Excited to meet other interns this summer!',
+    internship: 'Data Science Intern @ Google',
+    location: 'Chicago, IL | May 2026 - Aug 2026',
+    about: 'Data intern who likes coffee, concerts, and exploring new neighborhoods.',
     pronouns: 'she/her',
-    interests: ['Music', 'Food', 'Reading', 'Art'],
-    drinks: 'Socially',
-  },
-  {
-    email: 'jessica@seed.com',
-    name: 'Jessica',
-    role: 'SWE Intern',
-    school: 'Georgia Tech',
-    company: 'Meta',
-    city: 'New York, NY',
-    image: 'https://picsum.photos/seed/profile2/100/100',
-    swipeImage: 'https://picsum.photos/seed/profile2/400/500',
-    age: 22,
-    major: 'Computer Science @ Georgia Tech',
-    internshipFull: 'Software Engineer Intern @ Meta',
-    locationFull: 'New York, NY | May – Aug 2026',
-    about: 'Full-stack developer, startup enthusiast, love hiking and trying new restaurants around the Bay.',
-    pronouns: 'she/her',
-    interests: ['Sports', 'Party', 'Creation', 'Cafes'],
-    drinks: 'Yes',
+    interests: ['🎵 Concerts', '☕ Cafes', '📚 Reading'],
   },
   {
     email: 'alex@seed.com',
-    name: 'Alex',
-    role: 'PM Intern',
-    school: 'Harvard University',
-    company: 'Apple',
-    city: 'Boston, MA',
-    image: 'https://picsum.photos/seed/profile3/100/100',
-    swipeImage: 'https://picsum.photos/seed/profile3/400/500',
-    age: 23,
-    major: 'Electrical Engineering @ Harvard',
-    internshipFull: 'Product Manager Intern @ Apple',
-    locationFull: 'Boston, MA | May – Aug 2026',
-    about: "I love building products that matter. When I'm not working, you can find me at concerts or reading sci-fi.",
-    pronouns: 'they/them',
-    interests: ['Music', 'Creation', 'Reading', 'Swimming'],
-    drinks: 'No',
-  },
-  {
-    email: 'elena@seed.com',
-    name: 'Elena',
-    role: 'UX Design Intern',
-    school: 'RISD',
-    company: 'Adobe',
-    city: 'New York, NY',
-    image: 'https://picsum.photos/seed/profile4/100/100',
-    swipeImage: 'https://picsum.photos/seed/profile4/400/500',
-    age: 20,
-    major: 'UX/UI Design @ RISD',
-    internshipFull: 'UX Designer Intern @ Adobe',
-    locationFull: 'New York, NY | May – Aug 2026',
-    about: 'Design lover and coffee enthusiast. I enjoy sketching, photography, and meeting creative people!',
-    pronouns: 'she/her',
-    interests: ['Food', 'Creation', 'Drinks', 'Photography'],
-    drinks: 'Socially',
-  },
-  {
-    email: 'morgan@seed.com',
-    name: 'Morgan',
+    name: 'Alex Rivera',
     role: 'Backend Intern',
     school: 'UC Berkeley',
     company: 'Stripe',
     city: 'San Francisco, CA',
-    image: 'https://picsum.photos/seed/profile5/100/100',
-    swipeImage: 'https://picsum.photos/seed/profile5/400/500',
-    age: 22,
+    image: 'https://picsum.photos/seed/alex/100/100',
+    swipeImage: 'https://picsum.photos/seed/alex/400/500',
     major: 'Computer Science @ UC Berkeley',
-    internshipFull: 'Backend Engineer Intern @ Stripe',
-    locationFull: 'San Francisco, CA | May – Aug 2026',
-    about: 'Backend optimization nerd, weekend athlete, and always down for a good game night.',
+    internship: 'Backend Intern @ Stripe',
+    location: 'San Francisco, CA | Jun 2026 - Sep 2026',
+    about: 'Backend optimization nerd. Also into climbing, gaming, and run clubs.',
     pronouns: 'he/him',
-    interests: ['Sports', 'Reading', 'Music', 'Gaming'],
-    drinks: 'Socially',
+    interests: ['🧗 Climbing', '🎮 Gaming', '🎾 Tennis'],
   },
 ];
 
-const connectionMap = {
-  lisa:    ['john', 'priya'],
-  john:    ['lisa', 'priya', 'jordan', 'sarah'],
-  priya:   ['lisa', 'john', 'elena'],
-  jordan:  ['john', 'sarah'],
-  sarah:   ['john', 'jordan', 'jessica', 'alex'],
-  jessica: ['sarah', 'alex'],
-  alex:    ['sarah', 'jessica'],
-  elena:   ['priya', 'morgan'],
-  morgan:  ['elena'],
-};
+const acceptedConnections = [
+  ['lisa', 'john'],
+  ['lisa', 'priya'],
+  ['john', 'jordan'],
+  ['john', 'sarah'],
+  ['priya', 'jordan'],
+  ['sarah', 'alex'],
+];
+
+const pendingConnections = [
+  ['alex', 'lisa'],
+  ['jordan', 'alex'],
+];
+
+function firstKey(name) {
+  return name.split(' ')[0].toLowerCase();
+}
 
 async function seed() {
   try {
     await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
 
+    await Connection.deleteMany({});
+    await Profile.deleteMany({});
     await User.deleteMany({});
-    console.log('Cleared existing users');
+    console.log('Cleared users, profiles, and connections');
 
-    const inserted = await User.insertMany(seedUsers);
-    console.log(`Seeded ${inserted.length} users`);
+    const usersToInsert = seedUsers.map((u) => ({
+      email: u.email,
+      verified: true,
+      verifiedAt: new Date(),
+      onboardingCompleted: true,
+      image: u.image,
+      swipeImage: u.swipeImage,
+      interests: u.interests || [],
+      connections: [],
+    }));
+
+    const insertedUsers = await User.insertMany(usersToInsert);
+    console.log(`Seeded ${insertedUsers.length} users`);
 
     const idMap = {};
-    inserted.forEach(u => {
-      const key = u.name.split(' ')[0].toLowerCase();
-      idMap[key] = u._id;
-      console.log(`${u.name}: ${u._id}`);
+    insertedUsers.forEach((user, i) => {
+      const key = firstKey(seedUsers[i].name);
+      idMap[key] = user._id;
+      console.log(`${seedUsers[i].name}: ${user._id}`);
     });
 
-    for (const [key, connNames] of Object.entries(connectionMap)) {
-      const connIds = connNames.map(n => idMap[n]).filter(Boolean);
-      await User.updateOne({ _id: idMap[key] }, { $set: { connections: connIds } });
+    const profileDocs = insertedUsers.map((user, i) => {
+      const seed = seedUsers[i];
+
+      return {
+        userId: user._id,
+        name: seed.name,
+        about: seed.about,
+        city: seed.city,
+        completed: true,
+        completedAt: new Date(),
+        currentStep: 'resume',
+        connections: 0,
+        interests: seed.interests || [],
+        meetupTypes: [],
+        attendingEvents: [],
+        hostingEvents: [],
+        major: seed.major,
+        internship: seed.internship,
+        location: seed.location,
+        pronouns: seed.pronouns || '',
+      };
+    });
+
+    await Profile.insertMany(profileDocs);
+    console.log(`Seeded ${profileDocs.length} profiles`);
+
+    const connectionDocs = [];
+
+    for (const [fromKey, toKey] of acceptedConnections) {
+      connectionDocs.push({
+        fromUserId: String(idMap[fromKey]),
+        toUserId: String(idMap[toKey]),
+        status: 'accepted',
+        acceptedAt: new Date(),
+      });
     }
-    console.log('Connections wired up!');
+
+    for (const [fromKey, toKey] of pendingConnections) {
+      connectionDocs.push({
+        fromUserId: String(idMap[fromKey]),
+        toUserId: String(idMap[toKey]),
+        status: 'pending',
+      });
+    }
+
+    await Connection.insertMany(connectionDocs);
+    console.log(`Seeded ${connectionDocs.length} connection records`);
+
+    const acceptedMap = {};
+
+    for (const [fromKey, toKey] of acceptedConnections) {
+      const fromId = String(idMap[fromKey]);
+      const toId = String(idMap[toKey]);
+
+      if (!acceptedMap[fromId]) acceptedMap[fromId] = new Set();
+      if (!acceptedMap[toId]) acceptedMap[toId] = new Set();
+
+      acceptedMap[fromId].add(toId);
+      acceptedMap[toId].add(fromId);
+    }
+
+    for (const [userId, connectionSet] of Object.entries(acceptedMap)) {
+      const connectionIds = [...connectionSet];
+
+      await User.findByIdAndUpdate(userId, {
+        $set: { connections: connectionIds },
+      });
+
+      await Profile.findOneAndUpdate(
+        { userId },
+        { $set: { connections: connectionIds.length } }
+      );
+    }
+
+    console.log('Updated User.connections and Profile.connections counts');
 
     process.exit(0);
   } catch (err) {
