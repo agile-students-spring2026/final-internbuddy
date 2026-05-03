@@ -19,6 +19,7 @@ const ALL_INTERESTS = [
 ];
 
 const emptyProfile = {
+  image: "",
   name: "",
   major: "",
   internship: "",
@@ -39,6 +40,29 @@ const emptyAccount = {
   email: "",
   phone: "",
 };
+
+const MAX_PROFILE_IMAGE_SIZE_BYTES = 2 * 1024 * 1024;
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("Failed to read selected image."));
+    reader.readAsDataURL(file);
+  });
+}
+
+function getInitials(name) {
+  if (!name) return "ME";
+
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "ME";
+
+  return parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() || "")
+    .join("");
+}
 
 export default function ProfilePage() {
   const navigate = useNavigate();
@@ -110,6 +134,7 @@ export default function ProfilePage() {
         const backendUser = authJson.user || {};
 
         const mappedProfile = {
+          image: backendProfile.image || "",
           name: backendProfile.name || "",
           major: backendProfile.major || "",
           internship:
@@ -187,6 +212,7 @@ export default function ProfilePage() {
       }
 
       const payload = {
+        image: draft.image,
         name: draft.name,
         major: draft.major,
         internship: draft.internship,
@@ -221,6 +247,7 @@ export default function ProfilePage() {
       const saved = data.profile || {};
 
       const mappedProfile = {
+        image: saved.image || "",
         name: saved.name || "",
         major: saved.major || "",
         internship:
@@ -249,6 +276,37 @@ export default function ProfilePage() {
       setPageError("Something went wrong while saving your profile.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleImageSelection = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith("image/")) {
+      setPageError("Please choose an image file for your profile picture.");
+      return;
+    }
+
+    if (file.size > MAX_PROFILE_IMAGE_SIZE_BYTES) {
+      setPageError("Profile picture must be 2 MB or smaller.");
+      return;
+    }
+
+    try {
+      const dataUrl = await fileToDataUrl(file);
+      setDraft((prev) => ({
+        ...prev,
+        image: typeof dataUrl === "string" ? dataUrl : "",
+      }));
+      setPageError("");
+    } catch (err) {
+      console.error(err);
+      setPageError("Could not process that image. Please try another file.");
+    } finally {
+      event.target.value = "";
     }
   };
 
@@ -298,6 +356,36 @@ export default function ProfilePage() {
         <div className="modal-overlay">
           <div className="modal">
             <h2 className="modal-title">Edit Profile</h2>
+
+            <label className="field-label">Profile Picture</label>
+            <div className="avatar-upload-row">
+              <div className="avatar-upload-preview">
+                {draft.image ? (
+                  <img src={draft.image} alt="Profile preview" className="avatar-image" />
+                ) : (
+                  <span>{getInitials(draft.name)}</span>
+                )}
+              </div>
+              <div className="avatar-upload-actions">
+                <input
+                  id="profile-image-input"
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  onChange={handleImageSelection}
+                  className="field-input"
+                />
+                {draft.image && (
+                  <button
+                    type="button"
+                    className="btn-ghost"
+                    onClick={() => setDraft((prev) => ({ ...prev, image: "" }))}
+                  >
+                    Remove photo
+                  </button>
+                )}
+                <p className="field-help">PNG, JPG, WEBP, or GIF. Max 2 MB.</p>
+              </div>
+            </div>
 
             <label className="field-label">Name</label>
             <input
@@ -387,7 +475,11 @@ export default function ProfilePage() {
             <div className="hero-card">
               <div className="avatar-ring">
                 <div className="avatar">
-                  <span>ME</span>
+                  {profileData.image ? (
+                    <img src={profileData.image} alt="Your profile" className="avatar-image" />
+                  ) : (
+                    <span>{getInitials(profileData.name)}</span>
+                  )}
                 </div>
               </div>
               <div className="hero-info">

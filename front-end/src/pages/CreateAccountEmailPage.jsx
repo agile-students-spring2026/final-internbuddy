@@ -73,7 +73,7 @@ function CreateAccountEmailPage() {
       navigate('/create-profile/name')
     } catch (err) {
       console.error(err)
-      setError('Something went wrong')
+      setError('Cannot reach server. Make sure backend is running on port 3001.')
       setLoading(false)
     }
   }

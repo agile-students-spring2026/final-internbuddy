@@ -1,11 +1,55 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './LoginPage.css'
 import { useNavigate } from 'react-router-dom'
 
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [restoringSession, setRestoringSession] = useState(true)
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const restoreSession = async () => {
+      const token = localStorage.getItem('token')
+
+      if (!token) {
+        setRestoringSession(false)
+        return
+      }
+
+      try {
+        const authRes = await fetch('/api/auth/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (!authRes.ok) {
+          localStorage.removeItem('token')
+          setRestoringSession(false)
+          return
+        }
+
+        const profileRes = await fetch('/api/profile/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+
+        if (profileRes.ok) {
+          navigate('/events', { replace: true })
+          return
+        }
+
+        navigate('/create-profile/name', { replace: true })
+      } catch (err) {
+        console.error(err)
+        setRestoringSession(false)
+      }
+    }
+
+    restoreSession()
+  }, [navigate])
 
   const handleLogin = async () => {
     try {
@@ -33,12 +77,19 @@ function LoginPage() {
 
       console.log('TOKEN SAVED:', data.token);
 
-      // redirect
-      if (data.user?.onboardingCompleted) {
+      // Redirect based on actual profile existence, not only onboarding flag.
+      const profileRes = await fetch('/api/profile/me', {
+        headers: {
+          Authorization: `Bearer ${data.token}`,
+        },
+      });
+
+      if (profileRes.ok) {
         navigate('/events');
-      } else {
-        navigate('/create-profile/name');
+        return;
       }
+
+      navigate('/create-profile/name');
 
     } catch (err) {
       console.error(err);
@@ -48,6 +99,17 @@ function LoginPage() {
 
   const handleSignUp = () => {
     navigate('/create-account/email')
+  }
+
+  if (restoringSession) {
+    return (
+      <div className="login-container">
+        <div className="login-card">
+          <h1 className="login-title">InternBuddy</h1>
+          <p className="login-subtitle">restoring your session...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
