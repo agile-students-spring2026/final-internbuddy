@@ -40,6 +40,16 @@ async function sendRequest(req, res, next) {
       if (existing.status === 'pending') {
         return res.status(409).json({ error: 'A pending connection request already exists' });
       }
+      if (existing.status === 'rejected') {
+        const updated = await Connection.findByIdAndUpdate(
+          existing._id,
+          { status: 'pending', fromUserId, toUserId, acceptedAt: null },
+          { returnDocument: 'after' }
+        );
+        const request = mapConnectionRecord(updated);
+        const toUser = await getUserById(toUserId);
+        return res.status(201).json({ message: 'Connection request sent', request: { ...request, toUser } });
+      }
     }
 
     const created = await Connection.create({
@@ -250,6 +260,15 @@ async function deleteConnection(req, res, next) {
     if (!record) {
       return res.status(404).json({ error: 'Connection not found' });
     }
+
+    const { fromUserId, toUserId } = record;
+
+    await Promise.all([
+      User.findByIdAndUpdate(fromUserId, { $pull: { connections: toUserId } }),
+      User.findByIdAndUpdate(toUserId, { $pull: { connections: fromUserId } }),
+      Profile.findOneAndUpdate({ userId: fromUserId }, { $inc: { connections: -1 } }),
+      Profile.findOneAndUpdate({ userId: toUserId }, { $inc: { connections: -1 } }),
+    ]);
 
     return res.status(200).json({
       message: 'Connection deleted',
