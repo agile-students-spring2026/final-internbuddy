@@ -57,7 +57,7 @@ export default function YourEventsPage() {
           {data.private.map(e => (
             <div key={e.id} className="ye-bubble ye-bubble--private">
               <span className="ye-bubble-title">{e.title}</span>
-              <span className="ye-bubble-host">from {e.host}</span>
+              {e.hostName && <span className="ye-bubble-host">from {e.hostName}</span>}
               <span className="ye-bubble-date">{e.date}</span>
             </div>
           ))}
