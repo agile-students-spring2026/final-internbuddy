@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
-function CreateProfileGenderPage() {
+function CreateProfileInternshipHeadlinePage() {
   const navigate = useNavigate()
   const { onboarding, updateOnboarding } = useProfile()
   const [internshipHeadline, setInternshipHeadline] = useState(onboarding.internshipHeadline || '')
@@ -35,4 +35,4 @@ function CreateProfileGenderPage() {
   )
 }
 
-export default CreateProfileGenderPage
+export default CreateProfileInternshipHeadlinePage

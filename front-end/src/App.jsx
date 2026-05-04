@@ -12,7 +12,7 @@ import CreateProfileNamePage from './pages/CreateProfileNamePage';
 import CreateProfileDobPage from './pages/CreateProfileDobPage';
 import CreateProfileLocationPage from './pages/CreateProfileLocationPage';
 import CreateProfilePronounsPage from './pages/CreateProfilePronounsPage';
-import CreateProfileGenderPage from './pages/CreateProfileGenderPage';
+import CreateProfileInternshipHeadlinePage from './pages/CreateProfileInternshipHeadlinePage';
 import CreateProfileFriendPrefPage from './pages/CreateProfileFriendPrefPage';
 import CreateProfilePersonalityPage from './pages/CreateProfilePersonalityPage';
 import CreateProfileInternshipPage from './pages/CreateProfileInternshipPage';
@@ -54,7 +54,7 @@ function App() {
                 <Route path="/create-profile/dob" element={<CreateProfileDobPage />} />
                 <Route path="/create-profile/location" element={<CreateProfileLocationPage />} />
                 <Route path="/create-profile/pronouns" element={<CreateProfilePronounsPage />} />
-                <Route path="/create-profile/gender" element={<CreateProfileGenderPage />} />
+                <Route path="/create-profile/internship-headline" element={<CreateProfileInternshipHeadlinePage />} />
                 <Route path="/create-profile/friend-preference" element={<CreateProfileFriendPrefPage />} />
                 <Route path="/create-profile/personality" element={<CreateProfilePersonalityPage />} />
                 <Route path="/create-profile/internship" element={<CreateProfileInternshipPage />} />
