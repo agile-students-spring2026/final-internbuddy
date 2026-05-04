@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 function CreateProfileJobTitlePage() {
   const navigate = useNavigate()
-  const [jobTitle, setJobTitle] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [jobTitle, setJobTitle] = useState(onboarding.jobTitle || '')
 
   return (
     <div className="create-profile-page">
@@ -21,7 +23,7 @@ function CreateProfileJobTitlePage() {
           onChange={(e) => setJobTitle(e.target.value)}
         />
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/school')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ jobTitle }); navigate('/create-profile/school') }}>
           Next
         </button>
 

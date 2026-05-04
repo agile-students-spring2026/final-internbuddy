@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 const OPTIONS = ['Builder', 'Creative', 'Outgoing', 'Curious', 'Collaborative', 'Adventurous']
 
 function CreateProfileLifestylePage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [selected, setSelected] = useState(onboarding.lifestyle || '')
 
   return (
     <div className="create-profile-page">
@@ -27,7 +29,7 @@ function CreateProfileLifestylePage() {
           ))}
         </div>
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/meetup-types')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ lifestyle: selected }); navigate('/create-profile/meetup-types') }}>
           Next
         </button>
 
