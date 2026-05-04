@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "c8 --reporter=text --reporter=html mocha --require test/setup.js \"test/**/*.test.js\""
+    "test": "c8 --reporter=text --reporter=html mocha --require test/setup.js \"test/**/*.test.js\"",
+    "seed:alphabet:randomize": "node src/scripts/randomizeAlphabetAccounts.js"
   },
   "keywords": [
     "express",
