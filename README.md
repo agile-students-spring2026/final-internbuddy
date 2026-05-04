@@ -1,6 +1,8 @@
 # Project Title
 InternBuddy - Helping interns find community faster
 
+**Live demo:** http://146.190.210.0
+
 # Team Members
 - [Sean Tang](https://github.com/plant445)
 - [Grace He](https://github.com/gracehe04)
