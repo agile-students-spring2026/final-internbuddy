@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Event = require('../models/Event');
 
 function serializeEvent(event) {
+  const createdBy = event.createdBy
+  const isPopulated = createdBy && typeof createdBy === 'object' && createdBy.name
   return {
     id: String(event._id),
     title: event.title,
@@ -10,7 +12,8 @@ function serializeEvent(event) {
     date: event.date,
     time: event.time,
     privacy: event.privacy,
-    createdBy: event.createdBy ? String(event.createdBy) : null,
+    createdBy: isPopulated ? String(createdBy._id) : createdBy ? String(createdBy) : null,
+    hostName: isPopulated ? createdBy.name : null,
     attendees: (event.attendees || []).map(String),
     createdAt: event.createdAt,
   };
@@ -73,7 +76,7 @@ async function getUserEvents(req, res, next) {
         privacy: 'private',
         attendees: userId,
         createdBy: { $ne: userId },
-      }).sort({ createdAt: -1 }).lean(),
+      }).sort({ createdAt: -1 }).populate('createdBy', 'name').lean(),
       Event.find({
         privacy: 'public',
         createdBy: { $ne: userId },
