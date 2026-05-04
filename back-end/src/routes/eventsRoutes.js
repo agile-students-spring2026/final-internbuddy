@@ -8,6 +8,8 @@ const {
   getEventById,
   getUserEvents,
   createEvent,
+  joinEvent,
+  leaveEvent,
 } = require('../controllers/eventsController');
 const { requireAuth } = require('../middleware/authMiddleware');
 const { validateRequest } = require('../middleware/validateRequest');
@@ -34,5 +36,8 @@ router.post(
   validateRequest,
   createEvent
 );
+
+router.post('/:id/join', requireAuth, joinEvent);
+router.delete('/:id/leave', requireAuth, leaveEvent);
 
 module.exports = router;

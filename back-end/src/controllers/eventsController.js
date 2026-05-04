@@ -117,4 +117,53 @@ async function createEvent(req, res, next) {
   }
 }
 
-module.exports = { getAllEvents, getEventsCount, getEventById, getUserEvents, createEvent };
+async function joinEvent(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    const event = await Event.findById(id);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+
+    const alreadyJoined = event.attendees.some(a => String(a) === String(userId));
+    if (!alreadyJoined) {
+      event.attendees.push(userId);
+      await event.save();
+    }
+
+    return res.status(200).json(serializeEvent(event));
+  } catch (err) {
+    return next(err);
+  }
+}
+
+async function leaveEvent(req, res, next) {
+  try {
+    const userId = req.auth.userId;
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(404).json({ error: 'Event not found' });
+    }
+
+    const event = await Event.findById(id);
+    if (!event) return res.status(404).json({ error: 'Event not found' });
+
+    if (String(event.createdBy) === String(userId)) {
+      return res.status(403).json({ error: 'Host cannot leave their own event' });
+    }
+
+    event.attendees = event.attendees.filter(a => String(a) !== String(userId));
+    await event.save();
+
+    return res.status(200).json(serializeEvent(event));
+  } catch (err) {
+    return next(err);
+  }
+}
+
+module.exports = { getAllEvents, getEventsCount, getEventById, getUserEvents, createEvent, joinEvent, leaveEvent };
