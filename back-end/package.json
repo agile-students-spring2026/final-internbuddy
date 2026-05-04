@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
-    "test": "c8 --reporter=text --reporter=html mocha --require test/setup.js \"test/**/*.test.js\""
+    "test": "c8 --reporter=text --reporter=html mocha --require test/setup.js \"test/**/*.test.js\"",
+    "seed:alphabet:randomize": "node src/scripts/randomizeAlphabetAccounts.js"
   },
   "keywords": [
     "express",
@@ -23,6 +24,7 @@
     "express-validator": "^7.3.2",
     "jsonwebtoken": "^9.0.3",
     "mongodb": "^7.2.0",
+    "mongodb-memory-server": "^11.0.1",
     "mongoose": "^9.5.0"
   },
   "devDependencies": {

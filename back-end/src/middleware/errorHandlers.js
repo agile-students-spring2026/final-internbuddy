@@ -12,6 +12,13 @@ function errorHandler(err, req, res, next) {
     return next(err);
   }
 
+  if (err?.type === 'entity.too.large' || err?.status === 413) {
+    return res.status(413).json({
+      error: 'Request payload too large',
+      details: 'Profile image is too large. Please choose a smaller image.'
+    });
+  }
+
   return res.status(500).json({
     error: 'Internal server error',
     details: process.env.NODE_ENV === 'production' ? undefined : err.message

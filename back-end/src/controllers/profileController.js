@@ -20,6 +20,7 @@ async function getMyProfile(req, res, next) {
 async function saveProfile(req, res, next) {
   try {
     const userId = req.auth.userId;
+    const image = typeof req.body.image === 'string' ? req.body.image : undefined;
 
     const profile = await Profile.findOneAndUpdate(
       { userId },
@@ -36,9 +37,15 @@ async function saveProfile(req, res, next) {
       }
     );
 
-    await User.findByIdAndUpdate(userId, {
+    const userUpdates = {
       onboardingCompleted: true,
-    });
+    };
+
+    if (typeof image !== 'undefined') {
+      userUpdates.image = image;
+    }
+
+    await User.findByIdAndUpdate(userId, userUpdates);
 
     return res.status(200).json({
       message: 'Profile saved',

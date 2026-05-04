@@ -91,4 +91,27 @@ describe('Profile routes', () => {
     expect(response.body.profile).to.have.property('name', 'Saved Profile User');
     expect(response.body.profile).to.have.property('major', 'Computer Science');
   });
+
+  it('saves and returns profile image', async () => {
+    const { token } = await registerAndGetToken();
+    const sampleImageDataUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAAB';
+
+    const saveResponse = await request(app)
+      .post('/api/profile')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        name: 'Profile Image User',
+        image: sampleImageDataUrl,
+      });
+
+    expect(saveResponse.status).to.equal(200);
+    expect(saveResponse.body.profile).to.have.property('image', sampleImageDataUrl);
+
+    const getResponse = await request(app)
+      .get('/api/profile/me')
+      .set('Authorization', `Bearer ${token}`);
+
+    expect(getResponse.status).to.equal(200);
+    expect(getResponse.body.profile).to.have.property('image', sampleImageDataUrl);
+  });
 });

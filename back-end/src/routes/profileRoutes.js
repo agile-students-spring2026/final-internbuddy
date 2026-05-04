@@ -51,6 +51,7 @@ const profileValidation = [
   // about / personality
   textField('about', 1000),
   textField('personality', 100),
+  textField('image', 3000000),
 
   // onboarding state
   textField('currentStep', 50),
