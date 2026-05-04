@@ -99,7 +99,7 @@ function SwipePage() {
 
             <div className="swipe-info-section">
               <h1 className="swipe-name">
-                {profile.name}, <span className="swipe-age">{profile.age}</span>
+                {profile.name}
               </h1>
               <p className="swipe-major">{profile.major}</p>
               <p className="swipe-internship">{profile.internshipFull}</p>
