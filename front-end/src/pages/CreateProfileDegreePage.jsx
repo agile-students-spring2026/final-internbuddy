@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 const DEGREES = [
@@ -13,7 +14,8 @@ const DEGREES = [
 
 function CreateProfileDegreePage() {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [selected, setSelected] = useState(onboarding.degree || '')
 
   return (
     <div className="create-profile-page">
@@ -34,7 +36,7 @@ function CreateProfileDegreePage() {
           ))}
         </div>
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/lifestyle')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ degree: selected }); navigate('/create-profile/lifestyle') }}>
           Next
         </button>
 

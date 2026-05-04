@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 function CreateProfileSchoolPage() {
   const navigate = useNavigate()
-  const [school, setSchool] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [school, setSchool] = useState(onboarding.school || '')
 
   return (
     <div className="create-profile-page">
@@ -21,7 +23,7 @@ function CreateProfileSchoolPage() {
           onChange={(e) => setSchool(e.target.value)}
         />
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/degree')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ school }); navigate('/create-profile/degree') }}>
           Next
         </button>
 

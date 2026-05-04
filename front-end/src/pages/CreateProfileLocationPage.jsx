@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
 function CreateProfileLocationPage() {
   const navigate = useNavigate()
+  const { onboarding, updateOnboarding } = useProfile()
   const [mode, setMode] = useState('city')
-  const [city, setCity] = useState('')
-  const [stateCode, setStateCode] = useState('')
+  const [city, setCity] = useState(onboarding.city || '')
+  const [stateCode, setStateCode] = useState(onboarding.stateCode || '')
 
   return (
     <div className="create-profile-page">
@@ -48,7 +50,7 @@ function CreateProfileLocationPage() {
           />
         )}
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/pronouns')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ city, stateCode }); navigate('/create-profile/pronouns') }}>
           Next
         </button>
 

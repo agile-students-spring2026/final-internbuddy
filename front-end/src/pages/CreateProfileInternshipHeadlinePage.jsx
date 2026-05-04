@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useProfile } from '../context/ProfileContext'
 import './CreateProfileFlow.css'
 
-function CreateProfileGenderPage() {
+function CreateProfileInternshipHeadlinePage() {
   const navigate = useNavigate()
-  const [internshipHeadline, setInternshipHeadline] = useState('')
+  const { onboarding, updateOnboarding } = useProfile()
+  const [internshipHeadline, setInternshipHeadline] = useState(onboarding.internshipHeadline || '')
 
   return (
     <div className="create-profile-page">
@@ -21,7 +23,7 @@ function CreateProfileGenderPage() {
           onChange={(e) => setInternshipHeadline(e.target.value)}
         />
 
-        <button className="create-profile-next-btn" onClick={() => navigate('/create-profile/friend-preference')}>
+        <button className="create-profile-next-btn" onClick={() => { updateOnboarding({ internshipHeadline }); navigate('/create-profile/friend-preference') }}>
           Next
         </button>
 
@@ -33,4 +35,4 @@ function CreateProfileGenderPage() {
   )
 }
 
-export default CreateProfileGenderPage
+export default CreateProfileInternshipHeadlinePage
