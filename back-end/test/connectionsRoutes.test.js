@@ -91,20 +91,20 @@ describe('Connections routes', () => {
     });
   });
 
-  describe('GET /api/connections/:userId/pending', () => {
+  describe('GET /api/connections/pending', () => {
     it('should return 401 without auth', async () => {
-      const res = await request(app).get(`/api/connections/${String(toId)}/pending`);
+      const res = await request(app).get('/api/connections/pending');
       expect(res.status).to.equal(401);
     });
 
-    it('should return pending requests for a user', async () => {
+    it('should return pending requests for the authenticated user', async () => {
       await request(app)
         .post('/api/connections/request')
         .set('Authorization', `Bearer ${fromToken}`)
         .send({ toUserId: String(toId) });
 
       const res = await request(app)
-        .get(`/api/connections/${String(toId)}/pending`)
+        .get('/api/connections/pending')
         .set('Authorization', `Bearer ${toToken}`);
 
       expect(res.status).to.equal(200);
@@ -121,7 +121,7 @@ describe('Connections routes', () => {
       );
 
       const res = await request(app)
-        .get(`/api/connections/${String(otherId)}/pending`)
+        .get('/api/connections/pending')
         .set('Authorization', `Bearer ${otherToken}`);
 
       expect(res.status).to.equal(200);
@@ -129,20 +129,20 @@ describe('Connections routes', () => {
     });
   });
 
-  describe('GET /api/connections/:userId/sent', () => {
+  describe('GET /api/connections/sent', () => {
     it('should return 401 without auth', async () => {
-      const res = await request(app).get(`/api/connections/${String(fromId)}/sent`);
+      const res = await request(app).get('/api/connections/sent');
       expect(res.status).to.equal(401);
     });
 
-    it('should return sent pending requests for a user', async () => {
+    it('should return sent pending requests for the authenticated user', async () => {
       await request(app)
         .post('/api/connections/request')
         .set('Authorization', `Bearer ${fromToken}`)
         .send({ toUserId: String(toId) });
 
       const res = await request(app)
-        .get(`/api/connections/${String(fromId)}/sent`)
+        .get('/api/connections/sent')
         .set('Authorization', `Bearer ${fromToken}`);
 
       expect(res.status).to.equal(200);
@@ -160,7 +160,7 @@ describe('Connections routes', () => {
       );
 
       const res = await request(app)
-        .get(`/api/connections/${String(otherId)}/sent`)
+        .get('/api/connections/sent')
         .set('Authorization', `Bearer ${otherToken}`);
 
       expect(res.status).to.equal(200);
@@ -168,13 +168,13 @@ describe('Connections routes', () => {
     });
   });
 
-  describe('GET /api/connections/:userId', () => {
+  describe('GET /api/connections/accepted', () => {
     it('should return 401 without auth', async () => {
-      const res = await request(app).get(`/api/connections/${String(fromId)}`);
+      const res = await request(app).get('/api/connections/accepted');
       expect(res.status).to.equal(401);
     });
 
-    it('should return accepted connections for a user', async () => {
+    it('should return accepted connections for the authenticated user', async () => {
       const send = await request(app)
         .post('/api/connections/request')
         .set('Authorization', `Bearer ${fromToken}`)
@@ -185,7 +185,7 @@ describe('Connections routes', () => {
         .set('Authorization', `Bearer ${toToken}`);
 
       const res = await request(app)
-        .get(`/api/connections/${String(fromId)}`)
+        .get('/api/connections/accepted')
         .set('Authorization', `Bearer ${fromToken}`);
 
       expect(res.status).to.equal(200);

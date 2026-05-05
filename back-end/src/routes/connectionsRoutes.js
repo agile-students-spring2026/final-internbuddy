@@ -21,9 +21,9 @@ router.post(
   validateRequest,
   sendRequest
 );
-router.get('/:userId/pending', requireAuth, getPending);
-router.get('/:userId/sent', requireAuth, getSent);
-router.get('/:userId', requireAuth, getAccepted);
+router.get('/pending', requireAuth, getPending);
+router.get('/sent', requireAuth, getSent);
+router.get('/accepted', requireAuth, getAccepted);
 router.post('/:requestId/accept', requireAuth, acceptRequest);
 router.post('/:requestId/reject', requireAuth, rejectRequest);
 router.delete('/:requestId', requireAuth, deleteConnection);
