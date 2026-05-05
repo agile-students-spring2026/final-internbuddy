@@ -33,7 +33,7 @@ function buildTimeline(startMonth, endMonth, currentInternship) {
 
 function CreateProfileMeetupPage() {
   const navigate = useNavigate()
-  const { onboarding, account, updateOnboarding } = useProfile()
+  const { onboarding, updateOnboarding } = useProfile()
   const [selected, setSelected] = useState(onboarding.interests || [])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')

@@ -1,12 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { ConnectionsContext } from '../context/ConnectionsContext'
-import { getToken } from '../utils/auth'
+import { authHeaders } from '../utils/auth'
 import './SwipePage.css'
-
-function authHeaders() {
-  const token = getToken()
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
 
 function SwipePage() {
   const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)

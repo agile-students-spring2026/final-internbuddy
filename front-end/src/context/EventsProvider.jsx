@@ -1,7 +1,6 @@
-import { createContext, useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
-
-export const EventsContext = createContext()
+import { useState, useEffect } from 'react'
+import { EventsContext } from './EventsContext'
+import { authHeaders } from '../utils/auth'
 
 export function EventsProvider({ children }) {
   const [events, setEvents] = useState([])
@@ -18,12 +17,11 @@ export function EventsProvider({ children }) {
   }, [])
 
   const addEvent = (newEvent) => {
-    const token = getToken()
     fetch('/api/events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...authHeaders(),
       },
       body: JSON.stringify(newEvent),
     })
