@@ -24,7 +24,7 @@ function expandQuery(q) {
 
 async function getUserById(id) {
   const [user, profile] = await Promise.all([
-    User.findById(id).lean(),
+    User.findById(id).select('-passwordHash').lean(),
     Profile.findOne({ userId: id }).lean(),
   ]);
 
