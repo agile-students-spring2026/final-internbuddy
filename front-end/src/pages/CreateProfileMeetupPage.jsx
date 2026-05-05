@@ -138,7 +138,7 @@ function CreateProfileMeetupPage() {
           onClick={handleFinish}
           disabled={loading}
         >
-          {loading ? 'Saving...' : 'Add Resume (Optional)'}
+          {loading ? 'Saving...' : 'Next'}
         </button>
 
         <button
