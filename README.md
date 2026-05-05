@@ -1,6 +1,7 @@
 # Project Title
 InternBuddy - Helping interns find community faster
 
+Go here!
 **Live demo:** http://146.190.210.0
 
 # Team Members
@@ -86,6 +87,15 @@ docker compose down
 ```bash
 docker compose up --build --force-recreate
 ```
+
+## Extra Credit
+All 3/3 extra credit opportunities were attempted.
+
+- Docker container deployment support is completed. The repository includes [docker-compose.yml], [back-end/Dockerfile], and [front-end/Dockerfile].
+
+- Continuous Integration is completed. The GitHub Actions workflow in [.github/workflows/ci.yml] runs backend tests and a frontend build on pushes and pull requests.
+
+- Continuous Deployment is Complete.
 
 # What and Why?
 
