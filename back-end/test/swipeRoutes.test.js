@@ -14,6 +14,17 @@ describe('Swipe Routes', function () {
 
   before(async function () {
     token = jwt.sign({ sub: String(testUserId), email: 'swipetest@test.com' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    const otherUserId = new mongoose.Types.ObjectId();
+    const User = require('../src/models/User');
+    const Profile = require('../src/models/Profile');
+
+    await User.create({ _id: otherUserId, email: 'other@test.com', password: 'hashedpassword' })
+    await Profile.create({
+      userId: otherUserId,
+      name: 'Test User',
+      completed: true,
+    })
   });
 
   after(async function () {
