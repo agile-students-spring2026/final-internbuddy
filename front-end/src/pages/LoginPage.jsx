@@ -75,8 +75,6 @@ function LoginPage() {
       // store token
       localStorage.setItem('token', data.token);
 
-
-
       // Redirect based on actual profile existence, not only onboarding flag.
       const profileRes = await fetch('/api/profile/me', {
         headers: {

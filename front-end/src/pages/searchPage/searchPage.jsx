@@ -110,6 +110,10 @@ export default function SearchPage() {
     const params = new URLSearchParams()
   
     if (query) params.set('q', query)
+    if (applied.city) params.set('city', applied.city)
+    if (applied.companies.length) params.set('company', applied.companies.join(','))
+    if (applied.schools.length) params.set('school', applied.schools.join(','))
+    if (applied.roles.length) params.set('role', applied.roles.join(','))
   
     setLoading(true)
     fetch(`/api/users/search?${params}`, {
@@ -122,7 +126,8 @@ export default function SearchPage() {
       })
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, pending, accepted, currentUserId])
+  }, [query, applied, pending, accepted, currentUserId])
+
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
@@ -193,12 +198,12 @@ export default function SearchPage() {
           value={query}
           onChange={e => setQuery(e.target.value)}
         />
-        {/* <button
+        <button
           className={`sp-filter-btn ${activeFilterCount > 0 ? 'sp-filter-btn--active' : ''}`}
           onClick={() => setShowFilters(true)}
         >
           Filters {activeFilterCount > 0 && <span className="sp-filter-badge">{activeFilterCount}</span>}
-        </button> */}
+        </button>
       </div>
 
       <div className="sp-sort-row">
