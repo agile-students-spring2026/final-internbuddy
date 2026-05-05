@@ -2,6 +2,26 @@ const Connection = require('../models/Connection');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
 
+const ROLE_SYNONYMS = {
+  'swe intern': ['software', 'engineer', 'developer', 'frontend', 'backend', 'fullstack', 'full-stack'],
+  'pm intern': ['product manager', 'product management', 'program manager'],
+  'design': ['designer', 'ux', 'ui', 'product design'],
+  'data': ['data science', 'data analyst', 'machine learning', 'ml', 'analytics'],
+  'finance': ['investment', 'banking', 'accounting', 'quant'],
+  'marketing': ['growth', 'brand', 'content', 'social media'],
+}
+
+function expandQuery(q) {
+  if (!q) return [q]
+  const lower = q.toLowerCase().trim()
+  for (const [key, synonyms] of Object.entries(ROLE_SYNONYMS)) {
+    if (lower === key || synonyms.includes(lower)) {
+      return [q, ...synonyms, key]
+    }
+  }
+  return [q]
+}
+
 async function getUserById(id) {
   const [user, profile] = await Promise.all([
     User.findById(id).lean(),
@@ -45,24 +65,51 @@ async function getAllUsers() {
   }));
 }
 
-async function searchUsers({ q, city } = {}) {
+async function searchUsers({ q, company, school, role, city } = {}) {
   const query = { completed: true };
 
   if (q) {
-    query.$or = [
-      { name: new RegExp(q, 'i') },
-      { major: new RegExp(q, 'i') },
-      { internship: new RegExp(q, 'i') },
-      { location: new RegExp(q, 'i') },
-      { city: new RegExp(q, 'i') },
-      { about: new RegExp(q, 'i') },
-      { interests: new RegExp(q, 'i') },
-      { meetupTypes: new RegExp(q, 'i') },
-    ];
+    const terms = expandQuery(q)
+    const termRegexes = terms.map(t => new RegExp(t, 'i'))
+
+    query.$or = termRegexes.flatMap(regex => [
+      { name: regex },
+      { major: regex },
+      { internship: regex },
+      { location: regex },
+      { city: regex },
+      { about: regex },
+      { interests: regex },
+      { meetupTypes: regex },
+    ])
   }
 
-  if (city) {
-    query.city = new RegExp(city, 'i');
+  if (city) query.city = new RegExp(city, 'i')
+
+  if (company) {
+    const companies = company.split(',').map(c => c.trim()).filter(Boolean)
+    if (companies.length) query.internship = { $in: companies.map(c => new RegExp(c, 'i')) }
+  }
+
+  if (school) {
+    const schools = school.split(',').map(s => s.trim()).filter(Boolean)
+    if (schools.length) query.major = { $in: schools.map(s => new RegExp(s, 'i')) }
+  }
+
+  if (role) {
+    const roles = role.split(',').map(r => r.trim()).filter(Boolean)
+    const expandedRoles = [...new Set(roles.flatMap(r => expandQuery(r)))]
+    const roleRegexes = expandedRoles.map(r => new RegExp(r, 'i'))
+
+    if (!query.$or) {
+      query.$or = roleRegexes.map(regex => ({ internship: regex }))
+    } else {
+      query.$and = [
+        { $or: query.$or },
+        { $or: roleRegexes.map(regex => ({ internship: regex })) }
+      ]
+      delete query.$or
+    }
   }
 
   const profiles = await Profile.find(query).lean();

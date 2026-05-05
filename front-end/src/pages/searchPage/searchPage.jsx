@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
-//import { faker } from '@faker-js/faker'
 import { ConnectionsContext } from '../../context/ConnectionsContext'
 import SwipePage from '../SwipePage'
 import './searchPage.css'
@@ -8,12 +7,13 @@ const COMPANIES = ['Google', 'Meta', 'Amazon', 'Apple', 'Microsoft', 'Figma', 'S
 const SCHOOLS = ['NYU', 'Columbia', 'Cornell', 'MIT', 'Stanford', 'UMich', 'UCLA', 'Georgia Tech', 'CMU', 'UPenn']
 const ROLES = ['SWE Intern', 'PM Intern', 'Design Intern', 'Data Intern', 'Finance Intern', 'Marketing Intern']
 const CITIES = ['New York, NY', 'San Francisco, CA', 'Seattle, WA', 'Austin, TX', 'Boston, MA', 'Chicago, IL']
-const RADII = ['5 mi', '10 mi', '25 mi', '50 mi', 'Any']
 
 function Degreebadge({ degree }) {
-  const labels = {1: '1st', 2: '2nd', 3: '3rd'}
-  const d = degree ?? 3
-  return <span className={`sp-degree sp-degree--${d}`}>{labels[degree]}</span>
+  if (degree === 0) return null
+  if (degree === 1) return <span className="sp-degree sp-degree--1">1st</span>
+  if (degree === 2) return <span className="sp-degree sp-degree--2">2nd</span>
+  if (degree === 3) return <span className="sp-degree sp-degree--3">3rd</span>
+  return <span className="sp-degree sp-degree--3">3rd+</span>
 }
 
 function getInitialStatus(person) {
@@ -52,6 +52,7 @@ function PersonCard({ person, onConnect, onCancel, onAccept }) {
 
   return (
     <div className="sp-card">
+      <Degreebadge degree={person.degree} />
       <img
         className="sp-avatar"
         src={`https://picsum.photos/seed/${person.id + 40}/64/64`}
@@ -60,10 +61,9 @@ function PersonCard({ person, onConnect, onCancel, onAccept }) {
       <div className="sp-card-info">
         <div className="sp-card-row">
           <span className="sp-name">{person.name}</span>
-          {person.degree && <Degreebadge degree={person.degree} />}
         </div>
-        <p className="sp-role">{person.role} @ {person.company}</p>
-        <p className="sp-meta">{person.school} · {person.city}</p>
+        <p className="sp-role">{person.role}{person.company ? ` @ ${person.company}` : ''}</p>
+        <p className="sp-meta">{[person.school, person.city].filter(Boolean).join(' · ')}</p>
         {person.mutualCount > 0 && (
           <p className="sp-mutual">{person.mutualCount} mutual connection{person.mutualCount > 1 ? 's' : ''}</p>
         )}
@@ -96,33 +96,32 @@ export default function SearchPage() {
     schools: [],
     roles: [],
     city: '',
-    radius: 'Any',
   })
   const [applied, setApplied] = useState({
     companies: [],
     schools: [],
     roles: [],
     city: '',
-    radius: 'Any',
   })
 
   useEffect(() => {
     const params = new URLSearchParams()
-  
+
     if (query) params.set('q', query)
-  
+    if (applied.city) params.set('city', applied.city)
+    if (applied.companies.length) params.set('company', applied.companies.join(','))
+    if (applied.schools.length) params.set('school', applied.schools.join(','))
+    if (applied.roles.length) params.set('role', applied.roles.join(','))
+
     setLoading(true)
     fetch(`/api/users/search?${params}`, {
       headers: currentUserId ? { 'x-current-user-id': currentUserId } : {},
     })
       .then(res => res.json())
-      .then(json => {
-        console.log('Search response:', json)
-        setPeople(json.data || [])
-      })
+      .then(json => setPeople(json.data || []))
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, pending, accepted, currentUserId])
+  }, [query, applied, pending, accepted, currentUserId])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
@@ -140,14 +139,14 @@ export default function SearchPage() {
   }
 
   const resetFilters = () => {
-    const empty = { companies: [], schools: [], roles: [], city: '', radius: 'Any' }
+    const empty = { companies: [], schools: [], roles: [], city: '' }
     setFilters(empty)
     setApplied(empty)
   }
 
   const activeFilterCount =
     applied.companies.length + applied.schools.length + applied.roles.length +
-    (applied.city ? 1 : 0) + (applied.radius !== 'Any' ? 1 : 0)
+    (applied.city ? 1 : 0)
 
   const results = useMemo(() => {
     let list = [...people]
@@ -160,7 +159,6 @@ export default function SearchPage() {
   const handleConnect = (id) => sendRequest(String(id))
   const handleCancel = (requestId) => cancelRequest(requestId)
   const handleAcceptFromSearch = (id) => {
-    // find the pending request for this user and accept it
     const req = pending.find(r => r.fromUserId === String(id))
     if (req) acceptRequest(req.id)
   }
@@ -184,7 +182,6 @@ export default function SearchPage() {
         </button>
       </div>
 
-      {/* Search bar */}
       <div className="sp-search-row">
         <input
           className="sp-search-input"
@@ -193,12 +190,12 @@ export default function SearchPage() {
           value={query}
           onChange={e => setQuery(e.target.value)}
         />
-        {/* <button
+        <button
           className={`sp-filter-btn ${activeFilterCount > 0 ? 'sp-filter-btn--active' : ''}`}
           onClick={() => setShowFilters(true)}
         >
           Filters {activeFilterCount > 0 && <span className="sp-filter-badge">{activeFilterCount}</span>}
-        </button> */}
+        </button>
       </div>
 
       <div className="sp-sort-row">
@@ -206,13 +203,17 @@ export default function SearchPage() {
           {loading ? 'Loading…' : `${results.length} intern${results.length !== 1 ? 's' : ''}`}
         </span>
         <div className="sp-sort-pills">
-          {['degree', 'mutual', 'name'].map(s => (
+          {[
+            { key: 'degree', label: 'My Network' },
+            { key: 'mutual', label: 'Mutual' },
+            { key: 'name', label: 'A–Z' },
+          ].map(s => (
             <button
-              key={s}
-              className={`sp-sort-pill ${sortBy === s ? 'active' : ''}`}
-              onClick={() => setSortBy(s)}
+              key={s.key}
+              className={`sp-sort-pill ${sortBy === s.key ? 'active' : ''}`}
+              onClick={() => setSortBy(s.key)}
             >
-              {s === 'degree' ? 'Closest' : s === 'mutual' ? 'Mutual' : 'A–Z'}
+              {s.label}
             </button>
           ))}
         </div>
@@ -222,7 +223,7 @@ export default function SearchPage() {
         {loading
           ? <p className="sp-empty">Loading…</p>
           : results.length === 0
-            ? <p className="sp-empty">No results. Try adjusting your filters.</p>
+            ? <p className="sp-empty">No results. Try adjusting your search or filters.</p>
             : results.map(p => (
                 <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} onAccept={handleAcceptFromSearch} />
               ))
@@ -247,21 +248,6 @@ export default function SearchPage() {
                     onClick={() => setFilters(prev => ({ ...prev, city: prev.city === c ? '' : c }))}
                   >
                     {c}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            <section className="sp-filter-section">
-              <h3 className="sp-filter-label">Radius</h3>
-              <div className="sp-chip-group">
-                {RADII.map(r => (
-                  <button
-                    key={r}
-                    className={`sp-chip ${filters.radius === r ? 'active' : ''}`}
-                    onClick={() => setFilters(prev => ({ ...prev, radius: r }))}
-                  >
-                    {r}
                   </button>
                 ))}
               </div>
