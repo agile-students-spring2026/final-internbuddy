@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: '.env.test' });
 const mongoose = require('mongoose');
 const { connectDB } = require('../src/db');
 
