@@ -515,8 +515,14 @@ export default function ProfilePage() {
               <button
                 className="action-btn outline"
                 onClick={() => setActiveTab("requests")}
+                style={{ position: 'relative' }}
               >
                 Friend Requests
+                {pending.length > 0 && (
+                  <span style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#4f46e5', color: '#fff', borderRadius: '50%', fontSize: '11px', fontWeight: 700, minWidth: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>
+                    {pending.length}
+                  </span>
+                )}
               </button>
               <button className="action-btn filled" onClick={openEdit}>
                 Edit Profile
@@ -676,7 +682,13 @@ export default function ProfilePage() {
                     <div className="req-actions">
                       <button
                         className="btn-primary small"
-                        onClick={() => acceptRequest(r.id)}
+                        onClick={() =>
+                          acceptRequest(r.id).then((data) => {
+                            if (data?.conversation?.id) {
+                              navigate(`/message/${data.conversation.id}`);
+                            }
+                          })
+                        }
                       >
                         Accept
                       </button>

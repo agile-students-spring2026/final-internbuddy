@@ -1,4 +1,5 @@
 import { useState, useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ConnectionsContext } from '../context/ConnectionsContext'
 import { getToken } from '../utils/auth'
 import './SwipePage.css'
@@ -9,6 +10,7 @@ function authHeaders() {
 }
 
 function SwipePage() {
+  const navigate = useNavigate()
   const { pending, sent, sendRequest, acceptRequest, rejectRequest } = useContext(ConnectionsContext)
   const [profiles, setProfiles] = useState([])
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -189,7 +191,7 @@ function SwipePage() {
                         <p>{req.fromUser?.role || ''}</p>
                       </div>
                       <div className="swipe-request-actions">
-                        <button className="swipe-request-accept" onClick={() => acceptRequest(req.id)}>✓</button>
+                        <button className="swipe-request-accept" onClick={() => acceptRequest(req.id).then(data => { if (data?.conversation?.id) { setShowRequests(false); navigate(`/message/${data.conversation.id}`) } })}>✓</button>
                         <button className="swipe-request-reject" onClick={() => rejectRequest(req.id)}>✕</button>
                       </div>
                     </div>
