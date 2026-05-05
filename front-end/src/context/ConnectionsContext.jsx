@@ -19,29 +19,23 @@ export function ConnectionsProvider({ children }) {
 
   const fetchConnections = useCallback((userId) => {
     const headers = authHeaders()
-    if (!userId || !headers.Authorization) return Promise.resolve()
+    if (!userId || !headers.Authorization) return
 
-    return Promise.all([
-      fetch(`/api/connections/${userId}/pending`, { headers })
-        .then(res => res.ok ? res.json() : null)
-        .then(data => { if (data) setPending(data.pending || []) })
-        .catch(() => {}),
-      fetch(`/api/connections/${userId}/sent`, { headers })
-        .then(res => res.ok ? res.json() : null)
-        .then(data => { if (data) setSent(data.sent || []) })
-        .catch(() => {}),
-      fetch(`/api/connections/${userId}`, { headers })
-        .then(res => res.ok ? res.json() : null)
-        .then(data => { if (data) setAccepted(data.accepted || []) })
-        .catch(() => {}),
-    ])
+    fetch(`/api/connections/${userId}/pending`, { headers })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setPending(data.pending || []) })
+      .catch(() => {})
+
+    fetch(`/api/connections/${userId}/sent`, { headers })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setSent(data.sent || []) })
+      .catch(() => {})
+
+    fetch(`/api/connections/${userId}`, { headers })
+      .then(res => res.ok ? res.json() : null)
+      .then(data => { if (data) setAccepted(data.accepted || []) })
+      .catch(() => {})
   }, [])
-
-  const refreshConnections = useCallback(() => {
-    const userId = currentUserIdRef.current
-    if (!userId) return Promise.resolve()
-    return fetchConnections(userId)
-  }, [fetchConnections])
 
   useEffect(() => {
     const token = getToken()
@@ -104,18 +98,12 @@ export function ConnectionsProvider({ children }) {
       headers: { 'Content-Type': 'application/json', ...authHeaders() },
       body: JSON.stringify({ toUserId }),
     })
-      .then(async (res) => {
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to send connection request')
-        }
-        return data
-      })
+      .then(res => res.json())
       .then(data => {
         if (data.request) {
-          setSent(prev => prev.some(item => item.id === data.request.id) ? prev : [...prev, data.request])
+          setSent(prev => [...prev, data.request])
         }
-        return refreshConnections().then(() => data)
+        return data
       })
   }
 
@@ -124,17 +112,10 @@ export function ConnectionsProvider({ children }) {
       method: 'POST',
       headers: authHeaders(),
     })
-      .then(async (res) => {
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to accept connection request')
-        }
-        return data
-      })
+      .then(res => res.json())
       .then(data => {
         setPending(prev => prev.filter(r => r.id !== requestId))
-        if (data.request) setAccepted(prev => [...prev, data.request])
-        return refreshConnections().then(() => data)
+        setAccepted(prev => [...prev, data.request])
       })
   }
 
@@ -143,16 +124,9 @@ export function ConnectionsProvider({ children }) {
       method: 'POST',
       headers: authHeaders(),
     })
-      .then(async (res) => {
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to reject connection request')
-        }
-        return data
-      })
-      .then((data) => {
+      .then(res => res.json())
+      .then(() => {
         setPending(prev => prev.filter(r => r.id !== requestId))
-        return refreshConnections().then(() => data)
       })
   }
 
@@ -161,21 +135,15 @@ export function ConnectionsProvider({ children }) {
       method: 'DELETE',
       headers: authHeaders(),
     })
-      .then(async (res) => {
-        const data = await res.json()
-        if (!res.ok) {
-          throw new Error(data.error || 'Failed to cancel connection request')
-        }
-        return data
-      })
+      .then(res => res.json())
       .then(data => {
         setSent(prev => prev.filter(r => r.id !== requestId))
-        return refreshConnections().then(() => data)
+        return data
       })
   }
 
   return (
-    <ConnectionsContext.Provider value={{ currentUserId, pending, sent, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest, refreshConnections }}>
+    <ConnectionsContext.Provider value={{ currentUserId, pending, sent, accepted, sendRequest, acceptRequest, rejectRequest, cancelRequest }}>
       {children}
     </ConnectionsContext.Provider>
   )

@@ -23,32 +23,24 @@ function getInitialStatus(person) {
   return 'idle'
 }
 
-function PersonCard({ person, requestId, onConnect, onCancel, onAccept }) {
+function PersonCard({ person, onConnect, onCancel, onAccept }) {
   const [status, setStatus] = useState(() => getInitialStatus(person))
-
-  useEffect(() => {
-    setStatus(getInitialStatus(person))
-  }, [person])
+  const [requestId, setRequestId] = useState(null)
 
   const handleConnect = () => {
-    if (status !== 'idle') return
     setStatus('pending')
-    onConnect(person.id).catch(() => {
-      setStatus(getInitialStatus(person))
-    })
+    onConnect(person.id).then(data => setRequestId(data.request.id))
   }
 
   const handleCancel = () => {
-    if (!requestId) return
     onCancel(requestId)
-      .then(() => setStatus('idle'))
-      .catch(() => setStatus('pending'))
+    setStatus('idle')
+    setRequestId(null)
   }
 
   const handleAccept = () => {
     onAccept(person.id)
-      .then(() => setStatus('connected'))
-      .catch(() => setStatus('incoming'))
+    setStatus('connected')
   }
 
   const label = {
@@ -92,7 +84,7 @@ function PersonCard({ person, requestId, onConnect, onCancel, onAccept }) {
 }
 
 export default function SearchPage() {
-  const { currentUserId, sendRequest, cancelRequest, pending, sent, acceptRequest } = useContext(ConnectionsContext)
+  const { currentUserId, sendRequest, cancelRequest, pending, accepted, acceptRequest } = useContext(ConnectionsContext)
   const [people, setPeople] = useState([])
   const [loading, setLoading] = useState(false)
   const [swipeMode, setSwipeMode] = useState(false)
@@ -129,7 +121,7 @@ export default function SearchPage() {
       .then(json => setPeople(json.data || []))
       .catch(err => console.error('Search fetch failed:', err))
       .finally(() => setLoading(false))
-  }, [query, applied, currentUserId])
+  }, [query, applied, pending, accepted, currentUserId])
 
   const toggleMulti = (key, value) => {
     setFilters(prev => {
@@ -164,44 +156,11 @@ export default function SearchPage() {
     return list
   }, [people, sortBy])
 
-  const handleConnect = (id) => {
-    return sendRequest(String(id)).then((data) => {
-      setPeople(prev => prev.map(person => (
-        String(person.id) === String(id)
-          ? { ...person, connected: false, connectionStatus: 'pending-outgoing' }
-          : person
-      )))
-      return data
-    })
-  }
-
-  const handleCancel = (requestId) => {
-    const request = sent.find(item => item.id === requestId)
-
-    return cancelRequest(requestId).then((data) => {
-      if (request?.toUserId) {
-        setPeople(prev => prev.map(person => (
-          String(person.id) === String(request.toUserId)
-            ? { ...person, connected: false, connectionStatus: null }
-            : person
-        )))
-      }
-      return data
-    })
-  }
-
+  const handleConnect = (id) => sendRequest(String(id))
+  const handleCancel = (requestId) => cancelRequest(requestId)
   const handleAcceptFromSearch = (id) => {
     const req = pending.find(r => r.fromUserId === String(id))
-    if (!req) return Promise.resolve()
-
-    return acceptRequest(req.id).then((data) => {
-      setPeople(prev => prev.map(person => (
-        String(person.id) === String(id)
-          ? { ...person, connected: true, connectionStatus: 'accepted' }
-          : person
-      )))
-      return data
-    })
+    if (req) acceptRequest(req.id)
   }
 
   if (swipeMode) {
@@ -266,14 +225,7 @@ export default function SearchPage() {
           : results.length === 0
             ? <p className="sp-empty">No results. Try adjusting your search or filters.</p>
             : results.map(p => (
-                <PersonCard
-                  key={p.id}
-                  person={p}
-                  requestId={sent.find(item => String(item.toUserId) === String(p.id))?.id || null}
-                  onConnect={handleConnect}
-                  onCancel={handleCancel}
-                  onAccept={handleAcceptFromSearch}
-                />
+                <PersonCard key={p.id} person={p} onConnect={handleConnect} onCancel={handleCancel} onAccept={handleAcceptFromSearch} />
               ))
         }
       </div>
