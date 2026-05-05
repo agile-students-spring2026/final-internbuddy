@@ -1,4 +1,9 @@
-require('dotenv').config({ path: '.env.test' });
+// Tests must never touch a real MongoDB. Wipe any MONGO_URI inherited from
+// .env / the shell before .env.test is applied, then force the in-memory fallback.
+delete process.env.MONGO_URI;
+require('dotenv').config({ path: '.env.test', override: true });
+process.env.ALLOW_IN_MEMORY_DB = 'true';
+
 const mongoose = require('mongoose');
 const { connectDB } = require('../src/db');
 
