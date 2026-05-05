@@ -26,6 +26,11 @@ jobs:
       - name: Run backend tests
         working-directory: back-end
         run: npm test
+        env:
+          NODE_ENV: test
+          JWT_SECRET: test-secret-for-ci
+          PORT: 3001
+          ALLOW_IN_MEMORY_DB: 'true'
 
       - name: Install frontend dependencies
         working-directory: front-end
