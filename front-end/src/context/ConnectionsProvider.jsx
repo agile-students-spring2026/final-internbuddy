@@ -32,31 +32,39 @@ export function ConnectionsProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    const token = getToken()
-    if (!token) return
+    let cancelled = false
 
-    fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => {
-        const userId = data?.user?.id || null
-        setCurrentUserId(userId)
-        currentUserIdRef.current = userId
-        if (userId) fetchConnections()
-      })
-      .catch(() => {
-        setCurrentUserId(null)
-        currentUserIdRef.current = null
-      })
-  }, [fetchConnections])
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (currentUserIdRef.current) {
-        fetchConnections()
+    async function tick() {
+      const token = getToken()
+      if (!token) {
+        if (currentUserIdRef.current) {
+          currentUserIdRef.current = null
+          setCurrentUserId(null)
+        }
+        return
       }
-    }, POLL_INTERVAL_MS)
 
-    return () => clearInterval(interval)
+      if (!currentUserIdRef.current) {
+        try {
+          const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+          if (cancelled || !res.ok) return
+          const data = await res.json()
+          if (cancelled) return
+          const userId = data?.user?.id || null
+          currentUserIdRef.current = userId
+          setCurrentUserId(userId)
+          if (!userId) return
+        } catch {
+          return
+        }
+      }
+
+      fetchConnections()
+    }
+
+    tick()
+    const interval = setInterval(tick, POLL_INTERVAL_MS)
+    return () => { cancelled = true; clearInterval(interval) }
   }, [fetchConnections])
 
   function sendRequest(toUserId) {
