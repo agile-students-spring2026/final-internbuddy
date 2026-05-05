@@ -151,7 +151,8 @@ export function ProfileProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(data))
+    const { password: _pw, ...accountSafe } = data.account
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify({ ...data, account: accountSafe }))
   }, [data])
 
   const updateAccount = (accountUpdates) => {
