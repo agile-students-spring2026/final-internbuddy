@@ -20,8 +20,6 @@ back-end/
       profileController.js
       swipeController.js
       userController.js
-    data/
-      profileStepOrder.js
     middleware/
       authMiddleware.js
       errorHandlers.js
@@ -42,9 +40,9 @@ back-end/
       swipeRoutes.js
       userRoutes.js
     scripts/
+      randomizeAlphabetAccounts.js
       seedUsers.js
     services/
-      mockStore.js
       usersStore.js
   test/
     authRoutes.test.js
@@ -64,7 +62,7 @@ back-end/
    ```bash
    npm install
    ```
-3. Create a `.env` file (see `.env.example` if available) — do **not** commit this file.
+3. Copy `.env.example` to `.env` and fill in the values — do **not** commit `.env`.
 4. Start the server:
    ```bash
    npm run dev
@@ -83,52 +81,73 @@ Coverage reports:
 - Terminal summary printed after tests
 - HTML report at `back-end/coverage/index.html`
 
+## Architecture
+
+`User` documents store login/account data (email, passwordHash, verified, connections). `Profile` documents store profile content (name, school, internship, interests, etc.). One `User` has at most one `Profile`, joined by `Profile.userId`.
+
 ## API Routes
 
-### Static route
+### Static / health
 
 - `GET /` — serves `public/index.html`
+- `GET /api/health` — returns `{ status: "ok", service: "internbuddy-backend" }`
 
-### Health
+### Auth (`/api/auth`)
 
-- `GET /api/health` — returns `{ status: "ok" }`
+- `POST /api/auth/register` — body: `{ email, password }`. Creates a User, returns `{ token, user }`.
+- `POST /api/auth/login` — body: `{ email, password }`. Returns `{ token, user }`.
+- `GET /api/auth/me` — `Authorization: Bearer <token>`. Returns the authenticated User.
 
-### Auth routes (`/api/auth`)
+### Profile (`/api/profile`) — all require auth
 
-- `POST /api/auth/register` — body: `{ "email": "...", "phone": "...", "password": "..." }` (MongoDB + JWT)
-- `POST /api/auth/login` — body: `{ "email": "...", "password": "..." }` (returns JWT)
-- `GET /api/auth/me` — requires `Authorization: Bearer <token>`
-- `POST /api/auth/signup` — body: `{ "email": "...", "phone": "..." }`
-- `POST /api/auth/verify` — body: `{ "userId": "...", "code": "123456" }`
-- `GET /api/auth/:userId` — get account by userId
+- `GET /api/profile/me` — returns the authenticated user's Profile (404 if not yet created).
+- `POST /api/profile` — upserts the authenticated user's Profile from request body fields and marks onboarding complete.
 
-### Profile routes (`/api/profile`)
+### Events (`/api/events`)
 
-- `GET /api/profile/:userId` — get profile
-- `POST /api/profile/:userId/step` — body: `{ "step": "name", "value": { ... } }`
-- `POST /api/profile/:userId/complete` — mark profile complete
+- `GET /api/events` — list public events (`?limit`, `?skip`).
+- `GET /api/events/count` — count of public events.
+- `GET /api/events/:id` — single event.
+- `GET /api/events/me` — auth — returns `{ hosting, attending, private, suggested }` for the authenticated user.
+- `POST /api/events` — auth — body: `{ title, description?, location?, date?, time?, privacy? }`.
+- `POST /api/events/:id/join` — auth.
+- `DELETE /api/events/:id/leave` — auth.
 
-### Events routes (`/api/events`)
+### Swipe (`/api/swipe`) — all require auth
 
-- `GET /api/events` — list all events
-- `GET /api/events/me` — get current user's events (hosting, attending, private, suggested)
-- `GET /api/events/:id` — get single event by id
-- `POST /api/events` — body: `{ "title": "...", "description": "...", "location": "...", "date": "...", "time": "...", "privacy": "public" }`
+- `GET /api/swipe/profiles` — candidates for the authenticated user.
+- `GET /api/swipe/history` — authenticated user's swipe history.
+- `GET /api/swipe/stats` — `{ likes, passes, total }`.
+- `POST /api/swipe/like` — body: `{ profileId }`.
+- `POST /api/swipe/pass` — body: `{ profileId }`.
+- `DELETE /api/swipe/:profileId` — undo a previous swipe.
 
-### Swipe routes (`/api/swipe`)
+### Messages (`/api/messages`) — all require auth
 
-- `GET /api/swipe/profiles` — list swipeable profiles
-- `POST /api/swipe/like` — body: `{ "profileId": 1 }`
-- `POST /api/swipe/pass` — body: `{ "profileId": 1 }`
-- `GET /api/swipe/requests` — get sent and received friend requests
+- `GET /api/messages` — conversations for the authenticated user.
+- `GET /api/messages/unread/count` — `{ count }`.
+- `POST /api/messages` — body: `{ otherUserId }`. Creates (or returns) a 1:1 conversation.
+- `GET /api/messages/:conversationId` — messages in a conversation (must be a participant).
+- `POST /api/messages/:conversationId` — body: `{ text }`.
 
-### Messages routes (`/api/messages`)
+### Connections (`/api/connections`) — all require auth
 
-- `GET /api/messages` — list all conversations
-- `GET /api/messages/:conversationId` — get conversation with messages
-- `POST /api/messages/:conversationId` — body: `{ "text": "..." }`
+- `POST /api/connections/request` — body: `{ toUserId }`.
+- `GET /api/connections/pending` — incoming pending requests for the authenticated user.
+- `GET /api/connections/sent` — outgoing pending requests.
+- `GET /api/connections/accepted` — accepted connections.
+- `POST /api/connections/:requestId/accept`
+- `POST /api/connections/:requestId/reject`
+- `DELETE /api/connections/:requestId` — cancel/remove.
+
+### Users (`/api/users`) — all require auth
+
+- `GET /api/users/search?q=&company=&school=&role=&city=&page=&limit=` — search profiles.
+- `GET /api/users/:id` — single user with relationship/degree/mutual data relative to the authenticated user.
 
 ## Notes
 
-- Current implementation uses in-memory mock data — data resets on server restart.
-- Do not commit secrets; store sensitive values in `.env` files.
+- Data is persisted to MongoDB Atlas via Mongoose. In development, if `MONGO_URI` is set but unreachable, the server can fall back to an in-memory MongoDB when `ALLOW_IN_MEMORY_DB=true`. In production, a working `MONGO_URI` is required.
+- Passwords are hashed with bcrypt; auth uses JSON Web Tokens with a 7-day expiry.
+- All write endpoints validate input with `express-validator`.
+- Do not commit secrets; store sensitive values in `.env`.

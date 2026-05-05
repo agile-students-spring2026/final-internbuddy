@@ -1,7 +1,6 @@
-import { createContext, useState, useEffect } from 'react'
-import { getToken } from '../utils/auth'
-
-export const EventsContext = createContext()
+import { useState, useEffect } from 'react'
+import { EventsContext } from './EventsContext'
+import { authHeaders } from '../utils/auth'
 
 export function EventsProvider({ children }) {
   const [events, setEvents] = useState([])
@@ -18,12 +17,11 @@ export function EventsProvider({ children }) {
   }, [])
 
   const addEvent = (newEvent) => {
-    const token = getToken()
     fetch('/api/events', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...authHeaders(),
       },
       body: JSON.stringify(newEvent),
     })
@@ -38,8 +36,30 @@ export function EventsProvider({ children }) {
       .catch(err => console.error('Failed to create event:', err))
   }
 
+  const joinEvent = async (id) => {
+    const res = await fetch(`/api/events/${id}/join`, {
+      method: 'POST',
+      headers: authHeaders(),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to join')
+    setEvents(prev => prev.map(e => (e.id === data.id ? data : e)))
+    return data
+  }
+
+  const leaveEvent = async (id) => {
+    const res = await fetch(`/api/events/${id}/leave`, {
+      method: 'DELETE',
+      headers: authHeaders(),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to leave')
+    setEvents(prev => prev.map(e => (e.id === data.id ? data : e)))
+    return data
+  }
+
   return (
-    <EventsContext.Provider value={{ events, addEvent }}>
+    <EventsContext.Provider value={{ events, addEvent, joinEvent, leaveEvent }}>
       {children}
     </EventsContext.Provider>
   )

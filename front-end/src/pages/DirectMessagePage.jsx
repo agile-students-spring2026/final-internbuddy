@@ -1,11 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getToken } from "../utils/auth";
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
+import { authHeaders } from "../utils/auth";
 
 export default function DirectMessagePage() {
   const navigate = useNavigate();

@@ -1,14 +1,8 @@
-import { createContext, useState, useEffect, useRef, useCallback } from 'react'
-import { getToken } from '../utils/auth'
-
-export const ConnectionsContext = createContext()
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { ConnectionsContext } from './ConnectionsContext'
+import { authHeaders, getToken } from '../utils/auth'
 
 const POLL_INTERVAL_MS = 5000
-
-function authHeaders() {
-  const token = getToken()
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
 
 export function ConnectionsProvider({ children }) {
   const [currentUserId, setCurrentUserId] = useState(null)
@@ -17,75 +11,60 @@ export function ConnectionsProvider({ children }) {
   const [accepted, setAccepted] = useState([])
   const currentUserIdRef = useRef(null)
 
-  const fetchConnections = useCallback((userId) => {
+  const fetchConnections = useCallback(() => {
     const headers = authHeaders()
-    if (!userId || !headers.Authorization) return
+    if (!headers.Authorization) return
 
-    fetch(`/api/connections/${userId}/pending`, { headers })
+    fetch('/api/connections/pending', { headers })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setPending(data.pending || []) })
       .catch(() => {})
 
-    fetch(`/api/connections/${userId}/sent`, { headers })
+    fetch('/api/connections/sent', { headers })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setSent(data.sent || []) })
       .catch(() => {})
 
-    fetch(`/api/connections/${userId}`, { headers })
+    fetch('/api/connections/accepted', { headers })
       .then(res => res.ok ? res.json() : null)
       .then(data => { if (data) setAccepted(data.accepted || []) })
       .catch(() => {})
   }, [])
 
   useEffect(() => {
-    const token = getToken()
+    let cancelled = false
 
-    if (!token) {
-      setCurrentUserId(null)
-      currentUserIdRef.current = null
-      setPending([])
-      setSent([])
-      setAccepted([])
-      return
-    }
+    async function tick() {
+      const token = getToken()
+      if (!token) {
+        if (currentUserIdRef.current) {
+          currentUserIdRef.current = null
+          setCurrentUserId(null)
+        }
+        return
+      }
 
-    fetch('/api/auth/me', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => (res.ok ? res.json() : null))
-      .then(data => {
-        const userId = data?.user?.id || null
-        setCurrentUserId(userId)
-        currentUserIdRef.current = userId
-
-        if (!userId) {
-          setPending([])
-          setSent([])
-          setAccepted([])
+      if (!currentUserIdRef.current) {
+        try {
+          const res = await fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+          if (cancelled || !res.ok) return
+          const data = await res.json()
+          if (cancelled) return
+          const userId = data?.user?.id || null
+          currentUserIdRef.current = userId
+          setCurrentUserId(userId)
+          if (!userId) return
+        } catch {
           return
         }
-
-        fetchConnections(userId)
-      })
-      .catch(() => {
-        setCurrentUserId(null)
-        currentUserIdRef.current = null
-        setPending([])
-        setSent([])
-        setAccepted([])
-      })
-  }, [fetchConnections])
-
-  // Poll for new pending requests every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const userId = currentUserIdRef.current
-      if (userId) {
-        fetchConnections(userId)
       }
-    }, POLL_INTERVAL_MS)
 
-    return () => clearInterval(interval)
+      fetchConnections()
+    }
+
+    tick()
+    const interval = setInterval(tick, POLL_INTERVAL_MS)
+    return () => { cancelled = true; clearInterval(interval) }
   }, [fetchConnections])
 
   function sendRequest(toUserId) {

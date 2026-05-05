@@ -71,7 +71,7 @@ async function sendRequest(req, res, next) {
 }
 
 async function getPending(req, res, next) {
-  const { userId } = req.params;
+  const userId = req.auth.userId;
 
   try {
     const rows = await Connection.find({
@@ -96,7 +96,7 @@ async function getPending(req, res, next) {
 }
 
 async function getAccepted(req, res, next) {
-  const { userId } = req.params;
+  const userId = req.auth.userId;
 
   try {
     const rows = await Connection.find({
@@ -122,7 +122,7 @@ async function getAccepted(req, res, next) {
 }
 
 async function getSent(req, res, next) {
-  const { userId } = req.params;
+  const userId = req.auth.userId;
 
   try {
     const rows = await Connection.find({

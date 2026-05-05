@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
 import { ConnectionsContext } from '../../context/ConnectionsContext'
+import { getToken } from '../../utils/auth'
 import SwipePage from '../SwipePage'
 import './searchPage.css'
 
@@ -113,14 +114,22 @@ export default function SearchPage() {
     if (applied.schools.length) params.set('school', applied.schools.join(','))
     if (applied.roles.length) params.set('role', applied.roles.join(','))
 
-    setLoading(true)
-    fetch(`/api/users/search?${params}`, {
-      headers: currentUserId ? { 'x-current-user-id': currentUserId } : {},
+    const token = getToken()
+    if (!token) return
+
+    let cancelled = false
+    Promise.resolve().then(() => {
+      if (cancelled) return
+      setLoading(true)
+      fetch(`/api/users/search?${params}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(res => res.json())
+        .then(json => { if (!cancelled) setPeople(json.data || []) })
+        .catch(err => { if (!cancelled) console.error('Search fetch failed:', err) })
+        .finally(() => { if (!cancelled) setLoading(false) })
     })
-      .then(res => res.json())
-      .then(json => setPeople(json.data || []))
-      .catch(err => console.error('Search fetch failed:', err))
-      .finally(() => setLoading(false))
+    return () => { cancelled = true }
   }, [query, applied, pending, accepted, currentUserId])
 
   const toggleMulti = (key, value) => {

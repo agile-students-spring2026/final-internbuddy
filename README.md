@@ -133,13 +133,14 @@ InternBuddy is appropriately scoped for a team of 4–6 programmers to complete 
 
 ### Minimum Viable Product (MVP)
 
-The initial MVP will focus on the following core features:
+The initial MVP focuses on the following core features:
 
-- **Account creation and profile setup**
-- **Login, logout, and password reset**
-- **Intern discovery** filtered by company, city, and internship dates
-- **City-based and company-based groups**
-- **Basic meetup event creation and viewing** on an events page
+- **Account creation and profile setup** — multi-step onboarding (name, location, school, internship, interests, etc.)
+- **Login and logout** with JWT-backed sessions
+- **Intern discovery** filtered by company, city, school, and role, with degree-of-connection and mutual-connection ranking
+- **Swipe-based recommendations** to surface potential connections
+- **Connection requests** (send, accept, reject, cancel) and a connections list
+- **Meetup events** — create, list, join, and leave public or private events
 
 These features establish the core user experience while keeping technical complexity manageable.
 
@@ -147,7 +148,7 @@ These features establish the core user experience while keeping technical comple
 
 Once a stable initial product is deployed, the following stretch goals can be pursued:
 
-- **Direct messaging between users**  
+- **Direct messaging between users** *(implemented post-MVP)*  
   Enable one-on-one communication between interns to coordinate meetups or ask questions.
 
 - **Event discussion threads**  

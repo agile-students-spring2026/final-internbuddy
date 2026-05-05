@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { EventsProvider } from './context/EventsContext';
-import { ProfileProvider } from './context/ProfileContext';
-import { ConnectionsProvider } from './context/ConnectionsContext';
+import { EventsProvider } from './context/EventsProvider';
+import { ProfileProvider } from './context/ProfileProvider';
+import { ConnectionsProvider } from './context/ConnectionsProvider';
 
 import LoginPage from './pages/LoginPage';
 import ConnectionsPage from "./pages/ConnectionsPage";

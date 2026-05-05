@@ -1,49 +1,24 @@
-import { useState } from 'react'
-import { getToken, getCurrentUserId } from '../utils/auth'
+import { useContext, useState } from 'react'
+import { EventsContext } from '../context/EventsContext'
+import { getCurrentUserId } from '../utils/auth'
 import './EventCard.css'
 
-function EventCard({ event, onJoin, onLeave }) {
+function EventCard({ event }) {
+  const { joinEvent, leaveEvent } = useContext(EventsContext)
   const currentUserId = getCurrentUserId()
   const isHost = currentUserId && String(event.createdBy) === String(currentUserId)
-  const [attendees, setAttendees] = useState(event.attendees || [])
+  const isJoined = currentUserId && (event.attendees || []).some(a => String(a) === String(currentUserId))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  const isJoined = currentUserId && attendees.some(a => String(a) === String(currentUserId))
-
-  const handleJoin = async () => {
+  const handleClick = async () => {
     setLoading(true)
     setError('')
     try {
-      const res = await fetch(`/api/events/${event.id}/join`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${getToken()}` },
-      })
-      const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Failed to join'); return }
-      setAttendees(data.attendees || [])
-      onJoin?.(data)
-    } catch {
-      setError('Something went wrong')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleLeave = async () => {
-    setLoading(true)
-    setError('')
-    try {
-      const res = await fetch(`/api/events/${event.id}/leave`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${getToken()}` },
-      })
-      const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Failed to leave'); return }
-      setAttendees(data.attendees || [])
-      onLeave?.(data)
-    } catch {
-      setError('Something went wrong')
+      if (isJoined) await leaveEvent(event.id)
+      else await joinEvent(event.id)
+    } catch (err) {
+      setError(err.message || 'Something went wrong')
     } finally {
       setLoading(false)
     }
@@ -64,7 +39,7 @@ function EventCard({ event, onJoin, onLeave }) {
       {!isHost && (
         <button
           className={`event-join-btn ${isJoined ? 'joined' : ''}`}
-          onClick={isJoined ? handleLeave : handleJoin}
+          onClick={handleClick}
           disabled={loading}
         >
           {loading ? '…' : isJoined ? 'Joined ✓' : 'Join Meetup'}

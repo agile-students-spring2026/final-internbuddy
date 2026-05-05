@@ -21,8 +21,11 @@ function CreateProfileDobPage() {
 
         <input
           className="create-profile-input"
-          type="month"
+          type={startMonth ? 'month' : 'text'}
+          placeholder="Start month (e.g. May 2026)"
           value={startMonth}
+          onFocus={(e) => { e.target.type = 'month' }}
+          onBlur={(e) => { if (!e.target.value) e.target.type = 'text' }}
           onChange={(e) => setStartMonth(e.target.value)}
         />
 
@@ -44,8 +47,11 @@ function CreateProfileDobPage() {
         {!currentInternship && (
           <input
             className="create-profile-input"
-            type="month"
+            type={endMonth ? 'month' : 'text'}
+            placeholder="End month (e.g. Aug 2026)"
             value={endMonth}
+            onFocus={(e) => { e.target.type = 'month' }}
+            onBlur={(e) => { if (!e.target.value) e.target.type = 'text' }}
             onChange={(e) => setEndMonth(e.target.value)}
           />
         )}
