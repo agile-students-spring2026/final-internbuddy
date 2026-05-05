@@ -58,6 +58,35 @@ InternBuddy - Helping interns find community faster
   npm run build
   ```
 
+# Run with Docker
+
+Containerized setup builds the React frontend (served via nginx on port 80) and the Express backend (port 3001) and wires them together so requests to `/api/*` on the frontend are reverse-proxied to the backend container.
+
+## Prerequisites
+- Docker Desktop (or Docker Engine 24+) with Docker Compose v2
+- A populated `back-end/.env` file (see "Run Locally" above)
+
+## Build and run all services
+From the repository root:
+```bash
+docker compose up --build
+```
+
+The first build takes a few minutes. Once running:
+- Frontend: http://localhost
+- Backend health check: http://localhost:3001/api/health
+- Frontend → backend proxy: http://localhost/api/health
+
+## Stop the stack
+```bash
+docker compose down
+```
+
+## Rebuild after code changes
+```bash
+docker compose up --build --force-recreate
+```
+
 # What and Why?
 
 InternBuddy is a mobile web application designed to help students connect with other students who are interning at the same company, in the same city, or during the same time period. Every summer, thousands of interns relocate to new cities where they know very few people. While internships are professionally exciting, they can also be socially isolating and logistically overwhelming.
