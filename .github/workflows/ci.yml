@@ -19,6 +19,12 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Cache mongodb-memory-server binary
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/mongodb-binaries
+          key: mongodb-memory-server-${{ runner.os }}
+
       - name: Install backend dependencies
         working-directory: back-end
         run: npm install
@@ -31,6 +37,7 @@ jobs:
           JWT_SECRET: test-secret-for-ci
           PORT: 3001
           ALLOW_IN_MEMORY_DB: 'true'
+          MONGOMS_CACHE_PATH: ~/.cache/mongodb-binaries
 
       - name: Install frontend dependencies
         working-directory: front-end
