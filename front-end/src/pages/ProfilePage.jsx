@@ -82,11 +82,6 @@ export default function ProfilePage() {
 
   const { pending, acceptRequest, rejectRequest } = useContext(ConnectionsContext);
 
-  // const [friendRequests] = useState([
-  //   { id: 1, name: "Alex Chen", role: "pm intern @ Meta", mutual: 4 },
-  //   { id: 2, name: "Priya S.", role: "design intern @ Figma", mutual: 2 },
-  // ]);
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -630,32 +625,6 @@ export default function ProfilePage() {
 
             <h2 className="page-title">Friend Requests</h2>
 
-            {/* {pending.map((r) => (
-              <div key={r.id} className="request-card">
-                <div className="req-avatar">{r.name[0]}</div>
-                <div className="req-info">
-                  <p className="req-name">{r.name}</p>
-                  <p className="req-role">{r.role}</p>
-                  <p className="req-mutual">{r.mutual} mutual connections</p>
-                </div>
-                <div className="req-actions">
-                <button
-                  className="btn-primary small"
-                  onClick={() => acceptRequest(r.id)}
-                >
-                  Accept
-                </button>
-
-                <button
-                  className="btn-ghost small"
-                  onClick={() => rejectRequest(r.id)}
-                >
-                  Ignore
-                </button>
-                </div>
-              </div>
-            ))} */}
-            
             {pending.length === 0 ? (
               <p className="about-text">No friend requests yet.</p>
             ) : (
