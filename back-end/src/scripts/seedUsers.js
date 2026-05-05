@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const Profile = require('../models/Profile');
-const Connection = require('../models/Connection');
+
 require('dotenv').config();
 
 const seedUsers = [
@@ -13,7 +13,8 @@ const seedUsers = [
     major: 'Computer Science @ Stanford',
     internship: 'SWE Intern @ Airbnb',
     location: 'San Francisco, CA | May 2026 - Aug 2026',
-    about: 'Full-stack intern who loves coffee shops, design systems, and weekend hikes.',
+    about:
+      'Full-stack intern who loves coffee shops, design systems, and weekend hikes.',
     personality: 'ENFJ',
     interests: ['☕ Cafes', '✈️ Travel', '🎵 Concerts'],
   },
@@ -24,7 +25,8 @@ const seedUsers = [
     major: 'Software Engineering @ Waterloo',
     internship: 'SWE Intern @ Google',
     location: 'New York, NY | Jun 2026 - Sep 2026',
-    about: 'Backend intern into distributed systems, basketball, and late-night pizza.',
+    about:
+      'Backend intern into distributed systems, basketball, and late-night pizza.',
     personality: 'INTJ',
     interests: ['🍕 Foodie', '🎮 Gaming', '📚 Reading'],
   },
@@ -35,7 +37,8 @@ const seedUsers = [
     major: 'Design @ NYU',
     internship: 'Design Intern @ Figma',
     location: 'New York, NY | May 2026 - Aug 2026',
-    about: 'Product design intern. Always down for galleries, cafes, and photo walks.',
+    about:
+      'Product design intern. Always down for galleries, cafes, and photo walks.',
     personality: 'ISFP',
     interests: ['🎨 Art', '📷 Photography', '☕ Cafes'],
   },
@@ -51,32 +54,30 @@ async function seed() {
     const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 12);
 
     for (const seed of seedUsers) {
-      // smaller User collection document
+      // USER COLLECTION (small schema)
       const user = await User.findOneAndUpdate(
         { email: seed.email },
         {
           $setOnInsert: {
             email: seed.email,
             passwordHash,
-            verified: true,
-            verifiedAt: new Date(),
-            onboardingCompleted: true,
             interests: [],
             connections: [],
           },
           $set: {
-            onboardingCompleted: true,
             verified: true,
+            verifiedAt: new Date(),
+            onboardingCompleted: true,
           },
         },
         {
-          new: true,
           upsert: true,
+          returnDocument: 'after',
           runValidators: true,
         }
       );
 
-      // larger Profile collection document
+      // PROFILE COLLECTION (large schema)
       await Profile.findOneAndUpdate(
         { userId: user._id },
         {
@@ -102,19 +103,23 @@ async function seed() {
           },
         },
         {
-          new: true,
           upsert: true,
+          returnDocument: 'after',
           runValidators: true,
         }
       );
 
-      console.log(`Seeded/updated ${seed.email}`);
+      console.log(`Seeded ${seed.email}`);
     }
 
-    console.log('Done seeding users and profiles without deleting existing data');
+    console.log('Finished seeding users + profiles');
+    console.log(`Password for all accounts: ${DEFAULT_PASSWORD}`);
+
+    await mongoose.disconnect();
     process.exit(0);
   } catch (err) {
     console.error('Seed failed:', err);
+    await mongoose.disconnect();
     process.exit(1);
   }
 }
