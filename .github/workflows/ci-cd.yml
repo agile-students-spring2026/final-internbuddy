@@ -66,7 +66,7 @@ jobs:
           username: ${{ secrets.DO_USER }}
           key: ${{ secrets.DO_SSH_KEY }}
           script: |
-            cd /var/www/final-internbuddy
+            set -e
+            cd /var/www/internbuddy
             git pull origin master
-            docker compose down
             docker compose up -d --build
