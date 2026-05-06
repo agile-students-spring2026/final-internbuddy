@@ -69,9 +69,4 @@ jobs:
             set -e
             cd /var/www/internbuddy
             git pull origin master
-            cd back-end
-            npm ci --omit=dev
-            cd ../front-end
-            npm ci
-            npm run build
-            pm2 restart internbuddy-api --update-env
+            docker compose up -d --build
